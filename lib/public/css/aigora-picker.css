@@ -55,6 +55,7 @@
 .ai-at-heading{padding:5px 10px;color:var(--text-muted);font-size:11px;font-weight:600}
 .ai-member-mention{display:inline;padding:1px 5px;border-radius:6px;background:var(--accent-soft);color:var(--accent-text);font-weight:600;box-decoration-break:clone;-webkit-box-decoration-break:clone}
 .ai-member-mention.is-me{background:var(--accent-fill);color:var(--on-accent);box-shadow:0 0 0 1px var(--accent-fill)}
+.message.me .bubble .ai-member-mention{background:transparent;color:var(--bubble-mine-text);font-weight:600;box-shadow:none}
 #ai-member-mentions{margin-bottom:6px}
 
 .ai-at-list .ai-pick-opt[aria-selected="true"]{background:var(--accent-soft);color:var(--accent-text);box-shadow:inset 3px 0 0 var(--accent-fill)}

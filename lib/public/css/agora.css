@@ -246,6 +246,22 @@
 .ai-usage-sidebar .ai-usage-popover { top: auto; right: 0; bottom: calc(100% + 8px); width: 100%; max-width: none; box-sizing: border-box; padding: 12px; }
 .ai-usage-sidebar .ai-usage-head { top: -12px; margin: -12px -12px 6px; padding: 10px 12px 6px; }
 .ai-usage-sidebar .ai-usage-provider { min-width: 0; padding: 10px; }
+@media (min-width: 769px) {
+  /* Fixed positioning can retain a wider width; keep English rows inside the sidebar. */
+  .ai-usage-sidebar { min-width: 0; }
+  .ai-usage-sidebar .ai-usage-popover { max-width: calc(var(--ag-sidebar-w, 288px) - 24px); overflow-x: hidden; }
+  .ai-usage-sidebar .ai-usage-provider-head { min-width: 0; max-width: 100%; flex: 0 1 auto; }
+  .ai-usage-sidebar .ai-usage-message,
+  .ai-usage-sidebar .ai-usage-metrics,
+  .ai-usage-sidebar .ai-usage-pool-name,
+  .ai-usage-sidebar .ai-usage-window-name,
+  .ai-usage-sidebar .ai-usage-title,
+  .ai-usage-sidebar .ai-usage-fresh,
+  .ai-usage-sidebar .ai-usage-legend { min-width: 0; white-space: normal; overflow-wrap: anywhere; }
+  .ai-usage-sidebar .ai-usage-window-name { flex: 0 1 auto; }
+  .ai-usage-sidebar .ai-usage-window-value,
+  .ai-usage-sidebar .ai-usage-refresh { flex: none; }
+}
 /* Docked: at <=768px the sidebar is hidden, so the same widget is moved into the
    mobile More sheet (ai-usage.js dockAiUsage). Its details open inline, below
    the button, instead of floating above it. */

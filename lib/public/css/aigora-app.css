@@ -112,7 +112,7 @@ button,textarea{font:inherit;color:inherit} h1,h2,p{margin:0} .hidden{display:no
 .ai-working{color:var(--text-muted);font-size:12px;margin:0 0 16px}
 .ai-composer{margin:0 max(34px,8vw) 20px;padding:10px 12px;border:1px solid var(--composer-border);border-radius:17px;background:var(--composer-bg);box-shadow:0 8px 30px rgba(var(--shadow-rgb),.10)}
 .ai-composer-row{display:flex;align-items:flex-end;gap:10px}
-.ai-input{flex:1;min-height:28px;max-height:180px;resize:none;border:0;outline:0;background:transparent;font-size:13px;line-height:1.5;padding:4px 0}
+.ai-input{flex:1;min-height:28px;max-height:180px;resize:none;overflow-y:hidden;border:0;outline:0;background:transparent;font-size:13px;line-height:1.5;padding:4px 0}
 .ai-input:disabled{cursor:not-allowed}
 .ai-send{width:30px;height:30px;border:0;border-radius:50%;background:var(--accent-fill);color:var(--on-accent);font-size:16px;cursor:pointer}
 .ai-send:disabled{background:var(--disabled);cursor:not-allowed}
@@ -914,7 +914,7 @@ html:lang(ko) .bubble,html:lang(ko) .ai-c p,html:lang(ko) .ai-notif p,html:lang(
   .ai-notices{margin-inline:12px}
   .ai-settings-nav{mask-image:linear-gradient(to right,transparent,black 6px,black calc(100% - 12px),transparent);scroll-padding-inline:12px}
   .ai-settings-nav-item{flex:0 0 auto}
-  .ai-offline{top:calc(64px + env(safe-area-inset-top));left:12px;right:12px;border-radius:10px}
+  .ai-offline{position:static;margin:0 12px;border-radius:10px}
   #layout .ai-side-foot .ai-account{justify-self:end;align-self:center}
   #layout .ai-side-foot .ai-account-btn{display:flex;align-items:center;justify-content:center;line-height:1}
   #layout .ai-side-foot .ai-account-avatar{display:flex;align-items:center;justify-content:center;line-height:1}
