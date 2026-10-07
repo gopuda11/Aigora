@@ -1,0 +1,1932 @@
+/* ==========================================================================
+   Icon Strip — Discord-style vertical server/project bar
+   ========================================================================== */
+
+#icon-strip {
+  position: relative;
+  width: 72px;
+  flex-shrink: 0;
+  background: var(--sidebar-bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 0 64px;
+  overflow: hidden;
+  z-index: 2;
+}
+
+/* --- Home / App icon (top) --- */
+.icon-strip-home {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  border-radius: 0;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  text-decoration: none;
+  color: var(--text);
+  flex-shrink: 0;
+}
+
+.icon-strip-home::before {
+  content: "";
+  position: absolute;
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  background: var(--bg-alt);
+  transition: background 0.2s ease;
+  z-index: -1;
+}
+
+.icon-strip-home:hover::before {
+  background: var(--accent);
+}
+
+.icon-strip-home .icon-strip-logo {
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+}
+
+.icon-strip-home:hover .icon-strip-logo {
+  opacity: 0.8;
+}
+
+.icon-strip-home.active::before {
+  background: var(--accent);
+}
+
+/* First separator aligns with title bar border (48px line) */
+.icon-strip-home + .icon-strip-separator {
+  margin-top: 0;
+}
+
+/* --- Pill indicator (left side, Discord-style white bar) --- */
+.icon-strip-pill {
+  position: absolute;
+  left: -12px;
+  width: 4px;
+  background: var(--text);
+  border-radius: 0 4px 4px 0;
+  transition: height 0.2s ease, opacity 0.2s ease;
+  opacity: 0;
+  height: 0;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* Hover: short pill */
+.icon-strip-item:hover .icon-strip-pill {
+  opacity: 1;
+  height: 20px;
+}
+
+/* Active: tall pill */
+.icon-strip-item.active .icon-strip-pill {
+  opacity: 1;
+  height: 32px;
+}
+
+.icon-strip-home:hover .icon-strip-pill {
+  opacity: 1;
+  height: 20px;
+}
+
+.icon-strip-home.active .icon-strip-pill {
+  opacity: 1;
+  height: 32px;
+}
+
+/* --- Separator --- */
+.icon-strip-separator {
+  width: 32px;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--border);
+  margin: 4px 0;
+  flex-shrink: 0;
+}
+
+/* Keyboard-shortcut hint above each switchable strip section. Tiny
+   pill with the platform-specific chord; clicking opens the switcher
+   in that mode, same as the keyboard shortcut itself. */
+.icon-strip-hint {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  padding: 2px 4px;
+  margin: 2px 0;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-alt);
+  color: var(--text-dimmer);
+  font-size: 10px;
+  font-weight: 600;
+  font-family: inherit;
+  border-radius: 6px;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.15s, color 0.15s, background 0.15s;
+}
+.icon-strip-hint:hover {
+  opacity: 1;
+  color: var(--text-muted);
+  background: var(--bg);
+}
+.icon-strip-hint.hidden {
+  display: none;
+}
+
+/* --- Scrollable project list area --- */
+.icon-strip-projects {
+  width: 100%;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  padding: 0;
+  scrollbar-width: none;
+}
+
+.icon-strip-projects::-webkit-scrollbar {
+  display: none;
+}
+
+/* --- Project icon item (48px hit-box, 38px visible bg) --- */
+.icon-strip-item {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  border-radius: 0;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  color: var(--text-secondary);
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+  user-select: none;
+}
+
+.icon-strip-item::before {
+  content: "";
+  position: absolute;
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  background: var(--bg-alt);
+  transition: background 0.2s ease;
+  z-index: -1;
+}
+
+.icon-strip-item:hover::before {
+  background: var(--accent);
+}
+
+.icon-strip-item:hover {
+  color: #fff;
+}
+
+.icon-strip-item.active::before {
+  background: var(--accent);
+}
+
+.icon-strip-item.active {
+  color: #fff;
+}
+
+/* --- Socket status indicator on icon (top-left dot) --- */
+.icon-strip-status {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--text-dimmer);
+  border: 2px solid var(--sidebar-bg);
+  opacity: 0;
+  transition: opacity 0.2s, background 0.3s;
+}
+
+/* Show dot only on active item or when processing */
+.icon-strip-item.active .icon-strip-status,
+.icon-strip-wt-item.active .icon-strip-status,
+.icon-strip-status.processing {
+  opacity: 1;
+}
+
+/* Connected = green */
+.icon-strip-status.connected {
+  background: var(--success);
+}
+
+/* Processing = solid green (LED off state) */
+.icon-strip-status.processing {
+  background: var(--success);
+}
+
+/* Multi-user tone (lr-66c118): ring shape (transparent center, colored
+   border) instead of a filled disc, plus a distinct violet hue — hue alone
+   is not sufficient to distinguish "another user active" from "I'm active"
+   at 10px under a red/green color-vision deficiency. */
+.icon-strip-status.other {
+  opacity: 1;
+  background: transparent;
+  border-width: 2px;
+  border-color: var(--activity-other, #B77BF3);
+}
+
+/* Alert tone (lr-66c118): unread activity wins over processing green. */
+.icon-strip-status.alert {
+  opacity: 1;
+  background: var(--danger, #e74c3c);
+}
+
+/* IO blink = HDD LED flash */
+.icon-strip-status.io {
+  opacity: 1;
+  background: #fff !important;
+  box-shadow: 0 0 6px var(--success);
+  transition: none;
+}
+
+/* Pending permission shake */
+.icon-strip-item.has-pending-perm,
+.icon-strip-wt-item.has-pending-perm {
+  animation: permShake 2s ease-in-out infinite;
+}
+
+@keyframes permShake {
+  0%, 8% { transform: translateX(0); }
+  1% { transform: translateX(-2px); }
+  2% { transform: translateX(2px); }
+  3% { transform: translateX(-2px); }
+  4% { transform: translateX(2px); }
+  5% { transform: translateX(-1px); }
+  6% { transform: translateX(1px); }
+  7% { transform: translateX(0); }
+}
+
+/* --- Add project button --- */
+.icon-strip-add {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  border-radius: 0;
+  background: transparent;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  color: var(--success);
+  margin-top: 0;
+}
+
+.icon-strip-add::before {
+  content: "";
+  position: absolute;
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  background: var(--bg-alt);
+  transition: background 0.2s ease;
+  z-index: -1;
+}
+
+.icon-strip-add:hover::before {
+  background: var(--success);
+}
+
+.icon-strip-add:hover {
+  color: #fff;
+}
+
+.icon-strip-add .lucide {
+  width: 18px;
+  height: 18px;
+}
+
+/* --- Tooltip on hover --- */
+.icon-strip-tooltip {
+  position: fixed;
+  left: 76px;
+  background: var(--code-bg);
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 600;
+  padding: 8px 12px;
+  border-radius: 6px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateX(-4px);
+  transition: opacity 0.1s, transform 0.1s;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(var(--shadow-rgb), 0.5);
+}
+
+.icon-strip-tooltip.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.icon-strip-tooltip::before {
+  content: "";
+  position: absolute;
+  left: -6px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: 6px solid transparent;
+  border-right-color: var(--code-bg);
+  border-left: none;
+}
+
+/* --- Drag-and-drop reordering --- */
+.icon-strip-item.dragging {
+  opacity: 0.3;
+  transform: scale(0.9);
+}
+
+.icon-strip-item.drag-over-above::after {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 32px;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--accent);
+  z-index: 10;
+}
+
+.icon-strip-item.drag-over-below::after {
+  content: "";
+  position: absolute;
+  bottom: -1px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 32px;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--accent);
+  z-index: 10;
+}
+
+/* --- Trash zone (replaces add button during drag) --- */
+.icon-strip-trash {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  border-radius: 0;
+  background: transparent;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: #e57373;
+  animation: trashAppear 0.25s ease-out;
+}
+
+.icon-strip-trash::before {
+  content: "";
+  position: absolute;
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  background: var(--bg-alt);
+  transition: background 0.2s ease, transform 0.2s ease;
+  z-index: -1;
+}
+
+.icon-strip-trash .lucide {
+  width: 18px;
+  height: 18px;
+  transition: transform 0.2s ease;
+}
+
+.icon-strip-trash.drag-hover {
+  color: #fff;
+}
+
+.icon-strip-trash.drag-hover::before {
+  background: #e53935;
+  transform: scale(1.1);
+}
+
+.icon-strip-trash.drag-hover .lucide {
+  transform: scale(1.15) rotate(-8deg);
+}
+
+@keyframes trashAppear {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* --- Dust particles --- */
+.dust-particle {
+  position: fixed;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 10000;
+  animation: dustFly var(--dust-duration, 800ms) ease-out forwards;
+}
+
+@keyframes dustFly {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.5);
+  }
+  15% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--dust-x, 30px), var(--dust-y, -40px)) scale(0);
+  }
+}
+
+/* --- Project emoji icon --- */
+.icon-strip-item .project-emoji {
+  width: 22px;
+  height: 22px;
+  pointer-events: none;
+}
+
+.icon-strip-item .project-emoji img {
+  width: 22px;
+  height: 22px;
+  filter:
+    drop-shadow(1px 0 0 rgba(0,0,0,0.25))
+    drop-shadow(-1px 0 0 rgba(0,0,0,0.25))
+    drop-shadow(0 1px 0 rgba(0,0,0,0.25))
+    drop-shadow(0 -1px 0 rgba(0,0,0,0.25))
+    drop-shadow(0 0 4px rgba(255,255,255,0.35));
+}
+
+/* Custom-image icon rendered as <img> (project-icon.js) */
+.project-emoji-img {
+  display: block;
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+/* Hub project icon rendered via renderProjectIcon */
+.hub-project-icon .project-emoji-img {
+  width: 18px;
+  height: 18px;
+}
+
+/* --- Custom emoji picker panel --- */
+.emoji-picker-custom-panel {
+  width: 100%;
+}
+
+.emoji-picker-slug-confirm {
+  padding: 6px 0 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.emoji-picker-slug-confirm.hidden {
+  display: none;
+}
+
+.emoji-picker-slug-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.emoji-picker-slug-input {
+  width: 100%;
+  box-sizing: border-box;
+  background: var(--input-bg, var(--bg-secondary));
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 13px;
+  padding: 5px 8px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.emoji-picker-slug-input:focus {
+  border-color: var(--accent, #7c6cf8);
+}
+
+.emoji-picker-slug-actions {
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+.emoji-picker-slug-actions button {
+  padding: 4px 12px;
+  border-radius: 5px;
+  font-size: 12px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: var(--bg-alt);
+  color: var(--text-secondary);
+  transition: background 0.15s;
+}
+
+.emoji-picker-slug-actions button:hover {
+  background: var(--bg-hover, var(--bg-alt));
+  color: var(--text);
+}
+
+.emoji-picker-slug-actions button.primary {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
+.emoji-picker-slug-actions button.primary:hover {
+  opacity: 0.9;
+}
+
+/* Upload tile in the custom emoji grid */
+.emoji-picker-upload-tile {
+  font-size: 22px;
+  font-weight: 300;
+  color: var(--text-dimmer);
+  border: 1.5px dashed var(--border);
+  border-radius: 6px;
+  background: transparent;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+
+.emoji-picker-upload-tile:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: rgba(var(--accent-rgb, 124, 58, 237), 0.06);
+  transform: none;
+}
+
+/* Individual custom-emoji tile (image + delete button) */
+.emoji-picker-custom-tile {
+  position: relative;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.emoji-picker-custom-tile:hover {
+  background: rgba(var(--overlay-rgb), 0.08);
+}
+
+.emoji-picker-custom-img {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  border-radius: 4px;
+  display: block;
+}
+
+.emoji-picker-custom-delete {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--error, #ef4444);
+  color: #fff;
+  font-size: 12px;
+  line-height: 1;
+  border: none;
+  cursor: pointer;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  z-index: 2;
+}
+
+.emoji-picker-custom-tile:hover .emoji-picker-custom-delete {
+  display: flex;
+}
+
+.emoji-picker-custom-empty {
+  font-size: 12px;
+  color: var(--text-tertiary, var(--text-dimmer));
+  padding: 8px 4px;
+  text-align: center;
+}
+
+/* --- Mobile-responsive emoji picker --- */
+@media (max-width: 768px) {
+  .emoji-picker {
+    /* On mobile, stretch to fill most of the viewport width, but never
+       past it — clamp against 100vw/100vh so the picker can't overflow
+       regardless of where the anchor that triggered it was positioned. */
+    width: calc(100vw - 24px);
+    max-width: min(340px, calc(100vw - 24px));
+    /* Limit height so it doesn't cover the entire screen, and clamp the
+       same way vertically. sidebar-projects.js (positionEmojiPicker)
+       centers the picker in the viewport on mobile and sets inline
+       top/left in px — it intentionally does not use left/right, so
+       nothing here should set them (a prior !important left/right pair
+       fought the JS top clamp and pushed the picker off-screen; lr-149e). */
+    max-height: min(70vh, calc(100vh - 24px));
+    overflow: hidden;
+  }
+
+  .emoji-picker-scroll {
+    max-height: calc(min(70vh, 100vh - 24px) - 120px);
+  }
+
+  .emoji-picker-grid {
+    /* Reduce from 8 to 6 columns on narrow screens */
+    grid-template-columns: repeat(6, 1fr);
+  }
+
+  /* Custom panel on mobile: upload tile + grid both need to fit the narrower layout */
+  .emoji-picker-custom-tile,
+  .emoji-picker-upload-tile {
+    width: 40px;
+    height: 40px;
+  }
+
+  .emoji-picker-custom-img {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+/* --- Project context menu --- */
+.project-ctx-menu {
+  position: fixed;
+  background: var(--sidebar-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 4px 0;
+  min-width: 180px;
+  box-shadow: 0 4px 16px rgba(var(--shadow-rgb), 0.4);
+  z-index: 9999;
+  animation: ctxMenuAppear 0.12s ease-out;
+}
+
+@keyframes ctxMenuAppear {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.project-ctx-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 14px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  background: none;
+  border: none;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.project-ctx-item .lucide { width: 15px; height: 15px; flex-shrink: 0; }
+.project-ctx-item:hover { background: rgba(var(--overlay-rgb), 0.06); color: var(--text); }
+.project-ctx-item:first-child { border-radius: 6px 6px 0 0; }
+.project-ctx-item:last-child { border-radius: 0 0 6px 6px; }
+
+.project-ctx-separator {
+  height: 1px;
+  background: var(--border);
+  margin: 4px 0;
+}
+
+.project-ctx-item.project-ctx-delete { color: var(--error); }
+.project-ctx-item.project-ctx-delete:hover { background: var(--error-8); }
+
+/* --- Project Access Popover --- */
+.project-access-popover {
+  position: fixed;
+  background: var(--sidebar-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0;
+  width: 260px;
+  box-shadow: 0 8px 30px rgba(var(--shadow-rgb), 0.35);
+  z-index: 9999;
+  animation: ctxMenuAppear 0.12s ease-out;
+  overflow: hidden;
+}
+.project-access-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px 8px;
+  border-bottom: 1px solid var(--border);
+}
+.project-access-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+.project-access-close {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 18px;
+  cursor: pointer;
+  padding: 0 2px;
+  line-height: 1;
+}
+.project-access-close:hover { color: var(--text); }
+.project-access-section {
+  padding: 10px 14px;
+}
+.project-access-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 6px;
+}
+.project-access-vis-row {
+  display: flex;
+  gap: 6px;
+}
+.project-access-vis-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 7px 0;
+  font-size: 12px;
+  font-family: inherit;
+  color: var(--text-secondary);
+  background: rgba(var(--overlay-rgb), 0.04);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.project-access-vis-btn .lucide { width: 14px; height: 14px; }
+.project-access-vis-btn:hover { background: rgba(var(--overlay-rgb), 0.08); }
+.project-access-vis-btn.active {
+  background: var(--accent-8, rgba(99, 102, 241, 0.08));
+  border-color: var(--accent, #6366f1);
+  color: var(--accent, #6366f1);
+  font-weight: 500;
+}
+.project-access-user-list {
+  max-height: 200px;
+  overflow-y: auto;
+}
+.project-access-user-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 0;
+  font-size: 13px;
+  color: var(--text);
+  cursor: pointer;
+}
+.project-access-user-item input[type="checkbox"] {
+  accent-color: var(--accent, #6366f1);
+  width: 15px;
+  height: 15px;
+  cursor: pointer;
+}
+.project-access-user-item:hover { color: var(--text); }
+.project-access-empty {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  padding: 8px 0;
+}
+.project-access-loading {
+  padding: 20px 14px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+/* --- Emoji picker popover --- */
+.emoji-picker {
+  position: fixed;
+  background: var(--sidebar-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 10px 6px;
+  width: 292px;
+  box-shadow: 0 8px 24px rgba(var(--shadow-rgb), 0.5);
+  z-index: 10001;
+  animation: ctxMenuAppear 0.15s ease-out;
+  display: flex;
+  flex-direction: column;
+}
+
+.emoji-picker-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 4px 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  flex-shrink: 0;
+}
+
+.emoji-picker-remove {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--error);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: inherit;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.emoji-picker-remove:hover {
+  background: var(--error-8);
+}
+
+/* Search */
+.emoji-picker-search-wrap {
+  padding: 0 0 6px;
+  flex-shrink: 0;
+}
+
+.emoji-picker-search {
+  width: 100%;
+  box-sizing: border-box;
+  background: var(--input-bg, var(--bg-secondary));
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 13px;
+  padding: 5px 8px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.emoji-picker-search:focus {
+  border-color: var(--accent, #7c6cf8);
+}
+
+.emoji-picker-search::placeholder {
+  color: var(--text-secondary);
+}
+
+.emoji-picker-no-results {
+  padding: 16px 0;
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+/* Category tab bar */
+.emoji-picker-tabs {
+  display: flex;
+  gap: 1px;
+  padding: 0 0 6px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 6px;
+  flex-shrink: 0;
+}
+
+.emoji-picker-tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 30px;
+  border: none;
+  background: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 0;
+  opacity: 0.5;
+  transition: opacity 0.15s, background 0.15s;
+}
+
+.emoji-picker-tab:hover {
+  opacity: 0.8;
+  background: rgba(var(--overlay-rgb), 0.06);
+}
+
+.emoji-picker-tab.active {
+  opacity: 1;
+  background: rgba(var(--overlay-rgb), 0.1);
+}
+
+.emoji-picker-tab img.emoji {
+  width: 18px;
+  height: 18px;
+}
+
+/* Scrollable emoji grid */
+.emoji-picker-scroll {
+  max-height: 280px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+.emoji-picker-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+
+.emoji-picker-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.emoji-picker-scroll::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 2px;
+}
+
+.emoji-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 2px;
+}
+
+.emoji-picker-item {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 20px;
+  transition: background 0.1s, transform 0.1s;
+  padding: 0;
+}
+
+.emoji-picker-item:hover {
+  background: rgba(var(--overlay-rgb), 0.08);
+  transform: scale(1.15);
+}
+
+.emoji-picker-item img.emoji {
+  width: 22px;
+  height: 22px;
+}
+
+/* --- Permanent Teams button (always visible, opens team panel) --- */
+.icon-strip-team-btn {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  border-radius: 0;
+  background: transparent;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  color: var(--text-secondary);
+}
+
+.icon-strip-team-btn::before {
+  content: "";
+  position: absolute;
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  background: var(--bg-alt);
+  transition: background 0.2s ease;
+  z-index: -1;
+}
+
+.icon-strip-team-btn:hover::before {
+  background: var(--accent);
+}
+
+.icon-strip-team-btn:hover {
+  color: #fff;
+}
+
+.icon-strip-team-btn.active::before {
+  background: var(--accent);
+}
+
+.icon-strip-team-btn.active {
+  color: #fff;
+}
+
+.icon-strip-team-btn .lucide {
+  width: 20px;
+  height: 20px;
+  position: relative;
+  z-index: 1;
+}
+
+
+/* Project unread badge */
+.icon-strip-project-badge {
+  position: absolute;
+  top: 1px;
+  right: 1px;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 9px;
+  background: #e74c3c;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 0 5px;
+  line-height: 18px;
+  text-align: center;
+  box-shadow: 0 0 0 2px var(--bg);
+  z-index: 2;
+}
+
+.icon-strip-project-badge.has-unread {
+  display: flex;
+}
+
+/* --- My avatar at bottom of icon strip (always present, behind user-island) --- */
+/* Positioned to align with icon-strip center (72px / 2 = 36px) */
+/* Matches user-island avatar center: left:8px + padding:10px + 18px = 36px */
+.icon-strip-me {
+  position: absolute;
+  bottom: 19px; /* vertically center with user-island (bottom:8px + height:58px/2 - 16px) */
+  left: 36px;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  z-index: 1; /* below user-island z-index: 15 */
+}
+
+.icon-strip-me-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* --- DM user picker popup --- */
+.dm-user-picker {
+  position: fixed;
+  background: var(--sidebar-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 8px;
+  width: 300px;
+  max-height: 70vh;
+  overflow-y: auto;
+  box-shadow: 0 8px 24px rgba(var(--shadow-rgb), 0.5);
+  z-index: 10001;
+  animation: ctxMenuAppear 0.15s ease-out;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+.dm-user-picker-search {
+  width: 100%;
+  padding: 7px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-alt);
+  color: var(--text);
+  font-size: 13px;
+  font-family: inherit;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.dm-user-picker-search:focus {
+  border-color: var(--accent);
+}
+
+.dm-user-picker-search::placeholder {
+  color: var(--text-dimmer);
+}
+
+.dm-user-picker-list {
+  overflow: visible;
+}
+
+.dm-user-picker-list.dm-mates-list {
+  max-height: 336px;  /* ~7 items at ~48px each */
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+  mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
+}
+
+.dm-user-picker-list.dm-mates-list.scrolled-bottom {
+  mask-image: linear-gradient(to bottom, transparent 0%, black 35%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 35%);
+}
+
+.dm-user-picker-list.dm-mates-list.no-overflow {
+  mask-image: none;
+  -webkit-mask-image: none;
+}
+
+.dm-user-picker-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.dm-user-picker-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.dm-user-picker-list::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 2px;
+}
+
+.dm-user-picker-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.dm-user-picker-item:hover {
+  background: rgba(var(--overlay-rgb), 0.08);
+}
+
+.dm-user-picker-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.dm-user-picker-section {
+  padding: 6px 10px 2px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-dimmer, #6272a4);
+}
+
+.dm-user-picker-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dm-user-picker-empty {
+  padding: 12px 8px;
+  font-size: 13px;
+  color: var(--text-dimmer);
+  text-align: center;
+}
+
+.dm-picker-fav-btn,
+.dm-picker-del-btn {
+  flex-shrink: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  opacity: 0.5;
+  transition: opacity 0.15s, color 0.15s;
+}
+
+.dm-picker-fav-btn:hover,
+.dm-picker-del-btn:hover {
+  opacity: 1;
+}
+
+.dm-picker-del-btn:hover {
+  color: var(--danger, #e74c3c) !important;
+}
+
+.dm-picker-fav-btn svg,
+.dm-picker-del-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+.dm-picker-fav .dm-picker-fav-btn {
+  opacity: 1;
+}
+
+/* --- Worktree folder groups --- */
+.icon-strip-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.icon-strip-group .folder-header {
+  position: relative;
+}
+
+.icon-strip-group-chevron {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--bg-alt);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-dimmer);
+  pointer-events: auto;
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.15s, border-color 0.15s;
+  z-index: 2;
+  line-height: 1;
+}
+
+.icon-strip-group-chevron i,
+.icon-strip-group-chevron svg {
+  width: 10px;
+  height: 10px;
+}
+
+.icon-strip-group-chevron:hover {
+  background: var(--bg-hover, var(--bg-alt));
+  border-color: var(--text-dimmer);
+  color: var(--text-secondary);
+}
+
+.icon-strip-group.collapsed .icon-strip-group-chevron {
+  background: var(--border);
+}
+
+.icon-strip-group-items {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: hidden;
+  transition: max-height 0.2s ease;
+  max-height: 500px;
+  border-left: 3px solid var(--text-dimmer);
+  margin-left: 0;
+  padding-left: 0;
+}
+
+.icon-strip-group.collapsed .icon-strip-group-items {
+  max-height: 0;
+}
+
+/* Worktree items (smaller than regular project icons) */
+.icon-strip-wt-item {
+  width: 48px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: relative;
+  text-decoration: none;
+  color: var(--text-secondary);
+  transition: background 0.15s;
+}
+
+.icon-strip-wt-item::before {
+  content: "";
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  background: var(--bg-alt);
+  opacity: 0.7;
+  transition: opacity 0.15s, background 0.15s;
+}
+
+.icon-strip-wt-item:hover::before {
+  opacity: 1;
+}
+
+.icon-strip-wt-item.active::before {
+  background: var(--accent);
+  opacity: 1;
+}
+
+.icon-strip-wt-item.active {
+  color: #fff;
+}
+
+.icon-strip-wt-item .wt-branch-abbrev {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: -0.5px;
+  pointer-events: none;
+  position: relative;
+  z-index: 1;
+}
+
+/* Disabled/inaccessible worktree */
+.icon-strip-wt-item.wt-disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.icon-strip-wt-item.wt-disabled::after {
+  content: "\1F6AB";
+  position: absolute;
+  font-size: 14px;
+  z-index: 3;
+  filter: grayscale(0.3);
+}
+
+/* Group add button */
+.icon-strip-group-add {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  border: 1.5px dashed var(--border);
+  background: transparent;
+  color: var(--text-dimmer);
+  font-size: 16px;
+  font-weight: 400;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 2px 0 4px 0;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+
+.icon-strip-group-add:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: rgba(var(--accent-rgb, 124, 58, 237), 0.08);
+}
+
+/* --- Worktree creation modal --- */
+.wt-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 9998;
+}
+
+.wt-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 9999;
+  min-width: 340px;
+  max-width: 420px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.wt-modal-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+}
+
+.wt-modal-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin: 10px 0 4px 0;
+}
+
+.wt-modal-label:first-of-type {
+  margin-top: 0;
+}
+
+.wt-modal-input {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg-alt);
+  color: var(--text-primary);
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.wt-modal-input:focus {
+  border-color: var(--accent);
+}
+
+select.wt-modal-input {
+  appearance: auto;
+  cursor: pointer;
+}
+
+.wt-modal-error {
+  color: var(--error, #ef4444);
+  font-size: 12px;
+  margin-top: 8px;
+  display: none;
+}
+
+.wt-modal-error.visible {
+  display: block;
+}
+
+.wt-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.wt-modal-btn {
+  padding: 7px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: var(--bg-alt);
+  color: var(--text-primary);
+  font-family: inherit;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.wt-modal-btn:hover {
+  background: var(--bg-hover, var(--bg-alt));
+}
+
+.wt-modal-btn.primary {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
+.wt-modal-btn.primary:hover {
+  opacity: 0.9;
+}
+
+.wt-modal-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* --- Mobile worktree folder --- */
+.mobile-project-folder {
+  display: flex;
+  flex-direction: column;
+}
+
+.mobile-project-item.wt-item {
+  padding-left: 28px;
+  opacity: 0.85;
+}
+
+.mobile-project-item.wt-disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.mobile-folder-chevron {
+  font-size: 8px;
+  color: var(--text-dimmer);
+  margin-left: auto;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+  padding: 4px;
+}
+
+.mobile-project-folder.collapsed .mobile-folder-chevron {
+  transform: rotate(-90deg);
+}
+
+.mobile-folder-items {
+  overflow: hidden;
+  transition: max-height 0.2s ease;
+  max-height: 500px;
+}
+
+.mobile-project-folder.collapsed .mobile-folder-items {
+  max-height: 0;
+}
+
+/* --- Per-project presence avatars --- */
+/* --- Mobile: hide icon strip --- */
+/* --- Skeleton loading placeholders --- */
+@keyframes skeleton-shimmer {
+  0% { opacity: 0.15; }
+  50% { opacity: 0.25; }
+  100% { opacity: 0.15; }
+}
+.skeleton-icon-strip-item {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  background: var(--text-muted, #888);
+  margin: 5px auto;
+  animation: skeleton-shimmer 1.5s ease-in-out infinite;
+}
+
+@media (max-width: 768px) {
+  #icon-strip {
+    display: none;
+  }
+}
+
+/* ==========================================================================
+   Drag-to-merge: folder merge indicator on icon-strip items
+   ========================================================================== */
+
+.icon-strip-item.drag-over-merge {
+  transform: scale(1.1);
+  box-shadow: 0 0 0 2px var(--accent), 0 0 12px rgba(var(--accent-rgb, 88, 87, 252), 0.4);
+  border-radius: 14px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  z-index: 5;
+}
+
+/* ==========================================================================
+   User-defined folder groups in the icon strip
+   ========================================================================== */
+
+.icon-strip-folder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+/* The folder header — same 48px hit-box as project icons */
+.icon-strip-folder-header {
+  position: relative;
+  width: 48px;
+  min-height: 48px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: 0;
+  -webkit-tap-highlight-color: transparent;
+  color: var(--text-secondary);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+/* Left-edge pill indicator — same mechanic as .icon-strip-item .icon-strip-pill */
+.icon-strip-folder-header::before {
+  content: "";
+  position: absolute;
+  left: -12px;
+  width: 4px;
+  background: var(--text);
+  border-radius: 0 4px 4px 0;
+  transition: height 0.2s ease, opacity 0.2s ease;
+  opacity: 0;
+  height: 0;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.icon-strip-folder-header:hover::before {
+  opacity: 1;
+  height: 20px;
+}
+
+/* Folder open (not collapsed): pill shows to signal items are visible */
+.icon-strip-folder:not(.collapsed) .icon-strip-folder-header::before {
+  opacity: 1;
+  height: 28px;
+}
+
+/* Contains-active (collapsed, active project inside): tall pill */
+.icon-strip-folder-header.active::before {
+  opacity: 1;
+  height: 32px;
+}
+
+/* Inner colored box — mirrors .icon-strip-item::before in shape/size.
+   A subtle border ring is always present to signal "this is a folder". */
+.icon-strip-folder-icon-box {
+  position: relative;
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  background: var(--bg-alt);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease, border-radius 0.15s ease, box-shadow 0.2s ease;
+  flex-shrink: 0;
+  box-shadow: inset 0 0 0 1.5px rgba(var(--overlay-rgb), 0.15);
+}
+
+/* When open (not collapsed): box has slightly rounded corners to signal state */
+.icon-strip-folder:not(.collapsed) .icon-strip-folder-icon-box {
+  border-radius: 8px;
+}
+
+/* Folder SVG icon (fallback, no emoji set) */
+.icon-strip-folder-icon-box svg {
+  width: 22px;
+  height: 22px;
+  color: var(--text-secondary);
+  transition: color 0.15s;
+}
+
+/* Emoji fills the box — rendered as plain text at a readable size */
+.icon-strip-folder-emoji-main {
+  font-size: 22px;
+  line-height: 1;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Folders hover with accent2 (blue) to distinguish from project icons (cyan) */
+.icon-strip-folder-header:hover .icon-strip-folder-icon-box {
+  background: var(--accent2);
+  border-radius: 14px;
+  box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, 0.25);
+}
+
+.icon-strip-folder-header:hover .icon-strip-folder-icon-box svg {
+  color: #fff;
+}
+
+.icon-strip-folder-header.active .icon-strip-folder-icon-box {
+  background: var(--accent2);
+  border-radius: 14px;
+  box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, 0.25);
+}
+
+/* Drag-over state: folder header highlights when a project is dragged over it */
+.icon-strip-folder-header.drag-over-folder .icon-strip-folder-icon-box {
+  background: var(--accent2);
+  border-radius: 14px;
+  box-shadow: 0 0 0 2px var(--accent2), 0 0 12px rgba(74, 127, 232, 0.4);
+}
+
+/* Reorder indicators on folder header when a folder is being dragged */
+.icon-strip-folder-header.drag-over-above::after {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 32px;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--accent);
+  z-index: 10;
+}
+
+.icon-strip-folder-header.drag-over-below::after {
+  content: "";
+  position: absolute;
+  bottom: -1px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 32px;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--accent);
+  z-index: 10;
+}
+
+/* Folder being dragged */
+.icon-strip-folder.dragging {
+  opacity: 0.3;
+}
+
+/* Folder label — shown below icon box, truncated */
+.icon-strip-folder-label {
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--text-dimmer);
+  max-width: 44px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: center;
+  line-height: 1.2;
+  margin-top: 2px;
+  cursor: inherit;
+  border-radius: 3px;
+  padding: 0 2px;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.icon-strip-folder-label[contenteditable="true"] {
+  outline: 1px solid var(--accent);
+  background: var(--bg-alt);
+  color: var(--text);
+  font-size: 10px;
+  cursor: text;
+}
+
+/* Chevron (small, bottom-right corner of the icon box area) */
+.icon-strip-folder-chevron {
+  position: absolute;
+  bottom: 6px;
+  right: 3px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--bg-alt);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  transition: transform 0.15s ease, background 0.15s, border-color 0.15s;
+  pointer-events: none;
+}
+
+.icon-strip-folder-chevron svg {
+  width: 10px;
+  height: 10px;
+}
+
+.icon-strip-folder.collapsed .icon-strip-folder-chevron {
+  transform: rotate(-90deg);
+  background: var(--border);
+}
+
+/* Open: chevron has accent tint to reinforce open state */
+.icon-strip-folder:not(.collapsed) .icon-strip-folder-chevron {
+  background: rgba(var(--accent-rgb, 88, 87, 252), 0.15);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* Items inside user folder */
+.icon-strip-folder-items {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: visible;
+  max-height: 800px;
+  transition: max-height 0.2s ease;
+  border-left: 3px solid var(--text-dimmer);
+  width: 100%;
+}
+
+.icon-strip-folder.collapsed .icon-strip-folder-items {
+  overflow: hidden;
+  max-height: 0;
+}
+
+/* Projects inside a user folder get a slight indent indicator.
+   Uses ::after (not ::before) so ::before remains the hover/active
+   background box inherited from .icon-strip-item::before. */
+.icon-strip-item.in-folder {
+  opacity: 0.92;
+}
+.icon-strip-item.in-folder::after {
+  content: "";
+  position: absolute;
+  left: 2px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 20px;
+  border-radius: 2px;
+  background: var(--accent);
+  opacity: 0;
+  transition: opacity 0.15s;
+  pointer-events: none;
+}
+.icon-strip-item.in-folder.active::after {
+  opacity: 1;
+}
+
+/* Drag-over indicators for in-folder items.
+   Must reset ALL geometry from .icon-strip-item.in-folder::after (left:2px, top:50%,
+   transform:translateY(-50%), width:3px, height:20px) to avoid the indent bar showing
+   centered on the item instead of as a line at the top/bottom edge. */
+.icon-strip-item.in-folder.drag-over-above::after {
+  top: -1px;
+  bottom: auto;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 32px;
+  height: 2px;
+  border-radius: 1px;
+  opacity: 1;
+  z-index: 10;
+}
+.icon-strip-item.in-folder.drag-over-below::after {
+  top: auto;
+  bottom: -1px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 32px;
+  height: 2px;
+  border-radius: 1px;
+  opacity: 1;
+  z-index: 10;
+}
+
+/* ==========================================================================
+   Light-theme overrides — make subtle structural lines visible
+   ========================================================================== */
+
+/* Indent lines next to folder items and worktree items are near-invisible in
+   light mode because --border resolves to a pale blue-grey (#C8D4E0) against
+   the light sidebar background. Use --text-dimmer instead, which maps to a
+   readable mid-tone in every theme. */
+.light-theme .icon-strip-folder-items,
+.light-theme .icon-strip-group-items {
+  border-left-color: var(--text-dimmer);
+}
+
+/* Folder header open/collapse pill indicator — use accent for contrast */
+.light-theme .icon-strip-folder:not(.collapsed) .icon-strip-folder-header::before {
+  background: var(--accent);
+  opacity: 0.7;
+}
+
+/* Folder icon box — use a visible tint in light mode (default bg-alt is pale) */
+.light-theme .icon-strip-folder-icon-box {
+  background: var(--border);
+  box-shadow: inset 0 0 0 1.5px rgba(0, 0, 0, 0.18);
+}
+
+/* Folder chevron badge — needs a darker border in light mode */
+.light-theme .icon-strip-folder-chevron {
+  background: var(--bg-alt);
+  border-color: var(--text-dimmer);
+  color: var(--text-secondary);
+}
+
+.light-theme .icon-strip-folder:not(.collapsed) .icon-strip-folder-chevron {
+  background: rgba(0, 0, 0, 0.06);
+  border-color: var(--accent);
+  color: var(--accent);
+}

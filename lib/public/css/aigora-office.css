@@ -1,0 +1,137 @@
+/* Office co-editing: the card's 함께 편집 button and badges, the full-screen editor overlay with an
+   Apple-style header (back, title + who is editing, version history), the history sheet and the
+   새 문서 sheet. Every tap target is at least 44px; on phones the editor takes the whole screen. */
+
+#input-add-menu [data-add-action="newdoc"].hidden{display:none}
+html.of-open,html.of-open body{overflow:hidden}
+
+/* Card additions. */
+.att-actions .of-open{flex:1 1 140px;border-color:transparent;background:var(--accent-fill);color:var(--on-accent)}
+.att-actions .of-open:hover{filter:brightness(1.06);background:var(--accent-fill)}
+.att-actions .of-open.is-off{background:var(--control-bg);border-color:var(--border);color:var(--text-muted);cursor:not-allowed;filter:none}
+.of-note{flex:1 1 100%;font-size:12px;line-height:1.45;color:var(--text-muted)}
+.of-note.of-down,.of-note.of-fail{color:var(--danger-text)}
+.of-badge{flex:1 1 100%;display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--accent-text)}
+.of-badge::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--success-text);box-shadow:0 0 0 3px var(--success-soft)}
+
+/* The editor layer. */
+.of-layer{position:fixed;inset:0;z-index:400}
+.of-overlay{position:absolute;inset:0;display:flex;flex-direction:column;background:var(--surface);color:var(--text);animation:of-in .22s cubic-bezier(.2,.8,.2,1)}
+@keyframes of-in{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.of-header{flex:none;display:grid;grid-template-columns:minmax(72px,auto) minmax(0,1fr) minmax(72px,auto);align-items:center;gap:8px;min-height:52px;padding:calc(6px + env(safe-area-inset-top)) max(10px,env(safe-area-inset-right)) 6px max(6px,env(safe-area-inset-left));border-bottom:1px solid var(--border-subtle);background:color-mix(in srgb,var(--surface) 82%,transparent);-webkit-backdrop-filter:saturate(1.8) blur(18px);backdrop-filter:saturate(1.8) blur(18px)}
+.of-back,.of-hist,.of-mode{display:inline-flex;align-items:center;gap:2px;min-width:44px;min-height:44px;padding:0 10px 0 4px;border:0;border-radius:12px;background:transparent;color:var(--accent-text);font:inherit;font-size:16px;font-weight:500;cursor:pointer}
+.of-layer.is-vv{inset:auto 0 auto 0;top:var(--of-vv-top,0px);height:var(--of-vv-h,100%)}
+.of-actions{display:flex;align-items:center;justify-self:end;gap:2px}
+.of-locate{display:inline-flex;align-items:center;justify-content:center;min-width:44px;min-height:44px;padding:0;border:0;border-radius:12px;background:transparent;color:var(--accent-text);cursor:pointer}
+.of-locate[hidden]{display:none}
+.of-locate svg{width:22px;height:22px}
+.of-hist,.of-mode{padding:0 8px 0 10px;gap:6px;font-size:14px;font-weight:600}
+.of-mode svg{width:20px;height:20px}
+.of-mode.is-edit{background:var(--accent-faint)}
+.of-back svg{width:26px;height:26px}
+.of-hist svg{width:22px;height:22px}
+.of-back:hover,.of-locate:hover,.of-hist:hover,.of-mode:hover,.of-hist[aria-expanded="true"]{background:var(--fill)}
+.of-back:focus-visible,.of-hist:focus-visible,.of-mode:focus-visible,.of-locate:focus-visible,.of-close:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.of-title{display:flex;flex-direction:column;align-items:center;min-width:0;text-align:center;line-height:1.25}
+.of-name{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:15px;font-weight:650;letter-spacing:-.01em}
+.of-who{max-width:100%;min-height:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;color:var(--text-muted)}
+.of-stage{position:relative;flex:1 1 auto;min-height:0;background:var(--bg-alt)}
+.of-frame{position:absolute;inset:0;width:100%;height:100%;border:0;background:var(--surface)}
+.of-state{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:12px;padding:24px;background:var(--surface);font-size:15px;color:var(--text-secondary)}
+.of-state.hidden{display:none}
+.of-spin{width:22px;height:22px;border-radius:50%;border:2.5px solid var(--border);border-top-color:var(--accent);animation:of-spin .8s linear infinite}
+@keyframes of-spin{to{transform:rotate(360deg)}}
+.of-error{max-width:360px;text-align:center}
+.of-error p{margin:0 0 16px;font-size:16px;line-height:1.55;color:var(--text)}
+.of-error-actions{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.of-error-actions .att-btn{flex:1 1 120px}
+
+/* Split view (wide screens): the editor is the right half, the chat stays usable on the left. */
+html.of-split #main-column{padding-right:var(--of-doc-w)}
+/* The chat column is everything between the sidebar and the divider: the inspector gives its column back even if it is still open,
+   and the vw-based side gutters give way to a centred readable line that never leaves a gap or squeezes the feed. */
+@media(min-width:1024px){html.of-split #layout .ag-context:not(.hidden){width:0;flex-basis:0;opacity:0;border-left-width:0;visibility:hidden;pointer-events:none}}
+html.of-split .ai-chat{padding-left:max(16px,calc((100% - 760px)/2));padding-right:max(16px,calc((100% - 760px)/2))}
+html.of-split .ai-composer{margin-left:max(14px,calc((100% - 780px)/2));margin-right:max(14px,calc((100% - 780px)/2));margin-bottom:14px}
+.of-layer.is-split{inset:0 0 0 auto;width:var(--of-doc-w)}
+.of-layer.is-split.is-full{width:var(--of-avail)}
+.of-layer.is-split .of-overlay{border-left:1px solid var(--border-subtle);animation:none}
+.of-split-header{grid-template-columns:minmax(0,1fr) auto;padding-left:14px}
+.of-split-header .of-title{align-items:flex-start;text-align:left}
+.of-split-header .of-who:empty{display:none}
+.of-split-header .of-hist{padding:0 10px}
+.of-divider{position:absolute;z-index:3;top:0;bottom:0;left:-6px;width:12px;cursor:col-resize;touch-action:none}
+.of-divider::after{content:"";position:absolute;top:0;bottom:0;left:5px;width:2px;background:var(--border);transition:background .15s}
+.of-divider::before{content:"";position:absolute;top:50%;left:2px;width:8px;height:44px;margin-top:-22px;border-radius:4px;background:var(--surface);border:1px solid var(--border);opacity:0;transition:opacity .15s,background .15s,border-color .15s;z-index:1}
+.of-divider:hover::after,.of-divider:focus-visible::after,.of-layer.is-dragging .of-divider::after{background:var(--accent)}
+.of-divider:hover::before,.of-divider:focus-visible::before,.of-layer.is-dragging .of-divider::before{opacity:1;border-color:var(--accent)}
+.of-divider:focus-visible{outline:none}
+.of-divider:focus-visible::before{box-shadow:0 0 0 2px var(--accent)}
+.of-layer.is-full .of-divider{display:none}
+.of-layer.is-dragging .of-frame{pointer-events:none}
+.of-layer.is-dragging{user-select:none}
+.of-hist[disabled]{opacity:.6;cursor:default}
+@media(max-width:1180px){.of-split-header .of-hist span{display:none}.of-split-header .of-hist{min-width:44px;justify-content:center;padding:0}}
+
+/* Version history: a side panel on desktop, a bottom sheet on phones. */
+.of-history{position:absolute;z-index:2;top:calc(52px + env(safe-area-inset-top));right:0;bottom:0;width:min(380px,100%);overflow:auto;padding:16px 16px calc(16px + env(safe-area-inset-bottom));border-left:1px solid var(--border-subtle);background:var(--elevated);box-shadow:-14px 0 40px rgba(var(--shadow-rgb),.12)}
+.of-history[hidden]{display:none}
+.of-history-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px}
+.of-history-head h2{margin:0;font-size:18px;font-weight:680;letter-spacing:-.02em}
+.of-close{min-width:44px;min-height:44px;padding:0 10px;border:0;border-radius:10px;background:transparent;color:var(--text-secondary);font:inherit;font-size:14px;font-weight:600;cursor:pointer}
+.of-close:hover{background:var(--fill)}
+.of-history-note{margin:0 0 10px;font-size:13px;line-height:1.5;color:var(--text-muted)}
+.of-history-msg{margin:0 0 10px;padding:9px 11px;border-radius:10px;background:var(--danger-soft-bg);color:var(--danger-soft-text);font-size:13px;line-height:1.45}
+.of-vers{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.of-ver{padding:12px;border:1px solid var(--border-subtle);border-radius:14px;background:var(--surface)}
+.of-ver-main{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 8px;font-size:13px;color:var(--text-secondary)}
+.of-ver-main strong{font-size:15px;color:var(--text)}
+.of-ver-now{padding:1px 8px;border-radius:999px;background:var(--success-soft);color:var(--success-text);font-size:11px;font-weight:650}
+.of-ver-from{flex:1 1 100%;color:var(--text-muted);font-size:12px}
+.of-ver-actions{display:flex;gap:8px;margin-top:10px}
+.of-ver-actions .att-btn{flex:1;min-height:44px}
+.of-ver-actions .att-btn.is-armed{background:var(--danger-fill);border-color:transparent;color:var(--on-accent)}
+
+/* 새 문서 */
+.of-tiles{display:grid;gap:8px;margin-bottom:14px}
+.of-tile{position:relative;display:flex;align-items:center;gap:12px;min-height:60px;padding:8px 14px;border:1px solid var(--border);border-radius:14px;background:var(--control-bg);cursor:pointer}
+.of-tile.is-on{border-color:var(--accent);background:var(--accent-faint)}
+.of-tile:focus-within{outline:2px solid var(--accent);outline-offset:2px}
+.of-tile input{position:absolute;opacity:0;pointer-events:none}
+.of-tile-ext{flex:none;display:grid;place-items:center;width:44px;height:44px;border-radius:12px;background:var(--success-soft);color:var(--success-text);font-family:"DM Mono",monospace;font-size:11px;font-weight:600}
+.of-tile-text{display:flex;flex-direction:column;gap:1px;min-width:0}
+.of-tile-text strong{font-size:15px;font-weight:650}
+.of-tile-text small{font-size:12px;color:var(--text-muted)}
+.of-name-label{display:block;margin:0 0 6px;font-size:13px;font-weight:600;color:var(--text-secondary)}
+.of-name-input{box-sizing:border-box;width:100%;min-height:48px;margin-bottom:12px;padding:0 14px;border:1px solid var(--border);border-radius:12px;background:var(--control-bg);color:var(--text);font:inherit;font-size:16px}
+.of-name-input:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+
+@media(max-width:768px){
+  .of-header{grid-template-columns:minmax(64px,auto) minmax(0,1fr) minmax(64px,auto)}
+  .of-hist span{display:none}
+  .of-hist{min-width:48px;justify-content:center;padding:0}
+  .of-history{top:auto;left:0;right:0;width:auto;max-height:72dvh;border:0;border-radius:22px 22px 0 0;box-shadow:0 -18px 50px rgba(var(--shadow-rgb),.22)}
+  .of-ver-actions .att-btn{font-size:14px}
+}
+@media(prefers-reduced-motion:reduce){.of-overlay{animation:none}.of-spin{animation-duration:2.4s}}
+:root[data-reduce-motion="1"] .of-overlay{animation:none}
+
+/* Split: the room tools (결과, 고정, 알림) stay left of the document pane. */
+html.of-split .ai-social-tools{right:calc(var(--of-doc-w) + 18px)}
+html.of-split .ai-pop{right:calc(var(--of-doc-w) + 16px)}
+@media(min-width:769px){
+  html.of-split #main-column:not(.dm-mode):has(#agora-room-header:not(.hidden)) .ai-social-tools{right:calc(var(--of-doc-w) + 56px)}
+}
+@media(min-width:769px) and (max-width:1279px){
+  /* a narrow chat column: the tools become a slim row above the header so the room name keeps its room */
+  html.of-split .ai-social-tools{position:static;order:-1;justify-content:flex-end;padding:8px 14px 0}
+  html.of-split .ai-social-tools.hidden{display:none}
+  html.of-split .ag-room-header-main{padding-right:0}
+  html.of-split #layout .ag-panel-toggle{position:static;margin-left:auto}
+  html.of-split .ai-pop{top:52px}
+}
+/* Compact stepper: dots only (names stay for screen readers and the tooltip), the stages with a result keep their label. */
+@media(min-width:769px) and (max-width:1319px){
+  html.of-split .ag-stage{min-width:0;flex:1 1 0}
+  html.of-split .ag-stage.is-empty .ag-stage-label{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+}

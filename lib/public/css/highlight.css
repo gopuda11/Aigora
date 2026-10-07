@@ -1,0 +1,144 @@
+/* ==========================================================================
+   Syntax Highlighting (highlight.js) — base16 CSS-variable driven
+   Replaces CDN github-dark-dimmed.min.css
+   ========================================================================== */
+
+.hljs {
+  color: var(--text);
+  background: var(--code-bg);
+}
+
+/* --- Comments --- */
+.hljs-comment,
+.hljs-quote {
+  color: var(--hl-comment);
+  font-style: italic;
+}
+
+/* --- Keywords / control flow --- */
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-selector-id {
+  color: var(--hl-keyword);
+}
+
+/* --- Strings / template literals --- */
+.hljs-string,
+.hljs-doctag,
+.hljs-selector-class {
+  color: var(--hl-string);
+}
+
+/* --- Numbers / booleans / null --- */
+.hljs-number,
+.hljs-literal {
+  color: var(--hl-number);
+}
+
+/* --- Functions / method calls --- */
+.hljs-title,
+.hljs-title.function_,
+.hljs-section {
+  color: var(--hl-function);
+}
+
+/* --- Variables / params --- */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-params {
+  color: var(--hl-variable);
+}
+
+/* --- Types / classes --- */
+.hljs-type,
+.hljs-title.class_,
+.hljs-title.class_.inherited__ {
+  color: var(--hl-type);
+}
+
+/* --- Constants / built-ins --- */
+.hljs-built_in {
+  color: var(--hl-builtin);
+}
+
+/* --- Tags (HTML/XML) --- */
+.hljs-tag,
+.hljs-name {
+  color: var(--hl-tag);
+}
+
+/* --- Attributes --- */
+.hljs-attr,
+.hljs-attribute {
+  color: var(--hl-attr);
+}
+
+/* --- Regexp / links --- */
+.hljs-regexp,
+.hljs-link {
+  color: var(--hl-regexp);
+}
+
+/* --- Meta / preprocessor --- */
+.hljs-meta,
+.hljs-meta .hljs-keyword,
+.hljs-meta .hljs-string {
+  color: var(--hl-meta);
+}
+
+/* --- Symbols / special --- */
+.hljs-symbol,
+.hljs-bullet {
+  color: var(--hl-symbol);
+}
+
+/* --- Diff additions / deletions --- */
+.hljs-addition {
+  color: var(--hl-addition);
+  background: var(--success-8);
+}
+
+.hljs-deletion {
+  color: var(--hl-deletion);
+  background: var(--error-8);
+}
+
+/* --- Emphasis / strong --- */
+.hljs-emphasis {
+  font-style: italic;
+}
+
+.hljs-strong {
+  font-weight: 700;
+}
+
+/* --- Subst / interpolation --- */
+.hljs-subst {
+  color: var(--text);
+}
+
+/* --- Selector --- */
+.hljs-selector-attr,
+.hljs-selector-pseudo {
+  color: var(--hl-keyword);
+}
+
+/* --- Property (CSS, JSON keys) --- */
+.hljs-property {
+  color: var(--hl-attr);
+}
+
+/* --- Punctuation (brackets etc.) --- */
+.hljs-punctuation {
+  color: var(--text-secondary);
+}
+
+/* --- Operator --- */
+.hljs-operator {
+  color: var(--hl-keyword);
+}
+
+/* --- Char / escape sequences --- */
+.hljs-char.escape_ {
+  color: var(--hl-regexp);
+}

@@ -1,0 +1,683 @@
+/* ==========================================================================
+   Top Bar — full-width bar above everything (forms reverse-ㄱ with icon strip)
+   ========================================================================== */
+
+#top-bar {
+  flex-shrink: 0;
+  height: 32px;
+  background: var(--sidebar-bg);
+  display: flex;
+  align-items: center;
+  padding: calc(var(--safe-top) + 0px) 0 0;
+  position: relative;
+  gap: 8px;
+}
+
+/* --- Update banner --- */
+.top-bar-update {
+  display: flex;
+  align-items: center;
+}
+
+.top-bar-update-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: color-mix(in srgb, #3b82f6 12%, transparent);
+  color: #3b82f6;
+  border: none;
+  border-radius: 10px;
+  padding: 2px 10px;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  line-height: 1;
+  transition: background 0.15s;
+}
+
+.top-bar-update-btn .lucide { width: 12px; height: 12px; }
+.top-bar-update-btn:hover { background: color-mix(in srgb, #3b82f6 20%, transparent); }
+
+/* --- Top bar actions (right-aligned group) --- */
+.top-bar-actions {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.top-bar-actions button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  border-radius: 6px;
+  color: var(--text-dimmer);
+  cursor: pointer;
+  padding: 3px;
+  transition: color 0.15s, background 0.15s;
+}
+
+.top-bar-actions button .lucide { width: 14px; height: 14px; }
+.top-bar-actions button:hover { color: var(--text-secondary); background: rgba(var(--overlay-rgb),0.06); }
+
+#server-settings-btn.active { color: var(--text); }
+
+/* --- Theme toggle pill switch (light/dark) --- */
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  -webkit-app-region: no-drag;
+}
+
+.theme-toggle input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.theme-toggle-track {
+  position: relative;
+  width: 46px;
+  height: 22px;
+  border-radius: 11px;
+  background: var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 4px;
+  box-sizing: border-box;
+  transition: background 0.3s;
+}
+
+.theme-toggle-track:hover {
+  background: var(--border-subtle);
+}
+.dark-theme .theme-toggle-track:hover {
+  background: var(--text-dimmer);
+}
+
+.theme-toggle-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  z-index: 2;
+  position: relative;
+  transition: color 0.25s;
+}
+
+.theme-toggle-icon .lucide {
+  width: 11px;
+  height: 11px;
+}
+
+.theme-toggle-thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--text-muted);
+  transition: left 0.25s cubic-bezier(0.4, 0, 0.2, 1), background 0.25s;
+  z-index: 1;
+}
+
+/* Dark mode (unchecked) — thumb LEFT on moon */
+.theme-toggle-moon { color: var(--bg); }           /* dark icon on lighter thumb */
+.theme-toggle-sun { color: var(--text-muted); }    /* light icon on dark track */
+
+/* Light mode (checked) — thumb RIGHT on sun */
+.theme-toggle input:checked ~ .theme-toggle-track .theme-toggle-thumb {
+  left: 24px;
+  background: var(--bg-alt);
+}
+
+.theme-toggle input:checked ~ .theme-toggle-track .theme-toggle-moon {
+  color: var(--text-muted);   /* darker icon on light track */
+}
+
+.theme-toggle input:checked ~ .theme-toggle-track .theme-toggle-sun {
+  color: var(--text-dimmer);  /* darker icon on light thumb */
+}
+
+/* ==========================================================================
+   Title Bar — split into sidebar-column and main-column sections
+   ========================================================================== */
+
+/* --- Sidebar section (inside #sidebar-column) --- */
+.title-bar-sidebar {
+  flex-shrink: 0;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  background: var(--sidebar-bg);
+  border-bottom: 1px solid var(--border-subtle);
+  gap: 6px;
+}
+
+.sidebar-presence {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.sidebar-presence-avatar {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid var(--sidebar-bg);
+  background: var(--bg-alt);
+  margin-left: -6px;
+  cursor: default;
+}
+
+.sidebar-presence-avatar:first-child {
+  margin-left: 0;
+}
+
+.sidebar-presence-more {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid var(--sidebar-bg);
+  background: var(--bg-alt);
+  margin-left: -6px;
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.title-bar-project-dropdown {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+  background: none;
+  border: none;
+  padding: 4px 8px;
+  margin: -4px -8px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.15s;
+  font-family: inherit;
+}
+
+.title-bar-project-dropdown:hover {
+  background: rgba(var(--overlay-rgb), 0.06);
+}
+
+.title-bar-project-icon {
+  display: none;
+  font-size: 18px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.title-bar-project-icon.has-icon {
+  display: inline-flex;
+  align-items: center;
+}
+
+.title-bar-project-icon .emoji {
+  width: 18px;
+  height: 18px;
+  vertical-align: middle;
+  filter:
+    drop-shadow(1px 0 0 rgba(0,0,0,0.25))
+    drop-shadow(-1px 0 0 rgba(0,0,0,0.25))
+    drop-shadow(0 1px 0 rgba(0,0,0,0.25))
+    drop-shadow(0 -1px 0 rgba(0,0,0,0.25))
+    drop-shadow(0 0 4px rgba(255,255,255,0.35));
+}
+
+.title-bar-project-name {
+  font-family: "Pretendard", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.title-bar-chevron {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  color: var(--text-secondary);
+  transition: transform 0.2s;
+}
+
+.title-bar-project-dropdown.open .title-bar-chevron {
+  transform: rotate(180deg);
+}
+
+.project-rename-input {
+  width: 100%;
+  font-family: "Pretendard", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--text);
+  background: var(--bg-alt);
+  border: 1px solid var(--accent);
+  border-radius: 4px;
+  padding: 1px 4px;
+  outline: none;
+  min-width: 0;
+}
+
+/* --- Content section (inside #main-column) --- */
+.title-bar-content {
+  flex-shrink: 0;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  min-width: 0;
+  border-bottom: 1px solid var(--border-subtle);
+  overflow: visible;
+}
+
+.title-bar-content #header-left {
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  min-width: 0;
+  flex: 1;
+}
+
+.title-bar-content .status {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-muted);
+  flex: 1;
+  flex-shrink: 0;
+  overflow: visible;
+}
+
+/* --- Mobile --- */
+@media (max-width: 768px) {
+  #top-bar {
+    display: none !important;
+  }
+
+  #sidebar-column {
+    width: 0 !important;
+    min-width: 0 !important;
+    overflow: visible;
+  }
+}
+
+/* ==========================================================================
+   Header Indicators (Context Bar, Rate Limit, Fast Mode)
+   ========================================================================== */
+
+/* --- Context bar --- */
+.header-context {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: 80px;
+  cursor: default;
+  position: relative;
+}
+
+.header-context-bar {
+  flex: 1;
+  height: 3px;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.header-context-fill {
+  height: 100%;
+  width: 0%;
+  background: var(--accent);
+  border-radius: 2px;
+  transition: width 0.3s ease, background 0.3s ease;
+}
+
+.header-context-fill.warn { background: var(--warning); }
+.header-context-fill.danger { background: var(--error); }
+
+.header-context-label {
+  font-family: "Roboto Mono", monospace;
+  font-size: 10px;
+  color: var(--text-dimmer);
+  white-space: nowrap;
+}
+
+/* --- Context usage popover --- */
+.context-usage-popover {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: -12px;
+  width: 320px;
+  background: var(--bg-alt);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  box-shadow: 0 4px 16px rgba(var(--shadow-rgb), 0.4);
+  z-index: 200;
+  animation: ctx-popover-in 0.12s ease-out;
+  line-height: 1.5;
+}
+
+.context-usage-popover.hidden { display: none; }
+
+@keyframes ctx-popover-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Header */
+.ctx-pop-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 12px;
+}
+
+.ctx-pop-model {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-family: "Roboto Mono", monospace;
+}
+
+.ctx-pop-pct {
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--text);
+  font-family: "Roboto Mono", monospace;
+  letter-spacing: -0.5px;
+}
+
+.ctx-pop-tokens {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-family: "Roboto Mono", monospace;
+  margin-left: 6px;
+  font-weight: 400;
+}
+
+/* Stacked category bar */
+.ctx-cat-bar {
+  display: flex;
+  height: 10px;
+  border-radius: 5px;
+  overflow: hidden;
+  background: var(--border);
+  margin-bottom: 12px;
+  gap: 1px;
+}
+
+.ctx-cat-bar > div {
+  height: 100%;
+  min-width: 3px;
+  transition: width 0.3s ease;
+  border-radius: 2px;
+}
+
+/* Category legend */
+.ctx-cat-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  margin-bottom: 4px;
+}
+
+.ctx-cat-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  font-size: 12px;
+  padding: 3px 0;
+  border-radius: 4px;
+  transition: background 0.1s ease;
+}
+
+.ctx-cat-item:hover {
+  background: rgba(var(--overlay-rgb), 0.03);
+}
+
+.ctx-emoji {
+  display: inline-block;
+  filter: grayscale(1);
+  font-size: 12px;
+  transition: filter 0.15s ease;
+}
+
+.ctx-cat-item:hover .ctx-emoji,
+.ctx-pop-row:hover .ctx-emoji,
+.ctx-pop-note .ctx-emoji {
+  filter: grayscale(0);
+}
+
+.ctx-cat-name {
+  color: var(--text-secondary);
+}
+
+.ctx-cat-value {
+  font-family: "Roboto Mono", monospace;
+  color: var(--text-muted);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Sections */
+.ctx-pop-divider {
+  border: none;
+  height: 1px;
+  background: var(--border-subtle);
+  margin: 10px 0;
+}
+
+.ctx-pop-section-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  letter-spacing: 0.8px;
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+
+.ctx-pop-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  padding: 3px 0;
+  border-radius: 4px;
+  transition: background 0.1s ease;
+}
+
+.ctx-pop-row:hover {
+  background: rgba(var(--overlay-rgb), 0.03);
+}
+
+.ctx-pop-row-label {
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-right: 12px;
+}
+
+.ctx-pop-row-value {
+  font-family: "Roboto Mono", monospace;
+  color: var(--text-muted);
+  font-size: 11px;
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.ctx-pop-note {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 10px;
+  text-align: center;
+  padding: 4px 8px;
+  background: var(--border-subtle);
+  border-radius: 4px;
+  font-family: "Roboto Mono", monospace;
+}
+
+@media (max-width: 400px) {
+  .context-usage-popover {
+    width: 260px;
+    right: -8px;
+  }
+}
+
+/* --- Shared pill style for rate limit & fast mode --- */
+.header-rate-limit,
+.header-fast-mode {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.header-rate-limit .lucide,
+.header-fast-mode .lucide {
+  width: 12px;
+  height: 12px;
+}
+
+.header-pill-text {
+  line-height: 1;
+}
+
+/* lr-872f94: vendor-reported rate-limit usedPercent, shown in the pill
+   itself alongside the label (previously only in the transient popover). */
+.header-pill-pct {
+  line-height: 1;
+  font-weight: 700;
+  opacity: 0.75;
+}
+
+/* Rate limit wrapper for popover positioning */
+.header-rate-limit-wrap {
+  position: relative;
+  display: inline-flex;
+  overflow: visible;
+}
+
+/* Rate limit states */
+.header-rate-limit.warning {
+  background: color-mix(in srgb, var(--warning) 12%, transparent);
+  color: var(--warning);
+}
+
+.header-rate-limit.rejected {
+  background: color-mix(in srgb, var(--error) 12%, transparent);
+  color: var(--error);
+}
+
+/* Rate limit external link icon */
+.rate-limit-link {
+  display: inline-flex;
+  align-items: center;
+  color: inherit;
+  opacity: 0.6;
+  margin-left: 2px;
+  transition: opacity 0.15s;
+}
+
+.rate-limit-link:hover {
+  opacity: 1;
+}
+
+.rate-limit-link .lucide {
+  width: 10px;
+  height: 10px;
+}
+
+/* Rate limit popover */
+.rate-limit-popover {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  background: color-mix(in srgb, var(--warning) 15%, var(--bg));
+  color: var(--warning);
+  border: 1px solid color-mix(in srgb, var(--warning) 25%, transparent);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+  animation: popover-in 0.2s ease-out;
+  z-index: 100;
+  pointer-events: none;
+}
+
+.rate-limit-popover.rejected {
+  background: color-mix(in srgb, var(--error) 15%, var(--bg));
+  color: var(--error);
+  border-color: color-mix(in srgb, var(--error) 25%, transparent);
+}
+
+.rate-limit-popover.fade-out {
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+@keyframes popover-in {
+  from { opacity: 0; transform: translateX(-50%) translateY(-4px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+/* Fast mode states */
+.header-fast-mode.cooldown {
+  background: color-mix(in srgb, var(--warning) 12%, transparent);
+  color: var(--warning);
+}
+
+.header-fast-mode.active {
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  color: var(--accent);
+}
+
+/* Hide pills on very narrow screens */
+@media (max-width: 400px) {
+  .header-pill-text,
+  .header-pill-pct { display: none; }
+  .header-rate-limit,
+  .header-fast-mode { padding: 3px; }
+  .rate-limit-popover { font-size: 11px; padding: 6px 10px; }
+  .header-context { width: 50px; }
+}

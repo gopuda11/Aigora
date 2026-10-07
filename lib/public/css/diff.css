@@ -1,0 +1,139 @@
+/* ==========================================================================
+   Diff Views (unified + split)
+   ========================================================================== */
+
+.diff-unified,
+.diff-split-view {
+  overflow: auto;
+  font-family: "Roboto Mono", monospace;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.diff-table {
+  border-collapse: collapse;
+  min-width: 100%;
+  table-layout: auto;
+}
+
+/* --- Line numbers --- */
+.diff-ln {
+  width: 40px;
+  min-width: 40px;
+  padding: 0 8px 0 4px;
+  text-align: right;
+  color: var(--text-dimmer);
+  user-select: none;
+  vertical-align: top;
+  white-space: nowrap;
+  opacity: 0.6;
+  border-right: 1px solid var(--border-subtle);
+}
+
+/* --- Marker column (unified only) --- */
+.diff-marker {
+  width: 16px;
+  min-width: 16px;
+  padding: 0 2px;
+  text-align: center;
+  color: var(--text-dimmer);
+  user-select: none;
+  vertical-align: top;
+}
+
+/* --- Code cells --- */
+.diff-code {
+  padding: 0 12px;
+  white-space: pre;
+  vertical-align: top;
+  tab-size: 2;
+}
+
+/* --- Unified diff row colors --- */
+.diff-row-remove {
+  background: var(--error-12);
+}
+
+.diff-row-remove .diff-marker {
+  color: var(--error);
+}
+
+.diff-row-add {
+  background: var(--success-12);
+}
+
+.diff-row-add .diff-marker {
+  color: var(--success);
+}
+
+/* --- Hunk header row (patch diffs) --- */
+.diff-row-hunk {
+  background: rgba(128, 128, 128, 0.05);
+}
+
+.diff-row-hunk .diff-hunk-text {
+  color: var(--text-dimmer);
+  font-style: italic;
+  padding: 2px 12px;
+}
+
+/* --- Split diff specifics --- */
+.diff-table-split {
+  table-layout: fixed;
+  width: 100%;
+}
+
+.diff-table-split .diff-code-old,
+.diff-table-split .diff-code-new {
+  width: 50%;
+  overflow-x: auto;
+}
+
+/* Split: divider between left and right */
+.diff-table-split .diff-code-old {
+  border-right: 1px solid var(--border-subtle);
+}
+
+/* Split: change rows */
+.diff-row-change .diff-code-old,
+.diff-row-remove .diff-code-old {
+  background: var(--error-12);
+}
+
+.diff-row-change .diff-code-new,
+.diff-row-add .diff-code-new {
+  background: var(--success-12);
+}
+
+/* Empty cells in split view */
+.diff-row-remove .diff-code-new,
+.diff-row-add .diff-code-old {
+  background: rgba(128, 128, 128, 0.03);
+}
+
+/* --- Word-wrap mode for prose files (markdown, etc.) --- */
+.diff-wrap .diff-code {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* --- Compact mode for inline previews --- */
+.diff-compact .diff-table {
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.diff-compact .diff-ln {
+  width: 28px;
+  min-width: 28px;
+  padding: 0 4px 0 2px;
+}
+
+.diff-compact .diff-code {
+  padding: 0 6px;
+}
+
+.diff-compact .diff-marker {
+  width: 12px;
+  min-width: 12px;
+}

@@ -1,0 +1,42 @@
+/* Explicit private-to-room sharing and shared result cards. */
+.ai-share-tool,.ai-posts-tool{width:auto;min-width:32px;padding:0 9px;border-radius:999px;font-size:11px;font-weight:600}
+.sp-layer{position:fixed;inset:0;z-index:360;display:flex;align-items:center;justify-content:center;padding:18px}
+.sp-scrim{position:absolute;inset:0;background:var(--scrim-sheet);backdrop-filter:blur(7px)}
+.sp-sheet{position:relative;width:min(680px,100%);max-height:min(780px,calc(100vh - 36px));overflow:auto;padding:20px;border-radius:22px;background:var(--elevated);box-shadow:0 26px 70px rgba(var(--shadow-rgb),.24)}
+.sp-share-sheet{width:min(720px,100%)}
+.sp-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:14px}
+.sp-head small{display:block;margin-bottom:3px;font-family:"DM Mono",monospace;font-size:9px;letter-spacing:.16em;color:var(--text-muted)}
+.sp-head h2{font-size:19px;font-weight:680;letter-spacing:-.025em}
+.sp-close{flex:none;width:30px;height:30px;border:0;border-radius:50%;background:var(--bg-alt);font-size:18px;cursor:pointer}
+.sp-help,.sp-preview-note{margin:0 0 14px;padding:10px 12px;border-radius:12px;background:var(--accent-faint);color:var(--text-secondary);font-size:12px;line-height:1.5}
+.sp-field{display:grid;gap:6px;margin:12px 0;font-size:12px;font-weight:600;color:var(--text-secondary)}
+.sp-field input,.sp-field textarea,.sp-field select{width:100%;padding:9px 11px;border:1px solid var(--border);border-radius:11px;background:var(--control-bg);color:var(--text);font:inherit;font-weight:400;outline:none}
+.sp-field textarea{min-height:76px;resize:vertical;line-height:1.5}
+.sp-field input:focus,.sp-field textarea:focus,.sp-field select:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-ring)}
+.sp-picks{margin:14px 0;padding:0;border:0}.sp-picks legend{margin-bottom:7px;font-size:12px;font-weight:650;color:var(--text-secondary)}
+.sp-pick{display:grid;grid-template-columns:20px minmax(0,1fr);gap:8px;padding:9px 10px;margin:5px 0;border-radius:12px;background:var(--bg-alt);cursor:pointer}
+.sp-pick input{margin-top:3px}.sp-pick b{display:block;font-size:11px}.sp-pick small{display:block;margin-top:2px;color:var(--text-muted);font-size:11px;line-height:1.4;white-space:pre-wrap;overflow-wrap:anywhere}
+.sp-muted,.sp-state{color:var(--text-muted);font-size:12px;line-height:1.5}.sp-state{padding:42px 16px;text-align:center}.sp-state b{display:block;margin-bottom:5px;color:var(--text-secondary);font-size:13px}
+.sp-error{margin:10px 0;padding:9px 11px;border-radius:10px;background:var(--danger-soft-bg);color:var(--danger-soft-text);font-size:12px}
+.sp-footer{display:flex;justify-content:flex-end;gap:8px;margin-top:16px;padding-top:14px;border-top:1px solid var(--border-subtle)}
+.sp-primary,.sp-secondary,.sp-danger-button,.sp-plain,.sp-comment-form button{padding:8px 13px;border:0;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer}
+.sp-primary{background:var(--accent-fill);color:var(--on-accent)}.sp-primary:disabled{background:var(--disabled);cursor:not-allowed}.sp-secondary,.sp-plain{background:var(--bg-alt);color:var(--text-secondary)}
+.sp-danger-button{background:var(--danger-fill);color:var(--on-accent)}.sp-danger{color:var(--danger-text)}
+.sp-card{margin:0 0 12px;padding:16px;border:1px solid var(--border-subtle);border-radius:16px;background:var(--surface)}
+.sp-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}.sp-card-head h3{margin:0 0 6px;font-size:15px;letter-spacing:-.015em}
+.sp-verify{display:inline-flex;padding:3px 7px;border-radius:999px;background:var(--bg-alt);font-family:"DM Mono",monospace;font-size:9px;letter-spacing:.04em;color:var(--text-secondary)}
+.sp-verify-tests_passed{color:var(--success-text);background:var(--success-soft)}
+.sp-body{margin:12px 0;line-height:1.58;font-size:13px;white-space:pre-wrap;overflow-wrap:anywhere}
+.sp-message,.sp-meta{margin:10px 0;padding:10px 12px;border-radius:12px;background:var(--bg-alt)}
+.sp-message small,.sp-meta b{font-family:"DM Mono",monospace;font-size:9px;letter-spacing:.08em;color:var(--text-muted)}
+.sp-message p,.sp-meta p{margin-top:4px;font-size:12.5px;line-height:1.55;white-space:pre-wrap;overflow-wrap:anywhere}
+.sp-files{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}.sp-file{padding:6px 9px;border-radius:9px;background:var(--bg-alt);color:var(--accent-text);font-size:11px;text-decoration:none}
+.sp-human{margin-top:13px;padding-top:12px;border-top:1px solid var(--border-subtle)}.sp-human>p{color:var(--text-muted);font-size:11px}.sp-actions{display:flex;gap:6px;margin:7px 0}
+.sp-comment{margin:7px 0;padding:8px 10px;border-radius:10px;background:var(--bg-alt)}.sp-comment b{font-size:11px}.sp-comment p{margin-top:2px;font-size:12px;line-height:1.45}
+.sp-comment-form{display:flex;gap:7px;margin-top:8px}.sp-comment-form input{flex:1;min-width:0;padding:8px 10px;border:1px solid var(--border);border-radius:10px;background:var(--control-bg);color:var(--text)}.sp-comment-form button{background:var(--accent-fill);color:var(--on-accent)}
+.sp-confirm{position:sticky;bottom:0;margin-top:12px;padding:12px 14px;border-radius:13px;background:var(--elevated);box-shadow:0 8px 28px rgba(var(--shadow-rgb),.16);border:1px solid var(--border)}
+.sp-confirm p{font-size:12px;margin-bottom:9px}.sp-confirm>div{display:flex;justify-content:flex-end;gap:7px}
+.sp-close:focus-visible,.sp-primary:focus-visible,.sp-secondary:focus-visible,.sp-danger-button:focus-visible,.sp-plain:focus-visible,.sp-comment-form button:focus-visible,.sp-pick:focus-within{outline:2px solid var(--accent);outline-offset:2px}
+@media(max-width:480px){.sp-layer{padding:0;align-items:flex-end}.sp-sheet{width:100%;max-height:92vh;border-radius:22px 22px 0 0;padding:18px 16px 20px}.ai-share-tool,.ai-posts-tool{min-width:30px;padding:0 7px;font-size:10.5px}.sp-footer{position:sticky;bottom:-20px;margin-left:-16px;margin-right:-16px;padding:12px 16px 20px;background:var(--elevated)}}
+@media(prefers-reduced-motion:reduce){.sp-layer,.sp-sheet{scroll-behavior:auto}}
+.sp-card-target{outline:2px solid var(--accent-fill);outline-offset:2px}

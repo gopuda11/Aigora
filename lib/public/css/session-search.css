@@ -1,0 +1,160 @@
+/* ==========================================================================
+   In-session search (Cmd+F / Ctrl+F)
+   ========================================================================== */
+
+/* --- Toggle button (in title bar, matches sticky-notes / terminal buttons) --- */
+#find-in-session-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  color: var(--text-dimmer);
+  cursor: pointer;
+  padding: 4px;
+  transition: color 0.15s, background 0.15s, border-color 0.15s;
+  position: relative;
+}
+
+#find-in-session-btn .lucide { width: 15px; height: 15px; }
+#find-in-session-btn:hover { color: var(--text-secondary); background: rgba(var(--overlay-rgb),0.04); border-color: var(--border); }
+#find-in-session-btn.active { color: var(--text); background: rgba(var(--overlay-rgb),0.06); border-color: var(--border); }
+
+/* --- Floating search bar --- */
+.session-search-bar {
+  position: absolute;
+  top: 0;
+  right: 16px;
+  z-index: 60;
+  animation: sessionSearchSlideDown 0.15s ease-out;
+}
+
+.session-search-bar.hidden {
+  display: none;
+}
+
+.session-search-inner {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--bg-alt);
+  border: 1px solid var(--border);
+  border-top: none;
+  border-radius: 0 0 10px 10px;
+  padding: 6px 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}
+
+#find-in-session-input {
+  width: 200px;
+  padding: 4px 8px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 13px;
+  outline: none;
+  font-family: inherit;
+}
+
+#find-in-session-input:focus {
+  border-color: var(--accent);
+}
+
+#find-in-session-input::placeholder {
+  color: var(--text-muted);
+}
+
+.session-search-count {
+  font-size: 11px;
+  color: var(--text-muted);
+  min-width: 60px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.session-search-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.session-search-btn:hover {
+  background: var(--hover);
+  color: var(--text);
+}
+
+/* Highlight marks */
+mark.session-search-highlight {
+  background: var(--accent-30, rgba(255, 165, 0, 0.3));
+  color: inherit;
+  border-radius: 2px;
+  padding: 0 1px;
+}
+
+mark.session-search-highlight-active {
+  background: var(--accent, #f59e0b);
+  color: var(--bg, #fff);
+  border-radius: 2px;
+  padding: 0 1px;
+}
+
+@keyframes sessionSearchSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Timeline (scroll map) - reuses rewind-timeline styles */
+.find-in-session-timeline {
+  position: absolute;
+  right: 8px;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.search-blink {
+  animation: searchBlink 0.4s ease-in-out 3;
+}
+
+@keyframes searchBlink {
+  0%, 100% { box-shadow: none; }
+  50% { box-shadow: 0 0 0 2px var(--accent); border-radius: 12px; }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  #find-in-session-btn {
+    display: flex;
+  }
+
+  .session-search-bar {
+    right: 8px;
+    left: 8px;
+  }
+
+  #find-in-session-input {
+    flex: 1;
+    width: auto;
+    min-width: 0;
+  }
+
+  .session-search-inner {
+    padding: 4px 6px;
+  }
+}
+

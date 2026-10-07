@@ -1,0 +1,1495 @@
+/* ============================
+   Scheduler — Shared Form Styles
+   ============================ */
+
+.sched-field-select {
+  background: var(--input-bg, var(--bg-alt));
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-size: 14px;
+  color: var(--text);
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 30px;
+}
+
+.sched-field-select:focus {
+  border-color: var(--accent);
+}
+
+/* --- Day-of-week picker --- */
+.sched-dow-row {
+  display: flex;
+  gap: 4px;
+}
+
+.sched-dow-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--bg-alt);
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.12s;
+}
+
+.sched-dow-btn:hover {
+  background: var(--hover);
+  color: var(--text);
+}
+
+.sched-dow-btn.active {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
+/* --- Shared buttons --- */
+.sched-btn {
+  padding: 7px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.12s;
+}
+
+.sched-btn-cancel {
+  background: var(--bg-alt);
+  border-color: var(--border);
+  color: var(--text-secondary);
+}
+
+.sched-btn-cancel:hover {
+  background: var(--hover);
+  color: var(--text);
+}
+
+.sched-btn-save {
+  background: var(--accent);
+  color: #fff;
+}
+
+.sched-btn-save:hover {
+  filter: brightness(1.1);
+}
+
+.sched-btn-delete {
+  background: none;
+  border-color: var(--border);
+  color: var(--error);
+  margin-right: auto;
+}
+
+.sched-btn-delete:hover {
+  background: color-mix(in srgb, var(--error) 12%, transparent);
+  border-color: var(--error);
+}
+
+/* --- Scheduler tabs (Calendar / Tasks) --- */
+.scheduler-tab {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 10px 16px;
+  font-size: 13px;
+  font-weight: 700;
+  border-bottom: 2px solid transparent;
+  transition: all 0.12s;
+}
+
+.scheduler-tab.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+.scheduler-tab:not(.active):hover {
+  color: var(--text);
+}
+
+/* --- Tasks list --- */
+.scheduler-library {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 16px 24px;
+}
+
+.job-library-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.job-library-item {
+  background: var(--bg-alt);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  transition: border-color 0.12s;
+}
+
+.job-library-item:hover {
+  border-color: var(--accent);
+}
+
+.job-library-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.job-library-name {
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--text);
+}
+
+.job-library-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.job-library-badge.scheduled {
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
+  color: var(--accent);
+}
+
+.job-library-badge.oneoff {
+  background: var(--bg);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+}
+
+.job-library-meta {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+}
+
+.job-library-task {
+  color: var(--text-muted);
+  margin-bottom: 2px;
+}
+
+.job-library-cron {
+  font-weight: 600;
+}
+
+.job-library-last-run {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.job-library-last-run .pass {
+  color: var(--success);
+}
+
+.job-library-last-run .fail {
+  color: var(--error);
+}
+
+.job-library-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.job-lib-btn {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  transition: all 0.12s;
+}
+
+.job-lib-btn:hover {
+  background: var(--hover);
+  color: var(--text);
+}
+
+.job-lib-btn.danger:hover {
+  background: color-mix(in srgb, var(--error) 12%, transparent);
+  color: var(--error);
+  border-color: var(--error);
+}
+
+/* --- Ralph wizard repeat select --- */
+.ralph-input-select {
+  background: var(--input-bg, var(--bg-alt));
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 28px 6px 8px;
+  font-size: 13px;
+  color: var(--text);
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  font-family: inherit;
+}
+
+.ralph-input-select:focus {
+  border-color: var(--accent);
+}
+
+/* ============================
+   Scheduler — Create Popover (inline)
+   ============================ */
+
+.sched-create-popover {
+  position: fixed;
+  z-index: 320;
+  width: 360px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.28), 0 2px 8px rgba(0,0,0,0.12);
+  display: flex;
+  flex-direction: column;
+  overflow: visible;
+}
+
+.sched-create-popover.hidden {
+  display: none;
+}
+
+/* --- Top row: date + time + close --- */
+.sched-create-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  gap: 6px;
+}
+
+.sched-create-date-chips {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.sched-create-date-input,
+.sched-create-time-input {
+  background: var(--input-bg, var(--bg-alt));
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 5px 8px;
+  font-size: 12px;
+  color: var(--text);
+  font-family: inherit;
+  outline: none;
+  color-scheme: dark;
+  height: 30px;
+  box-sizing: border-box;
+}
+
+.light-theme .sched-create-date-input,
+.light-theme .sched-create-time-input {
+  color-scheme: light;
+}
+
+.sched-create-date-input:focus,
+.sched-create-time-input:focus {
+  border-color: var(--accent);
+}
+
+.sched-create-time-input {
+  width: 80px;
+}
+
+.sched-create-recurrence-btn {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px 8px;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  transition: all 0.12s;
+}
+
+.sched-create-recurrence-btn:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.sched-create-recurrence-btn.has-recurrence {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+}
+
+.sched-create-recurrence-btn svg {
+  width: 13px;
+  height: 13px;
+}
+
+/* --- Close button --- */
+.sched-create-close-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 3px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.sched-create-close-btn:hover {
+  color: var(--text);
+  background: var(--hover);
+}
+
+.sched-create-close-btn svg {
+  width: 15px;
+  height: 15px;
+}
+
+/* --- Title row --- */
+.sched-create-title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-top: 1px solid var(--border-subtle, var(--border));
+}
+
+.sched-create-color-picker-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.sched-create-color-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px;
+  display: flex;
+  align-items: center;
+  border-radius: 50%;
+  transition: opacity 0.12s;
+}
+
+.sched-create-color-btn:hover {
+  opacity: 0.75;
+}
+
+.sched-create-color-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--accent, #ffb86c);
+  display: block;
+}
+
+.sched-create-color-palette {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+  padding: 8px;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 6px;
+  z-index: 340;
+}
+
+.sched-create-color-palette.hidden {
+  display: none;
+}
+
+.sched-color-swatch {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  padding: 0;
+  transition: transform 0.1s, border-color 0.1s;
+}
+
+.sched-color-swatch:hover {
+  transform: scale(1.15);
+}
+
+.sched-color-swatch.active {
+  border-color: var(--text);
+}
+
+.sched-create-title-input {
+  flex: 1;
+  background: none;
+  border: none;
+  outline: none;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  padding: 2px 0;
+  font-family: inherit;
+}
+
+.sched-create-title-input::placeholder {
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+/* --- Row (task, description) --- */
+.sched-create-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 6px 14px;
+}
+
+.sched-create-row-icon {
+  width: 15px;
+  height: 15px;
+  color: var(--text-dimmer);
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+
+.sched-create-row-textarea {
+  flex: 1;
+  background: none;
+  border: none;
+  outline: none;
+  font-size: 13px;
+  color: var(--text-secondary);
+  padding: 3px 0;
+  font-family: inherit;
+  resize: none;
+  min-height: 44px;
+}
+
+.sched-create-row-textarea:focus {
+  color: var(--text);
+}
+
+.sched-create-row-textarea::placeholder {
+  color: var(--text-dimmer);
+}
+
+/* --- Task dropdown (JS) --- */
+.sched-create-task-dropdown {
+  flex: 1;
+  position: relative;
+}
+
+.sched-create-task-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 3px 0;
+  font-size: 13px;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-family: inherit;
+  transition: color 0.12s;
+}
+
+.sched-create-task-btn:hover {
+  color: var(--text);
+}
+
+.sched-create-task-btn.has-value .sched-create-task-label {
+  color: var(--text);
+  font-weight: 500;
+}
+
+.sched-create-task-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sched-create-task-btn svg {
+  width: 12px;
+  height: 12px;
+  color: var(--text-dimmer);
+  flex-shrink: 0;
+}
+
+.sched-create-task-btn.invalid .sched-create-task-label {
+  color: var(--error, #ff5555);
+}
+
+.sched-create-task-list {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: -26px;
+  right: -14px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+  z-index: 340;
+  max-height: 200px;
+  overflow-y: auto;
+  padding: 4px;
+}
+
+.sched-create-task-list.hidden {
+  display: none;
+}
+
+.sched-create-task-item {
+  padding: 7px 10px;
+  font-size: 13px;
+  color: var(--text);
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background 0.1s;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sched-create-task-item:hover {
+  background: var(--hover);
+}
+
+.sched-create-task-item.selected {
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.sched-create-task-empty {
+  padding: 10px;
+  font-size: 12px;
+  color: var(--text-dimmer);
+  text-align: center;
+}
+
+#sched-create-desc-row.hidden { display: none; }
+
+.sched-create-row-icon-spacer {
+  width: 15px;
+  flex-shrink: 0;
+}
+
+.sched-review-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.sched-review-toggle input[type="checkbox"] {
+  accent-color: var(--accent);
+}
+
+.sched-review-label {
+  flex-shrink: 0;
+}
+
+.sched-review-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.sched-review-count.hidden {
+  display: none;
+}
+
+.sched-create-desc-wrap {
+  margin-top: 10px;
+}
+
+.sched-create-desc-wrap .sched-create-row-textarea {
+  width: 100%;
+}
+
+/* --- Accordion sections --- */
+.sched-accordion-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 4px 14px 0;
+  opacity: 0.5;
+}
+
+.sched-accordion-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 8px 14px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text);
+  transition: background 0.12s;
+  text-align: left;
+}
+
+.sched-accordion-header:hover {
+  background: var(--hover);
+}
+
+.sched-accordion-header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sched-accordion-icon {
+  width: 15px;
+  height: 15px;
+  color: var(--text-dimmer);
+  flex-shrink: 0;
+}
+
+.sched-accordion.has-value .sched-accordion-icon {
+  color: var(--accent);
+}
+
+.sched-accordion-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.sched-accordion-title {
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.sched-accordion-subtitle {
+  font-size: 11px;
+  color: var(--text-dimmer);
+  line-height: 1.3;
+  margin-top: 1px;
+}
+
+.sched-accordion-header-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sched-accordion-clear {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  color: var(--text-dimmer);
+  transition: background 0.12s, color 0.12s;
+}
+
+.sched-accordion-clear:hover {
+  background: var(--hover);
+  color: var(--text);
+}
+
+.sched-accordion-clear .lucide {
+  width: 12px;
+  height: 12px;
+}
+
+.sched-accordion-clear.hidden {
+  display: none;
+}
+
+.sched-accordion-chevron {
+  width: 14px;
+  height: 14px;
+  color: var(--text-dimmer);
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.sched-accordion.open .sched-accordion-chevron {
+  transform: rotate(90deg);
+}
+
+.sched-accordion-body {
+  padding: 4px 14px 10px 39px;
+}
+
+.sched-accordion-body.hidden {
+  display: none;
+}
+
+/* --- Bottom bar --- */
+.sched-create-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border-top: 1px solid var(--border-subtle, var(--border));
+  margin-top: 2px;
+}
+
+.sched-create-save-btn {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 7px 20px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: filter 0.12s;
+}
+
+.sched-create-save-btn:hover {
+  filter: brightness(1.1);
+}
+
+.sched-create-bottom-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sched-create-delete-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 8px;
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: color 0.12s, border-color 0.12s, background 0.12s;
+}
+.sched-create-delete-btn .lucide { width: 15px; height: 15px; }
+.sched-create-delete-btn:hover {
+  color: #e55;
+  border-color: #e55;
+  background: rgba(238, 85, 85, 0.08);
+}
+.sched-create-delete-btn.hidden { display: none; }
+
+/* Delete recurring event — standalone dialog */
+.sched-delete-dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 400;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: sched-delete-backdrop-in 0.15s ease-out;
+}
+.sched-delete-dialog-backdrop.hidden { display: none; }
+@keyframes sched-delete-backdrop-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.sched-delete-dialog {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+  width: 320px;
+  max-width: 90vw;
+  overflow: hidden;
+  animation: sched-delete-dialog-in 0.15s ease-out;
+}
+@keyframes sched-delete-dialog-in {
+  from { opacity: 0; transform: scale(0.95) translateY(8px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+.sched-delete-dialog-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+  padding: 16px 18px 8px;
+}
+.sched-delete-dialog-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px 18px 12px;
+}
+.sched-delete-dialog-body.hidden { display: none; }
+.sched-delete-dialog-footer {
+  border-top: 1px solid var(--border-subtle, var(--border));
+  padding: 10px 18px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+.sched-delete-confirm-btn {
+  color: #fff !important;
+  background: #e55 !important;
+  border-color: #e55 !important;
+  border-radius: 8px;
+  padding: 7px 18px;
+  font-weight: 600;
+}
+.sched-delete-confirm-btn:hover {
+  background: #d44 !important;
+  border-color: #d44 !important;
+}
+.sched-delete-confirm-btn.hidden { display: none; }
+.sched-delete-option {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 9px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.12s, border-color 0.12s;
+  width: 100%;
+}
+.sched-delete-option:hover {
+  background: rgba(var(--overlay-rgb), 0.06);
+  border-color: var(--text-secondary);
+}
+.sched-delete-option[data-delete="all"] {
+  color: #e55;
+}
+.sched-delete-option[data-delete="all"]:hover {
+  background: rgba(238, 85, 85, 0.08);
+  border-color: #e55;
+}
+.sched-delete-option.cancel {
+  color: var(--text-muted);
+  border: none;
+  text-align: center;
+  padding: 7px 14px;
+}
+.sched-delete-option.cancel:hover {
+  background: rgba(var(--overlay-rgb), 0.04);
+}
+
+/* --- Recurrence dropdown (floating) --- */
+.sched-create-recurrence-dropdown {
+  position: fixed;
+  width: 280px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+  z-index: 330;
+  overflow: hidden;
+}
+
+.sched-create-recurrence-dropdown.hidden {
+  display: none;
+}
+
+
+.sched-create-interval-btn {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 4px 8px;
+  cursor: pointer;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  transition: all 0.12s;
+}
+
+.sched-create-interval-btn:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.sched-create-interval-btn.has-recurrence {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+}
+
+.sched-create-interval-btn svg {
+  width: 13px;
+  height: 13px;
+}
+
+.sched-create-interval-dropdown {
+  position: fixed;
+  z-index: 1200;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+  min-width: 220px;
+  max-width: 280px;
+  overflow: hidden;
+}
+
+.sched-create-interval-dropdown.hidden {
+  display: none;
+}
+
+
+/* --- Interval custom row --- */
+.sched-interval-custom-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+}
+
+.sched-interval-custom-row .sched-custom-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.sched-interval-custom-row .sched-custom-interval {
+  width: 48px;
+  padding: 5px 6px;
+  font-size: 13px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--input-bg);
+  color: var(--text);
+}
+
+.sched-interval-unit-toggle {
+  display: flex;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.sched-interval-seg {
+  padding: 5px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  border: none;
+  background: var(--input-bg);
+  color: var(--text-dimmer);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.sched-interval-seg:first-child {
+  border-right: 1px solid var(--border);
+}
+
+.sched-interval-seg.active {
+  background: var(--accent);
+  color: #fff;
+  font-weight: 600;
+}
+
+.sched-interval-seg:not(.active):hover {
+  background: var(--hover);
+  color: var(--text);
+}
+
+/* --- Interval end conditions --- */
+.sched-interval-end-section {
+  padding: 0 12px 4px;
+  border-top: 1px solid var(--border-subtle, var(--border));
+  margin-top: 2px;
+  padding-top: 8px;
+}
+
+.sched-interval-end-section.hidden {
+  display: none;
+}
+
+.sched-interval-end-divider {
+  display: none;
+}
+
+.sched-interval-end-options {
+  display: flex;
+  gap: 2px;
+}
+
+.sched-interval-end-opt {
+  flex: 1;
+  background: none;
+  border: 1px solid transparent;
+  padding: 5px 6px;
+  text-align: center;
+  cursor: pointer;
+  font-size: 12px;
+  border-radius: 6px;
+  color: var(--text-dimmer);
+  transition: background 0.15s, color 0.15s;
+}
+
+.sched-interval-end-opt:hover {
+  background: var(--hover);
+  color: var(--text);
+}
+
+.sched-interval-end-opt.active {
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.sched-interval-end-after,
+.sched-interval-end-until {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 0 2px;
+}
+
+.sched-interval-end-after.hidden,
+.sched-interval-end-until.hidden {
+  display: none;
+}
+
+.sched-interval-end-input {
+  width: 48px;
+  padding: 5px 6px;
+  font-size: 13px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--input-bg);
+  color: var(--text);
+}
+
+.sched-interval-end-label {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.sched-interval-end-time {
+  width: 90px;
+  padding: 5px 6px;
+  font-size: 13px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--input-bg);
+  color: var(--text);
+  color-scheme: dark;
+}
+
+.light-theme .sched-interval-end-time {
+  color-scheme: light;
+}
+
+/* --- Skip if running toggle --- */
+.sched-skip-running-row {
+  padding: 8px 12px 4px;
+  border-top: 1px solid var(--border-subtle, var(--border));
+  margin-top: 4px;
+}
+
+.sched-switch-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.sched-switch-text {
+  font-size: 11px;
+  color: var(--text-muted);
+  user-select: none;
+}
+
+.sched-switch {
+  position: relative;
+  width: 28px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.sched-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  position: absolute;
+}
+
+.sched-switch-slider {
+  position: absolute;
+  inset: 0;
+  background: var(--border);
+  border-radius: 8px;
+  transition: background 0.2s;
+}
+
+.sched-switch-slider::before {
+  content: "";
+  position: absolute;
+  left: 2px;
+  top: 2px;
+  width: 12px;
+  height: 12px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform 0.2s;
+}
+
+.sched-switch input:checked + .sched-switch-slider {
+  background: var(--accent);
+}
+
+.sched-switch input:checked + .sched-switch-slider::before {
+  transform: translateX(12px);
+}
+
+/* --- Custom repeat panel --- */
+.sched-custom-repeat-panel {
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+
+.sched-custom-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+}
+
+.sched-custom-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  min-width: 36px;
+}
+
+.sched-custom-interval {
+  background: var(--input-bg, var(--bg-alt));
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 5px 6px;
+  font-size: 12px;
+  color: var(--text);
+  outline: none;
+  width: 46px;
+  text-align: center;
+  font-family: inherit;
+}
+
+.sched-custom-interval:focus {
+  border-color: var(--accent);
+}
+
+.sched-custom-unit {
+  flex: 1;
+  max-width: 100px;
+}
+
+.sched-accordion-body .sched-field-select {
+  padding: 5px 26px 5px 8px;
+  font-size: 12px;
+  border-radius: 6px;
+  background-position: right 6px center;
+}
+
+.sched-custom-dow-section {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px 8px;
+}
+
+.sched-custom-dow-section .sched-dow-row {
+  flex: 1;
+  display: flex;
+  gap: 4px;
+}
+
+.sched-custom-dow-section .sched-dow-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.sched-custom-actions {
+  display: flex;
+  gap: 8px;
+  padding: 10px 12px;
+  border-top: 1px solid var(--border-subtle, var(--border));
+}
+
+.sched-custom-actions .sched-btn {
+  flex: 1;
+  text-align: center;
+}
+
+/* --- End row variants --- */
+.sched-custom-end-row {
+  flex-wrap: wrap;
+}
+
+/* End JS dropdown */
+.sched-custom-end-dropdown {
+  position: relative;
+}
+
+.sched-custom-end-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--input-bg, var(--bg-alt));
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 5px 8px;
+  font-size: 12px;
+  color: var(--text);
+  cursor: pointer;
+  font-family: inherit;
+  transition: border-color 0.12s;
+  white-space: nowrap;
+}
+
+.sched-custom-end-btn:hover {
+  border-color: var(--accent);
+}
+
+.sched-custom-end-btn svg {
+  width: 10px;
+  height: 10px;
+  color: var(--text-dimmer);
+  flex-shrink: 0;
+}
+
+.sched-custom-end-list {
+  position: fixed;
+  min-width: 80px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+  z-index: 350;
+  padding: 3px;
+  display: flex;
+  flex-direction: column;
+}
+
+.sched-custom-end-list.hidden {
+  display: none;
+}
+
+.sched-custom-end-item {
+  background: none;
+  border: none;
+  padding: 6px 10px;
+  font-size: 12px;
+  color: var(--text);
+  cursor: pointer;
+  text-align: left;
+  border-radius: 4px;
+  font-family: inherit;
+  transition: background 0.1s;
+  white-space: nowrap;
+}
+
+.sched-custom-end-item:hover {
+  background: var(--hover);
+}
+
+.sched-custom-end-item.active {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.sched-custom-end-date-btn {
+  background: var(--input-bg, var(--bg-alt));
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 5px 10px;
+  font-size: 12px;
+  color: var(--text);
+  cursor: pointer;
+  font-family: inherit;
+  transition: border-color 0.12s;
+  white-space: nowrap;
+}
+
+.sched-custom-end-date-btn:hover {
+  border-color: var(--accent);
+}
+
+.sched-custom-end-date-btn.hidden,
+.sched-custom-end-after.hidden {
+  display: none;
+}
+
+.sched-custom-end-after {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sched-custom-end-after-input {
+  width: 52px;
+}
+
+.sched-custom-end-after-suffix {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+/* --- Inline calendar for Until --- */
+.sched-custom-end-calendar {
+  padding: 8px 12px 4px;
+}
+
+.sched-custom-end-calendar.hidden {
+  display: none;
+}
+
+.sched-cal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 0 8px;
+}
+
+.sched-cal-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.sched-cal-nav {
+  display: flex;
+  gap: 2px;
+}
+
+.sched-cal-nav-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 2px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.1s;
+}
+
+.sched-cal-nav-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+.sched-cal-nav-btn:hover {
+  color: var(--text);
+}
+
+.sched-cal-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-muted);
+  padding-bottom: 4px;
+}
+
+.sched-cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+
+.sched-cal-day {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  aspect-ratio: 1;
+  font-size: 11px;
+  color: var(--text);
+  background: none;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.1s;
+}
+
+.sched-cal-day:hover {
+  background: var(--hover);
+}
+
+.sched-cal-day.other-month {
+  color: var(--text-dimmer);
+}
+
+.sched-cal-day.selected {
+  background: var(--accent);
+  color: #fff;
+  font-weight: 700;
+}
+
+.sched-cal-day.today {
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.sched-cal-day.today.selected {
+  color: #fff;
+}
+
+/* Calendar cell clickable */
+.scheduler-cell {
+  cursor: pointer;
+}
+
+.scheduler-cell:hover {
+  background: color-mix(in srgb, var(--accent) 5%, transparent);
+}
+
+@media (max-width: 480px) {
+  .sched-create-popover {
+    width: calc(100vw - 20px);
+    left: 10px !important;
+    right: 10px !important;
+  }
+  .sched-create-recurrence-dropdown {
+    width: calc(100vw - 24px);
+  }
+}

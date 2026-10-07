@@ -1,0 +1,332 @@
+/* ==========================================================================
+   Aigora
+   ========================================================================== */
+
+
+/* --- Twemoji COLR Font (cross-platform consistent emoji via font, no JS parsing) --- */
+@font-face {
+  font-family: 'Twemoji';
+  src: url('https://cdn.jsdelivr.net/npm/twemoji-colr-font@15.0.3/twemoji.woff2') format('woff2');
+  font-display: swap;
+}
+
+/* --- Global utility --- */
+.hidden { display: none !important; }
+
+/* --- Reset & Variables --- */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(var(--overlay-rgb),0.15) transparent;
+}
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(var(--overlay-rgb),0.15); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(var(--overlay-rgb),0.25); }
+
+/* --- Global Twemoji baseline --- */
+img.emoji {
+  height: 1.2em;
+  width: 1.2em;
+  vertical-align: -0.2em;
+  margin: 0 1px;
+  display: inline;
+  pointer-events: none;
+}
+
+:root {
+  /* aigora-dark — pre-JS fallback (matches aigora-dark.json via computeVars) */
+  --bg: #060810;
+  --bg-alt: #111827;
+  --text: #E0EAF4;
+  --text-secondary: #C8D4E0;
+  --text-muted: #7A8FA6;
+  --text-dimmer: #3D5068;
+  --accent: #00CFFF;
+  --accent-hover: #33D8FF;
+  --accent-bg: rgba(0, 207, 255, 0.12);
+  --code-bg: #05070E;
+  --border: #1E2E48;
+  --border-subtle: #101726;
+  --input-bg: #172338;
+  --user-bubble: #151F31;
+  --error: #FF4D6A;
+  --success: #29D9A8;
+  --warning: #4A7FE8;
+  /* lr-66c118: --danger was referenced with two DISAGREEING fallbacks
+     (#F24822 at sidebar.css:1713, #e74c3c at icon-strip.css/mention.css)
+     but never defined here. Defining it settles both call sites on one
+     color; #e74c3c matches the existing unread/alert red already used
+     throughout (session-unread-badge, hub-recent-dot.alert, etc). */
+  --danger: #e74c3c;
+  /* lr-66c118: multi-user activity tone — a THIRD color, distinct from
+     --success (own activity, green) and --danger (alert, red). Violet is
+     maximally hue-separated from both and from --accent (cyan) /
+     --accent2/--warning (blue), which already carry meaning. Hue alone is
+     not sufficient at 6-8px (deuteranopia/protanopia; violet/blue
+     confusion) — render sites must pair this with a shape difference
+     (ring vs filled disc), never ship on hue alone. */
+  --activity-other: #B77BF3;
+  --accent-8: rgba(0, 207, 255, 0.08);
+  --accent-12: rgba(0, 207, 255, 0.12);
+  --accent-15: rgba(0, 207, 255, 0.15);
+  --accent-20: rgba(0, 207, 255, 0.20);
+  --accent-25: rgba(0, 207, 255, 0.25);
+  --accent-30: rgba(0, 207, 255, 0.30);
+  --accent2: #4A7FE8;
+  --accent2-hover: #6B97F0;
+  --accent2-bg: rgba(74, 127, 232, 0.12);
+  --accent2-8: rgba(74, 127, 232, 0.08);
+  --accent2-12: rgba(74, 127, 232, 0.12);
+  --accent2-15: rgba(74, 127, 232, 0.15);
+  --accent2-20: rgba(74, 127, 232, 0.20);
+  --accent2-25: rgba(74, 127, 232, 0.25);
+  --accent2-30: rgba(74, 127, 232, 0.30);
+  --error-8: rgba(255, 77, 106, 0.08);
+  --error-12: rgba(255, 77, 106, 0.12);
+  --error-15: rgba(255, 77, 106, 0.15);
+  --error-25: rgba(255, 77, 106, 0.25);
+  --success-8: rgba(41, 217, 168, 0.08);
+  --success-12: rgba(41, 217, 168, 0.12);
+  --success-15: rgba(41, 217, 168, 0.15);
+  --success-25: rgba(41, 217, 168, 0.25);
+  --warning-bg: rgba(74, 127, 232, 0.12);
+  --overlay-rgb: 255,255,255;
+  --shadow-rgb: 0,0,0;
+  --hl-comment: #3D5068;
+  --hl-keyword: #A855F7;
+  --hl-string: #29D9A8;
+  --hl-number: #00CFFF;
+  --hl-function: #4A7FE8;
+  --hl-variable: #FF4D6A;
+  --hl-type: #4A7FE8;
+  --hl-constant: #00CFFF;
+  --hl-tag: #FF4D6A;
+  --hl-attr: #4A7FE8;
+  --hl-regexp: #7B3FE4;
+  --hl-meta: #6366F1;
+  --hl-builtin: #00CFFF;
+  --hl-symbol: #6366F1;
+  --hl-addition: #29D9A8;
+  --hl-deletion: #FF4D6A;
+  --sidebar-bg: #04060B;
+  --sidebar-hover: #0A0E19;
+  --sidebar-active: #162134;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --content-width: 820px;
+}
+
+/* PWA standalone: home indicator safe area still applies on notched devices */
+
+::selection {
+  background: rgba(80, 250, 123, 0.25);
+}
+
+html, body {
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "DM Sans", "Twemoji", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+  overflow: hidden;
+  overscroll-behavior: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* --- Lucide icons --- */
+.lucide {
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+
+.icon-spin {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-spin .lucide {
+  animation: spin 1s linear infinite;
+}
+
+.icon-spin-inline { animation: spin 1s linear infinite; }
+
+/* --- Layout --- */
+#layout {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  height: 100dvh;
+  position: relative;
+}
+
+#layout-body {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+  background: var(--sidebar-bg);
+  position: relative;
+}
+
+#sidebar-column {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* --- Main Area (sidebar + resize-handle + main-column) --- */
+#main-area {
+  flex: 1;
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  position: relative;
+  background: var(--bg);
+  border-top-left-radius: 8px;
+  border-top: 1px solid var(--border-subtle);
+  border-left: 1px solid var(--border-subtle);
+}
+
+/* --- Main Column --- */
+#main-column {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* --- Main Panels (app + file-viewer + terminal side-by-side) --- */
+#main-panels {
+  flex: 1;
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* --- Toast --- */
+.toast {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%) translateY(8px);
+  background: var(--bg-alt);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 8px 18px;
+  font-size: 13px;
+  font-weight: 500;
+  z-index: 400;
+  opacity: 0;
+  transition: opacity 0.2s, transform 0.2s;
+  pointer-events: none;
+  box-shadow: 0 4px 20px rgba(var(--shadow-rgb), 0.3);
+}
+
+.toast.visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+/* lr-136f81: --warning-bg / --error-12 are translucent tokens designed for
+   inline diagnostic badges sitting inside an already-opaque panel
+   (diagnostics.css:310-312). A position:fixed overlay toast has live chat
+   content behind it, so a translucent background lets that content bleed
+   through and the toast reads as malformed. Layer the tint over the opaque
+   --bg-alt toast surface instead of using the translucent token directly —
+   --warning-bg itself stays untouched so the diagnostic-badge use case is
+   unaffected. */
+.toast.toast-warn {
+  background: linear-gradient(var(--warning-bg), var(--warning-bg)), var(--bg-alt);
+  border-color: var(--warning);
+  color: var(--warning);
+}
+.toast.toast-error {
+  background: linear-gradient(var(--error-12), var(--error-12)), var(--bg-alt);
+  border-color: var(--error);
+  color: var(--error);
+}
+
+/* SW update banner — shown when a new service worker activates while the page is visible */
+.sw-update-banner {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%) translateY(8px);
+  background: var(--bg-alt);
+  color: var(--text);
+  border: 1px solid var(--accent);
+  border-radius: 10px;
+  padding: 8px 12px 8px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  z-index: 400;
+  opacity: 0;
+  transition: opacity 0.2s, transform 0.2s;
+  box-shadow: 0 4px 20px rgba(var(--shadow-rgb), 0.3);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  white-space: nowrap;
+}
+.sw-update-banner.visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+.sw-update-banner-btn {
+  background: var(--accent);
+  color: var(--accent-text, #1a1208);
+  border: none;
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.sw-update-banner-btn:hover {
+  filter: brightness(1.1);
+}
+.sw-update-banner-dismiss {
+  background: transparent;
+  border: none;
+  color: var(--text-dim);
+  cursor: pointer;
+  font-size: 14px;
+  padding: 2px 4px;
+  line-height: 1;
+}
+.sw-update-banner-dismiss:hover {
+  color: var(--text);
+}
+
+/* Mobile (lr-2fdd): bottom:80px occludes the bottom-nav / input box / content
+   on narrow viewports (iOS screenshot showed the toast covering content just
+   above the Projects/Chat/Team/More nav). Top-anchor instead — per Andy's
+   steer ("should top align more than bottom align") — clearing the notch /
+   status bar via the safe-area inset. Desktop placement is unchanged. */
+@media (max-width: 768px) {
+  .toast,
+  .sw-update-banner {
+    top: calc(var(--safe-top) + 12px);
+    bottom: auto;
+    transform: translateX(-50%) translateY(-8px);
+  }
+  .toast.visible,
+  .sw-update-banner.visible {
+    transform: translateX(-50%) translateY(0);
+  }
+}
+

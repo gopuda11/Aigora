@@ -1,0 +1,61 @@
+/* aigora-picker.css - the composer's AI picker: the chip beside the send-mode toggle, the "@" suggestion list and the
+   phone bottom sheet (보내기 방식 + AI 선택). Colours and radii come from aigora-app.css tokens; nothing new is defined. */
+.ai-composer{position:relative}
+.ai-composer-modes{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:6px}
+.ai-composer-modes.hidden{display:none}
+.ai-composer-modes .ai-send-mode{margin-bottom:0}
+.ai-pick{position:relative}
+.ai-pick.hidden{display:none}
+.ai-pick-chip{display:inline-flex;align-items:center;gap:6px;min-height:26px;padding:3px 10px;border:0;border-radius:999px;background:var(--fill);color:var(--text);font:inherit;font-size:12px;font-weight:600;cursor:pointer}
+.ai-pick-cap{color:var(--text-muted);font-weight:500}
+.ai-pick-caret{color:var(--text-muted);font-size:10px}
+.ai-pick-chip[data-agent]:not([data-agent=""]){background:var(--accent-soft);color:var(--accent-text)}
+.ai-pick-chip[aria-disabled="true"]{cursor:default}
+.ai-pick-chip:focus-visible,.ai-pick-opt:focus-visible,.ai-pick-seg button:focus-visible,.ai-pick-done:focus-visible{outline:2px solid var(--accent-fill);outline-offset:2px}
+.ai-pick-list,.ai-at-list{z-index:40;min-width:220px;margin:0;padding:6px;list-style:none;border:1px solid var(--border-subtle);border-radius:14px;background:var(--elevated);box-shadow:0 12px 36px rgba(var(--shadow-rgb),.18)}
+.ai-pick-list{position:absolute;left:0;bottom:calc(100% + 6px)}
+.ai-at-list{position:absolute;left:12px;bottom:calc(100% - 2px)}
+.ai-pick-list.hidden,.ai-at-list.hidden{display:none}
+.ai-pick-opt{display:flex;align-items:baseline;justify-content:space-between;gap:16px;width:100%;min-height:36px;padding:7px 10px;border:0;border-radius:10px;background:transparent;color:var(--text);font:inherit;font-size:13px;text-align:left;cursor:pointer}
+.ai-pick-opt small{color:var(--text-muted);font-size:12px}
+.ai-pick-opt:hover,.ai-pick-opt[aria-selected="true"]{background:var(--fill)}
+.ai-pick-list .ai-pick-opt[aria-selected="true"] span::after{content:" ✓";color:var(--accent-text)}
+
+/* Phone: the "AI ▾" chip opens this sheet; it holds both choices. 44px targets, no horizontal scroll. */
+.ai-pick-sheet{position:fixed;inset:0;z-index:320;display:flex;align-items:flex-end}
+.ai-pick-sheet.hidden{display:none}
+.ai-pick-scrim{position:absolute;inset:0;background:var(--scrim-sheet)}
+.ai-pick-panel{position:relative;box-sizing:border-box;width:100%;max-height:85dvh;overflow-y:auto;overflow-x:hidden;padding:10px 16px calc(16px + env(safe-area-inset-bottom));border-radius:20px 20px 0 0;background:var(--elevated);color:var(--text);box-shadow:0 -12px 40px rgba(var(--shadow-rgb),.22)}
+.ai-pick-grip{display:block;width:36px;height:5px;margin:0 auto 10px;border-radius:3px;background:var(--border-subtle)}
+.ai-pick-head{margin:12px 0 6px;font-size:12px;font-weight:650;color:var(--text-muted)}
+.ai-pick-typed{margin:0 0 6px;font-size:12px;color:var(--accent-text)}
+.ai-pick-typed.hidden,[data-sheet-ai].hidden{display:none}
+.ai-pick-seg{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:3px;border-radius:12px;background:var(--fill)}
+.ai-pick-seg button{min-height:44px;padding:0 8px;border:0;border-radius:10px;background:transparent;color:var(--text-secondary);font:inherit;font-size:15px;font-weight:600;cursor:pointer}
+.ai-pick-seg button[aria-pressed="true"]{background:var(--accent-fill);color:var(--on-accent)}
+.ai-pick-sheet-list{display:flex;flex-direction:column;gap:2px}
+.ai-pick-sheet-list .ai-pick-opt{min-height:44px;padding:10px 12px;font-size:16px}
+.ai-pick-sheet-list .ai-pick-opt[aria-selected="true"]{background:var(--accent-soft);color:var(--accent-text)}
+.ai-pick-sheet-list .ai-pick-opt[aria-selected="true"] span::after{content:" ✓"}
+.ai-pick-done{width:100%;min-height:44px;margin-top:14px;border:0;border-radius:12px;background:var(--fill);color:var(--text);font:inherit;font-size:16px;font-weight:650;cursor:pointer}
+@media (min-width:769px){.ai-pick-sheet{display:none}}
+@media (max-width:768px){
+  #layout #ai-composer-modes{display:none !important}
+  .ai-at-list{left:6px;right:6px;min-width:0}
+  .ai-at-list .ai-pick-opt{min-height:44px}
+  .ai-mode-chip[data-pick]:not([data-pick=""])::after{content:"";display:inline-block;width:6px;height:6px;margin-left:6px;border-radius:50%;background:var(--accent-fill)}
+}
+.ai-pickfail{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.ai-pickfail-btn{min-height:44px;padding:0 14px;border:1px solid var(--border-subtle);border-radius:12px;background:var(--elevated);color:var(--text);font:inherit;font-size:14px;cursor:pointer}
+.ai-pickfail-btn:focus-visible{outline:2px solid var(--accent-fill);outline-offset:2px}
+
+/* Reuse the room's existing accent/fill tokens for member identities. */
+.ai-at-list{max-height:min(340px,50vh);overflow-y:auto}
+.ai-at-list ul{list-style:none;padding:0;margin:0}
+.ai-at-heading{padding:5px 10px;color:var(--text-muted);font-size:11px;font-weight:600}
+.ai-member-mention{display:inline;padding:1px 5px;border-radius:6px;background:var(--accent-soft);color:var(--accent-text);font-weight:600;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+.ai-member-mention.is-me{background:var(--accent-fill);color:var(--on-accent);box-shadow:0 0 0 1px var(--accent-fill)}
+#ai-member-mentions{margin-bottom:6px}
+
+.ai-at-list .ai-pick-opt[aria-selected="true"]{background:var(--accent-soft);color:var(--accent-text);box-shadow:inset 3px 0 0 var(--accent-fill)}
+.ai-at-list .ai-pick-opt[aria-selected="true"] small{color:var(--accent-text)}

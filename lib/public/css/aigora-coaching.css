@@ -1,0 +1,46 @@
+/* 지시 코칭 ("더 나은 지시"): the rubric in the 5th step, 내 지시 기록 and the shared card. */
+.coach-rubric{list-style:none;margin:0 0 8px;padding:0;display:grid;gap:6px}
+.coach-rubric.is-compact{display:flex;flex-wrap:wrap;gap:6px}
+.coach-row{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 8px}
+.coach-chip{display:inline-flex;align-items:center;gap:4px;padding:0 8px;border:1px solid var(--ag-line,var(--border));border-radius:999px;font-size:12px;line-height:20px;white-space:nowrap}
+.coach-chip.is-present{color:var(--ag-pass,var(--success-text));border-color:var(--ag-pass,var(--success-text))}
+.coach-chip.is-weak{color:var(--ag-ink-soft,var(--text-secondary));border-style:dotted}
+.coach-chip.is-missing{color:var(--ag-not-run,var(--text-muted));border-style:dashed}
+.coach-reason{font-size:12px;line-height:1.45;color:var(--ag-ink-soft,var(--text-secondary));overflow-wrap:anywhere}
+.coach-hint{margin:0 0 8px;font-size:12px;line-height:1.5}
+.coach-locked,.coach-empty{margin:0;font-size:13px;color:var(--ag-ink-soft,var(--text-secondary))}
+.coach-empty{padding:36px 12px;text-align:center}
+.coach-suggestion,.coach-hist-text{margin:0 0 8px;padding:8px 10px;border-radius:10px;background:var(--bg-alt,var(--ag-accent-wash));font-size:13px;line-height:1.55;white-space:pre-wrap;overflow-wrap:anywhere}
+.coach-actions{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:6px}
+.coach-shared,.coach-tag{padding:1px 8px;border-radius:999px;background:var(--bg-alt);font-size:11px;color:var(--text-secondary)}
+.coach-card-label{margin:6px 0 2px;font-size:11px;color:var(--text-muted)}
+
+.coach-layer{position:fixed;inset:0;z-index:360;display:flex;align-items:center;justify-content:center;padding:18px}
+.coach-layer.hidden{display:none}
+.coach-scrim{position:absolute;inset:0;background:var(--scrim-sheet);backdrop-filter:blur(7px)}
+.coach-sheet{position:relative;width:min(680px,100%);max-height:min(780px,calc(100vh - 36px));overflow:auto;padding:20px;border-radius:22px;background:var(--elevated);color:var(--text);box-shadow:0 26px 70px rgba(var(--shadow-rgb),.24)}
+.coach-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:10px}
+.coach-head small{display:block;margin-bottom:3px;font-family:"DM Mono",monospace;font-size:9px;letter-spacing:.16em;color:var(--text-muted)}
+.coach-head h2{font-size:19px;font-weight:680;letter-spacing:-.025em}
+.coach-close{flex:none;width:30px;height:30px;border:0;border-radius:50%;background:var(--bg-alt);font-size:18px;cursor:pointer}
+.coach-privacy{margin:0 0 12px;padding:10px 12px;border-radius:12px;background:var(--accent-faint);color:var(--text-secondary);font-size:12px;line-height:1.5}
+.coach-hist-summary{margin:0 0 12px;font-size:13px;font-weight:600}
+.coach-hist-list{list-style:none;margin:0;padding:0;display:grid;gap:12px}
+.coach-hist-item{padding:14px;border:1px solid var(--border-subtle);border-radius:16px;background:var(--surface)}
+.coach-hist-target{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-ring)}
+.coach-hist-head{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:8px;font-size:12px;color:var(--text-secondary)}
+@media (max-width:768px){.coach-layer{padding:0;align-items:flex-end}.coach-sheet{width:100%;max-height:92vh;border-radius:22px 22px 0 0}}
+
+/* Coaching detail under the author's own message, opened by the 지시 코칭 icon in the action row. */
+.coach-inline { margin: 6px 0 0; max-width: min(100%, 520px); }
+.coach-inline-body { margin-top: 8px; padding: 12px; border-radius: 14px; background: var(--bg-alt); text-align: left; }
+.coach-inline-body[hidden] { display: none; }
+.coach-tab-block { margin: 0 0 14px; }
+.coach-tab-title { margin: 0 0 6px; font-size: 12px; font-weight: 650; color: var(--text-secondary); }
+.coach-trend { margin: 0; font-size: 13px; }
+.coach-ai { margin: 8px 0 0; }
+.coach-ai-error { margin: 0 0 6px; font-size: 12px; line-height: 1.45; color: var(--danger-text, var(--text-secondary)); }
+.coach-ai-result { margin: 4px 0 8px; }
+@media (max-width: 768px) {
+  .coach-inline-body .ag-btn, .coach-tab-block .ag-btn, .coach-hist-item .ag-btn { min-height: 44px; }
+}

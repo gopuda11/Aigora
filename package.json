@@ -1,0 +1,72 @@
+{
+  "name": "aigora",
+  "version": "0.1.0",
+  "description": "Self-hosted collaborative AI workspace with explicit API credentials and local models.",
+  "bin": {
+    "aigora": "./bin/cli.js",
+    "aigora-mcp-bridge": "./bin/mcp-bridge.js"
+  },
+  "scripts": {
+    "dev": "node bin/cli.js --dev",
+    "postinstall": "node scripts/postinstall.js",
+    "prepack": "node scripts/write-build-sha.js",
+    "test": "node scripts/run-tests.js",
+    "check:public": "node scripts/check-public-safety.js",
+    "e2e:isolation": "AIGORA_E2E=1 node --test test/e2e/two-user-isolation.e2e.js",
+    "install:local-test": "node scripts/install-local-test.js",
+    "verify:installed-build": "node scripts/verify-installed-build.js",
+    "gen:notices": "node scripts/gen-third-party-notices.js"
+  },
+  "files": [
+    "bin/",
+    "lib/",
+    "scripts/",
+    "deploy/",
+    "native-host/",
+    "CREDITS.md",
+    "THIRD-PARTY-NOTICES.md",
+    "docs/setup-api.md",
+    "docs/local-models.md",
+    "docs/BUILDING-WITH-AI.md",
+    "FORK_NOTICE.md",
+    "SECURITY.md",
+    "PRIVACY.md",
+    "README.ko.md"
+  ],
+  "keywords": [
+    "claude",
+    "claude-agent-sdk",
+    "codex",
+    "codex-cli",
+    "openai",
+    "self-hosted",
+    "multi-user",
+    "team",
+    "workspace",
+    "ai-agent",
+    "ai-coding-agent",
+    "cron",
+    "mobile",
+    "pwa",
+    "web-ui",
+    "browser",
+    "aigora",
+    "multi-agent",
+    "collaborative-ai"
+  ],
+  "author": "Aigora contributors",
+  "dependencies": {
+    "@anthropic-ai/claude-agent-sdk": "^0.3.173",
+    "@anthropic-ai/sdk": "^0.104.1",
+    "@lydell/node-pty": "^1.2.0-beta.3",
+    "@openai/codex": "^0.160.0",
+    "nodemailer": "^10.0.13",
+    "qrcode-terminal": "^0.12.0",
+    "web-push": "^3.6.7",
+    "ws": "^8.22.0"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=22.15"
+  }
+}

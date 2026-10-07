@@ -1,0 +1,448 @@
+<!doctype html>
+<html lang="ko" class="light-theme">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="light dark">
+  <title>Aⁱgora</title>
+  <!-- Apply the stored 테마 before first paint (no light flash). Same key as aigora/theme.js; "system" = no attribute. -->
+  <script>try{var t=localStorage.getItem("aigora.theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+  <!-- Same for 세션 표시 방식 (default C) and 동작 줄이기. Same keys as aigora/display-prefs.js. -->
+  <script>try{var l=localStorage.getItem("aigora.sessionLayout");document.documentElement.setAttribute("data-session-layout",l==="A"||l==="B"?l:"C");if(localStorage.getItem("aigora.reduceMotion")==="1")document.documentElement.setAttribute("data-reduce-motion","1")}catch(e){document.documentElement.setAttribute("data-session-layout","C")}</script>
+  <!-- 언어: <html lang> before first paint (saved choice, else the browser's). Same key and rule as aigora/i18n.js. -->
+  <script>try{var g;try{g=localStorage.getItem("aigora.lang")}catch(e){}if(g!=="ko"&&g!=="en")g=/^ko($|[-_])/i.test(navigator.language||"ko")?"ko":"en";document.documentElement.setAttribute("lang",g);if(g==="en"){var d=document.documentElement;d.setAttribute("data-lang-pending","1");setTimeout(function(){d.removeAttribute("data-lang-pending")},2500)}}catch(e){}</script>
+  <!-- Before the stylesheets arrive: let the canvas follow the chosen/OS scheme so 시스템 + dark OS never flashes white. -->
+  <style>:root{color-scheme:light dark}:root[data-theme="light"]{color-scheme:light}:root[data-theme="dark"]{color-scheme:dark}</style>
+  <!-- English: hide the Korean markup until the module below has translated it (applyDom), so it never flashes. -->
+  <style>html[data-lang-pending]{visibility:hidden}</style>
+  <link rel="icon" type="image/x-icon" href="favicon.ico" sizes="any">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="stylesheet" href="css/agora.css?v=12">
+  <link rel="stylesheet" href="css/aigora-app.css?v=38">
+  <link rel="stylesheet" href="css/aigora-shared-posts.css?v=2">
+  <link rel="stylesheet" href="css/aigora-coaching.css?v=3">
+  <link rel="stylesheet" href="css/aigora-skills.css?v=1">
+  <link rel="stylesheet" href="css/aigora-attachments.css?v=12">
+  <link rel="stylesheet" href="css/aigora-office.css?v=9">
+  <link rel="stylesheet" href="css/aigora-picker.css?v=2">
+  <link rel="stylesheet" href="css/aigora-phone.css?v=6">
+  <!-- The shared Agora renderers import three legacy modules; Aigora supplies its own. -->
+  <script type="importmap">
+  {
+    "imports": {
+      "./modules/sidebar-sessions.js": "./aigora/host.js",
+      "./modules/utils.js": "./aigora/host.js",
+      "./modules/app-rendering.js": "./aigora/host.js"
+    }
+  }
+  </script>
+  <script type="module">import { applyDom } from "./aigora/i18n.js"; applyDom(document); document.documentElement.removeAttribute("data-lang-pending");</script>
+</head>
+<body>
+  <a class="ai-skip" href="#ai-chat" data-i18n="client.skipLink">대화로 건너뛰기</a>
+  <div id="layout">
+    <aside id="ai-sidebar" class="ai-sidebar">
+      <div class="ai-brand"><strong>A<sup>i</sup>gora</strong><p data-i18n="client.brandTagline">우리 팀의 Ai 작업실</p></div>
+      <!-- Phone (<=768px): this aside is the off-canvas sidebar (aigora/phone-nav.js). Everything between the brand and the
+           footer is drawn only there; above 768px the page is exactly the desktop sidebar. -->
+      <div id="ai-phone-side" class="ai-phone-side" lang="ko">
+        <div class="ai-ps-head"><h2 class="ai-ps-title">A<sup>i</sup>gora</h2><button id="ai-ps-search-btn" type="button" class="ai-ps-circle" aria-label="검색" aria-expanded="false" aria-controls="ai-ps-search" data-i18n-attr="aria-label:phoneNav.search"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></button></div>
+        <form id="ai-ps-search" class="ai-ps-search hidden" role="search"><input id="ai-ps-q" type="search" placeholder="방과 세션 검색" aria-label="방과 세션 검색" autocomplete="off" enterkeyhint="search" data-i18n-attr="placeholder:phoneNav.searchPlaceholder; aria-label:phoneNav.searchPlaceholder"></form>
+        <div id="ai-ps-results" class="ai-ps-results hidden" aria-live="polite"></div>
+        <div id="ai-ps-body" class="ai-ps-body">
+          <nav id="ai-ps-menu" class="ai-ps-menu" aria-label="메뉴" data-i18n-attr="aria-label:phoneNav.menuLabel"></nav>
+          <div id="ai-ps-divider" class="ai-ps-divider hidden" role="separator"></div>
+          <div id="ai-ps-prev" class="ai-ps-prev"></div>
+          <section id="ai-phone-list" class="ai-phone-list" aria-label="나만의 채널 세션" data-i18n-attr="aria-label:phoneNav.privateSessions"></section>
+        </div>
+      </div>
+      <div id="ai-room-tools" class="ai-room-tools hidden"><span data-i18n="roomAdmin.createRoomLabel">방 만들기</span><button id="ai-room-create" type="button" aria-label="새 방 만들기" title="새 방 만들기" aria-haspopup="dialog" data-i18n-attr="aria-label:roomAdmin.newRoom; title:roomAdmin.newRoom">+</button></div>
+      <div id="agora-room-rail" class="ag-rail hidden" lang="ko"></div>
+      <div class="ai-spacer"></div>
+      <div class="ai-side-foot">
+      <button id="ai-ps-primary" type="button" class="ai-ps-primary hidden" data-ps-primary=""></button>
+      <div id="ai-usage" class="ai-usage ai-usage-sidebar">
+        <button id="ai-usage-btn" class="ai-usage-btn" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="ai-usage-popover" aria-label="AI 사용량 불러오는 중" data-level="unknown"><span class="ai-usage-btn-dot" aria-hidden="true"></span><span class="ai-usage-btn-label" data-i18n="aiUsage.title">AI 사용량</span><span id="ai-usage-value" class="ai-usage-btn-value">불러오는 중</span><i data-lucide="chevron-up" aria-hidden="true"></i></button>
+        <div id="ai-usage-popover" class="ai-usage-popover" role="dialog" aria-label="AI 사용량" data-i18n-attr="aria-label:aiUsage.title" hidden>
+          <div class="ai-usage-head"><span class="ai-usage-title" data-i18n="aiUsage.title">AI 사용량</span><button id="ai-usage-refresh" class="ai-usage-refresh" type="button" aria-label="AI 사용량 새로고침" data-i18n-attr="aria-label:aiUsage.refresh"><i data-lucide="refresh-cw"></i></button></div>
+          <div id="ai-usage-list" class="ai-usage-list" aria-live="polite"></div>
+          <div id="ai-usage-fresh" class="ai-usage-fresh"></div>
+        </div>
+      </div>
+      <div class="ai-conn"><span id="ai-conn-dot" class="ai-conn-dot" aria-hidden="true"></span><span id="ai-conn-text" data-i18n="client.connConnecting">연결 중…</span></div>
+      <div id="ai-account" class="ai-account hidden" lang="ko">
+        <button id="ai-account-btn" class="ai-account-btn" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="ai-account-menu"><span id="ai-account-avatar" class="ai-account-avatar" aria-hidden="true"></span><span class="ai-account-text"><strong id="ai-account-name"></strong><small id="ai-account-role"></small></span><svg class="ai-account-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 14l5-5 5 5"/></svg></button>
+      </div>
+      </div>
+    </aside>
+    <!-- Layout C: the session list column. Shut (zero width) in 방 대화 and under layouts A and B. -->
+    <nav id="ai-session-col" class="ai-session-col is-shut" aria-label="나만의 채널 세션" data-i18n-attr="aria-label:privateChannels.sessionsAria" aria-hidden="true" lang="ko"></nav>
+    <main id="main-column">
+      <div id="ai-offline" class="ai-offline hidden" role="status" aria-live="polite"></div>
+      <!-- Phone (<=768px) top bar: ☰, the 방 | 채널 pill, and the bell (방) or 새 세션 (채널). Hidden above 768px. -->
+      <div id="ai-phone-bar" class="ai-phone-bar" lang="ko">
+        <button id="ai-pb-menu" type="button" class="ai-pb-circle" aria-label="메뉴 열기" aria-expanded="false" aria-controls="ai-sidebar" data-i18n-attr="aria-label:phoneNav.openMenu"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h16M4 16h10"/></svg></button>
+        <div id="ai-pb-seg" class="ai-send-mode ai-pb-seg hidden" role="tablist" aria-label="보기" data-tab="room" data-i18n-attr="aria-label:phoneNav.viewLabel"><span class="ai-send-pill" aria-hidden="true"></span><button type="button" role="tab" data-pb-tab="room" aria-selected="true">방</button><button type="button" role="tab" data-pb-tab="private" aria-selected="false" tabindex="-1">채널</button></div>
+        <button id="ai-pb-action" type="button" class="ai-pb-circle hidden" data-action="bell" aria-label="알림"><span id="ai-pb-action-icon" class="ai-pb-icon"></span><span id="ai-pb-badge" class="ai-pb-badge hidden"></span></button>
+      </div>
+      <p id="ai-phone-room" class="ai-phone-room hidden" lang="ko"></p>
+      <div class="ai-mobile-bar">
+        <button id="ai-account-mobile" type="button" class="ai-account-mobile hidden" aria-label="계정 메뉴" data-i18n-attr="aria-label:settings.accountMenu" aria-haspopup="menu" aria-expanded="false" aria-controls="ai-account-menu" lang="ko"></button>
+        <button id="ai-room-manage-mobile" type="button" class="ai-mobile-manage hidden" aria-haspopup="dialog" data-i18n="roomAdmin.manageTitle">방 관리</button>
+      </div>
+      <header id="agora-room-header" class="ag-room-header hidden" lang="ko"></header>
+      <div id="ai-skills-bar" class="ai-skills-bar hidden" lang="ko"><button id="ai-skills-chip" type="button" class="ai-skills-chip" aria-haspopup="dialog"></button></div>
+      <!-- Layout A: the session menu under the title "나만의 채널 · <세션> ⌄". -->
+      <div id="ai-session-pop" class="ai-session-pop is-shut" role="menu" aria-label="세션" data-i18n-attr="aria-label:privateChannels.sessionsAria" aria-hidden="true" lang="ko"></div>
+      <div id="ai-social-tools" class="ai-social-tools hidden">
+        <button id="ai-pin-btn" type="button" class="ai-tool-btn" aria-haspopup="true" aria-expanded="false" aria-controls="ai-pop-pin" aria-label="고정한 항목" title="고정한 항목" data-i18n-attr="aria-label:social.pinsHeading; title:social.pinsHeading">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 17v5M9 3h6l-1 6 3 3v2H7v-2l3-3-1-6z"/></svg>
+        </button>
+        <button id="ai-notif-btn" type="button" class="ai-tool-btn" aria-haspopup="true" aria-expanded="false" aria-controls="ai-pop-notif" aria-label="댓글 알림" title="댓글 알림" data-i18n-attr="aria-label:social.notifHeading; title:social.notifHeading">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0112 0c0 7 3 8 3 8H3s3-1 3-8M10 21a2 2 0 004 0"/></svg>
+          <span id="ai-notif-dot" class="ai-dot hidden"></span>
+        </button>
+      </div>
+      <div id="ai-pop-notif" class="ai-pop hidden" role="dialog" aria-label="댓글 알림" data-i18n-attr="aria-label:social.notifHeading"></div>
+      <div id="ai-pop-pin" class="ai-pop hidden" role="dialog" aria-label="고정한 항목" data-i18n-attr="aria-label:social.pinsHeading"></div>
+      <!-- Phone (<=768px): the list screen and the chat screen are the two screens of the 나만의 채널 stack (aigora/phone-nav.js);
+           above 768px the wrappers dissolve (display:contents) and the list is never drawn. -->
+      <div id="ai-phone-chat" class="ai-phone-chat">
+      <section id="ai-chat" class="ai-chat" tabindex="-1" aria-label="대화" data-i18n-attr="aria-label:client.chatLabel" aria-live="polite"></section>
+      <div id="ai-perm-live" class="ai-sr-only" aria-live="assertive" aria-atomic="true"></div>
+      <div id="ai-phone-progress" class="ai-phone-progress hidden" role="status" lang="ko"></div>
+      <div id="ai-phone-suggest" class="ai-phone-suggest hidden" lang="ko"></div>
+      <div id="ai-notices" class="ai-notices">
+        <div id="ai-toast" class="ai-toast" role="status" aria-live="polite"></div>
+        <button type="button" id="ai-update" class="ai-update hidden" data-i18n="client.updateAvailable">새 버전이 배포됐어요 · 새로고침</button>
+      </div>
+      <div id="ai-queued" class="ai-queued hidden">
+        <span id="ai-queued-status" role="status" aria-live="polite"></span>
+        <button id="ai-queued-cancel" class="ai-set-btn" type="button" data-i18n="client.queueCancel">취소</button>
+      </div>
+      <form id="ai-composer" class="ai-composer" autocomplete="off">
+        <div id="ai-uploads" class="ai-uploads hidden" aria-live="polite"></div>
+        <div id="ai-attachments" class="ai-attachments hidden"></div>
+        <div id="ai-composer-modes" class="ai-composer-modes hidden">
+          <div id="ai-send-mode" class="ai-send-mode hidden" role="group" aria-label="보내기 방식" data-i18n-attr="aria-label:composer.sendModeLabel" data-mode="ai">
+            <span class="ai-send-pill" aria-hidden="true"></span>
+            <button type="button" data-send-mode="ai" aria-pressed="true" data-i18n="composer.toAi">AI에게 지시</button>
+            <button type="button" data-send-mode="member" aria-pressed="false" data-i18n="composer.toMember">조원에게 메시지</button>
+          </div>
+          <div id="ai-pick" class="ai-pick hidden">
+            <button id="ai-pick-chip" type="button" class="ai-pick-chip" aria-haspopup="listbox" aria-expanded="false" aria-controls="ai-pick-list" aria-label="AI 선택: 자동"><span class="ai-pick-cap">AI</span><span data-pick-value data-i18n="aiPicker.auto">자동</span><span class="ai-pick-caret" aria-hidden="true">▾</span></button>
+            <div id="ai-pick-list" class="ai-pick-list hidden" role="listbox" aria-label="이번 지시를 받을 AI" data-i18n-attr="aria-label:aiPicker.listLabel"></div>
+          </div>
+        </div>
+        <ul id="ai-at-list" class="ai-at-list hidden" role="listbox" aria-label="AI 멘션 제안" data-i18n-attr="aria-label:aiPicker.mentionListLabel"></ul>
+        <div id="ai-member-mentions" class="ai-chips hidden" aria-live="polite"></div>
+        <div class="ai-composer-row">
+          <div id="attach-wrap">
+            <button id="input-more-btn" type="button" aria-label="추가" title="추가" data-i18n-attr="aria-label:input.addLabel; title:input.addLabel" aria-haspopup="menu" aria-controls="input-add-menu" aria-expanded="false"><i data-lucide="plus"></i></button>
+            <div id="input-add-menu" class="hidden" role="menu" aria-label="추가" data-i18n-attr="aria-label:input.addLabel">
+              <button id="ai-new-session" type="button" role="menuitem" data-add-action="session" disabled><i data-lucide="message-circle-plus"></i><span><strong data-i18n="input.newSession">새 세션</strong><small data-i18n="input.newSessionHint">나만의 채널에서 새 작업 시작</small></span></button>
+              <button type="button" role="menuitem" data-add-action="file"><i data-lucide="paperclip"></i><span><strong data-i18n="input.file">파일</strong><small id="ai-file-hint">방에 올릴 파일 · 25MB</small></span></button>
+              <button type="button" role="menuitem" data-add-action="image"><i data-lucide="image"></i><span><strong data-i18n="input.photo">사진</strong><small data-i18n="input.photoHint">AI에게 보여줄 사진</small></span></button>
+              <button type="button" role="menuitem" data-add-action="camera" class="ai-add-camera"><i data-lucide="camera"></i><span><strong data-i18n="input.camera">카메라</strong><small data-i18n="input.cameraHint">지금 찍어서 AI에게 보여주기</small></span></button>
+              <button type="button" role="menuitem" data-add-action="inbox" class="hidden"><i data-lucide="folder-open"></i><span><strong>방 파일 첨부</strong><small data-i18n="input.pickFilesHint">이번 지시에 붙일 파일 고르기</small></span></button>
+              <button type="button" role="menuitem" data-add-action="newdoc" class="hidden"><i data-lucide="file-plus"></i><span><strong data-i18n="input.newDoc">새 문서</strong><small data-i18n="input.newDocHint">워드·엑셀·파워포인트 빈 문서</small></span></button>
+              <button type="button" role="menuitem" data-add-action="addon" aria-disabled="true"><i data-lucide="puzzle"></i><span><strong data-i18n="input.addon">스킬 / 플러그인 추가</strong><small data-i18n="input.addonHint">Aigora에서 준비 중입니다</small></span></button>
+            </div>
+          </div>
+          <button id="ai-mode-chip" type="button" class="ai-mode-chip hidden" data-send-mode-toggle></button>
+          <textarea id="ai-input" class="ai-input" rows="1" placeholder="이 방에 지시를 입력하세요…" aria-label="메시지" data-i18n-attr="placeholder:composer.placeholderAi; aria-label:composer.inputLabel" disabled></textarea>
+          <button id="ai-send" class="ai-send" type="submit" aria-label="보내기" data-i18n-attr="aria-label:composer.send" disabled>↑</button>
+        </div>
+        <input id="ai-image-input" type="file" accept="image/png,image/jpeg,image/gif,image/webp" multiple hidden>
+        <input id="ai-camera-input" type="file" accept="image/*" capture="environment" hidden>
+        <input id="ai-file-input" type="file" multiple hidden>
+        <p id="ai-composer-note" class="ai-composer-note" role="status"></p>
+        <p id="ai-attach-hint" class="ai-attach-hint hidden"></p>
+      </form>
+      </div>
+      <div id="ai-phone-edge" class="ai-phone-edge hidden" aria-hidden="true"></div>
+    </main>
+    <aside id="agora-context" class="ag-context hidden" aria-label="방 작업 패널" data-i18n-attr="aria-label:agoraRender.contextPanelLabel"></aside>
+  </div>
+  <div id="ai-pick-sheet" class="ai-pick-sheet hidden" role="dialog" aria-modal="true" aria-label="보내기 설정" data-i18n-attr="aria-label:aiPicker.sheetLabel" lang="ko">
+    <div class="ai-pick-scrim" data-pick-close></div>
+    <div class="ai-pick-panel">
+      <span class="ai-pick-grip" aria-hidden="true"></span>
+      <p class="ai-pick-head" id="ai-pick-sheet-mode-h" data-i18n="aiPicker.sheetModeHead">보내기 방식</p>
+      <div class="ai-pick-seg" role="group" aria-labelledby="ai-pick-sheet-mode-h">
+        <button type="button" data-sheet-mode="ai" aria-pressed="true" data-i18n="composer.toAi">AI에게 지시</button>
+        <button type="button" data-sheet-mode="member" aria-pressed="false" data-i18n="composer.toMember">조원에게 메시지</button>
+      </div>
+      <div data-sheet-ai>
+        <p class="ai-pick-head" id="ai-pick-sheet-ai-h" data-i18n="aiPicker.sheetAiHead">AI 선택</p>
+        <p class="ai-pick-typed hidden" data-sheet-typed data-i18n="aiPicker.sheetTyped">입력한 @멘션이 우선합니다.</p>
+        <div data-sheet-ai-list class="ai-pick-sheet-list" role="listbox" aria-labelledby="ai-pick-sheet-ai-h"></div>
+      </div>
+      <button type="button" class="ai-pick-done" data-pick-close data-i18n="aiPicker.sheetDone">완료</button>
+    </div>
+  </div>
+  <aside id="agora-room-sheet" class="ag-sheet" role="dialog" aria-label="방 전환" data-i18n-attr="aria-label:agoraRender.switchRoom" lang="ko"><div id="agora-room-sheet-body"></div><button id="ai-room-create-sheet" type="button" class="ai-sheet-create hidden" aria-haspopup="dialog" data-i18n="client.roomCreatePlus">+ 방 만들기</button></aside>
+  <div id="agora-scrim" class="ag-scrim"></div>
+  <div id="ai-phone-scrim" class="ai-phone-scrim"></div>
+  <div id="ai-settings" class="ai-settings hidden" role="dialog" aria-modal="true" aria-labelledby="ai-settings-title" lang="ko">
+    <div class="ai-settings-scrim" data-settings-close></div>
+    <div class="ai-settings-modal">
+      <aside class="ai-settings-side">
+        <h2 id="ai-settings-title" data-i18n="settings.title">설정</h2>
+        <nav id="ai-settings-nav" class="ai-settings-nav" aria-label="설정 항목" data-i18n-attr="aria-label:settings.navLabel"></nav>
+      </aside>
+      <button id="ai-admin-close" class="ai-settings-close" type="button" aria-label="닫기" data-i18n-attr="aria-label:settings.close">×</button>
+      <div class="ai-settings-main">
+        <div class="ai-settings-scroll">
+          <!-- One pane per section id in settings-model.js. -->
+          <section class="ai-set-pane" data-settings-pane="general" aria-labelledby="ai-set-h-general" hidden>
+            <h3 id="ai-set-h-general" class="ai-set-title" data-i18n="settings.sectionGeneral">일반</h3>
+            <div class="ai-set-group">
+              <div class="ai-set-row"><div class="ai-set-label"><strong id="ai-theme-label" data-i18n="settings.themeLabel">테마</strong><small data-i18n="settings.themeHint">시스템을 고르면 기기의 라이트/다크 설정을 따릅니다.</small></div><div id="ai-theme-choices" class="ai-seg" role="radiogroup" aria-labelledby="ai-theme-label"></div></div>
+              <div class="ai-set-row"><div class="ai-set-label"><strong id="ai-lang-label" data-i18n="settings.langLabel">언어 / Language</strong><small data-i18n="settings.langHint">화면에 보이는 언어입니다. 고르면 바로 바뀝니다.</small></div><div id="ai-lang-choices" class="ai-seg" role="radiogroup" aria-labelledby="ai-lang-label"></div></div>
+            </div>
+            <h4 id="ai-layout-label" class="ai-set-group-title" data-i18n="sessionLayouts.title">세션 표시 방식</h4>
+            <p class="ai-set-note" data-i18n="sessionLayouts.note">나만의 채널의 세션을 고르는 방법입니다. 고르면 바로 적용됩니다.</p>
+            <div id="ai-layout-choices" class="ai-lay-cards" role="radiogroup" aria-labelledby="ai-layout-label"></div>
+            <div class="ai-set-group">
+              <div class="ai-set-row"><div class="ai-set-label"><strong id="ai-motion-label" data-i18n="settings.motionLabel">동작 줄이기</strong><small data-i18n="settings.motionHint">화면 전환과 움직임 효과를 끕니다. 기기의 동작 줄이기 설정과 상관없이 적용됩니다.</small></div><button id="ai-reduce-motion" class="ai-sw" type="button" role="switch" aria-checked="false" aria-labelledby="ai-motion-label"></button></div>
+              <div class="ai-set-row"><div class="ai-set-label"><strong id="ai-coaching-label" data-i18n="coaching.settingTitle">지시 코칭 표시</strong><small data-i18n="coaching.settingNote">AI에게 지시를 보낼 때 "더 나은 지시" 단계에 내 지시문 점검 결과와 제안을 나에게만 보여 줍니다.</small></div><button id="ai-prompt-coaching" class="ai-sw" type="button" role="switch" aria-checked="true" aria-labelledby="ai-coaching-label"></button></div>
+            </div>
+          </section>
+          <section class="ai-set-pane" data-settings-pane="account" aria-labelledby="ai-set-h-account" hidden>
+            <h3 id="ai-set-h-account" class="ai-set-title" data-i18n="settings.sectionAccount">계정</h3>
+            <div class="ai-set-group">
+              <div class="ai-set-row"><div class="ai-set-label"><strong data-i18n="settings.accountDisplayName">표시 이름</strong></div><span id="ai-settings-name" class="ai-set-value"></span></div>
+              <div class="ai-set-row"><div class="ai-set-label"><strong data-i18n="settings.accountUsername">사용자 이름</strong></div><span id="ai-settings-username" class="ai-set-value"></span></div>
+              <div class="ai-set-row"><div class="ai-set-label"><strong data-i18n="settings.accountRole">역할</strong></div><span id="ai-settings-role" class="ai-set-value"></span></div>
+            </div>
+            <h4 class="ai-set-group-title" data-i18n="settings.nickTitle">닉네임</h4>
+            <form id="ai-set-nick-form" class="ai-set-group ai-admin-form" autocomplete="off">
+              <input class="ai-field" id="ai-set-nick" aria-describedby="ai-set-nick-msg" type="text" maxlength="40" aria-label="닉네임" data-i18n-attr="aria-label:settings.nickTitle" autocomplete="nickname">
+              <p id="ai-set-nick-msg" class="ai-set-msg" role="status"></p>
+              <button id="ai-set-nick-save" class="ai-set-btn is-primary" type="submit" data-i18n="settings.nickSave">닉네임 변경</button>
+            </form>
+            <h4 id="ai-set-pin-title" class="ai-set-group-title">PIN 변경</h4>
+            <form id="ai-set-pin-form" class="ai-set-group ai-admin-form" autocomplete="off">
+              <input class="ai-field" id="ai-set-pin-cur" aria-describedby="ai-set-pin-msg" type="password" maxlength="6" inputmode="numeric" aria-label="현재 PIN" placeholder="현재 PIN" data-i18n-attr="aria-label:settings.pinCurrent; placeholder:settings.pinCurrent" autocomplete="current-password">
+              <input class="ai-field" id="ai-set-pin-new" aria-describedby="ai-set-pin-msg" type="password" maxlength="6" inputmode="numeric" aria-label="새 PIN" placeholder="새 PIN (숫자 6자리)" data-i18n-attr="aria-label:settings.pinNew; placeholder:settings.pinNewHint" autocomplete="new-password">
+              <input class="ai-field" id="ai-set-pin-new2" aria-describedby="ai-set-pin-msg" type="password" maxlength="6" inputmode="numeric" aria-label="새 PIN 확인" placeholder="새 PIN 확인" data-i18n-attr="aria-label:settings.pinNewConfirm; placeholder:settings.pinNewConfirm" autocomplete="new-password">
+              <p id="ai-set-pin-msg" class="ai-set-msg" role="status"></p>
+              <button id="ai-set-pin-save" class="ai-set-btn is-primary" type="submit" data-i18n="settings.pinTitleChange">PIN 변경</button>
+            </form>
+            <form id="ai-set-cred-form" class="ai-set-group ai-admin-form" autocomplete="off" hidden>
+              <p class="ai-set-note" style="margin:0" data-i18n="settings.credIntro">아이디와 PIN을 설정하면 다른 기기에서도 로그인할 수 있어요.</p>
+              <input class="ai-field" id="ai-set-cred-id" aria-describedby="ai-set-cred-msg" type="text" maxlength="30" aria-label="아이디" placeholder="아이디 (영문, 숫자, . _ -)" data-i18n-attr="aria-label:settings.credId; placeholder:settings.credIdHint" autocomplete="username" autocapitalize="none" spellcheck="false">
+              <input class="ai-field" id="ai-set-cred-pin" aria-describedby="ai-set-cred-msg" type="password" maxlength="6" inputmode="numeric" aria-label="PIN" placeholder="PIN (숫자 6자리)" data-i18n-attr="aria-label:settings.credPin; placeholder:settings.credPinHint" autocomplete="new-password">
+              <input class="ai-field" id="ai-set-cred-pin2" aria-describedby="ai-set-cred-msg" type="password" maxlength="6" inputmode="numeric" aria-label="PIN 확인" placeholder="PIN 확인" data-i18n-attr="aria-label:settings.credPinConfirm; placeholder:settings.credPinConfirm" autocomplete="new-password">
+              <p id="ai-set-cred-msg" class="ai-set-msg" role="status"></p>
+              <button id="ai-set-cred-save" class="ai-set-btn is-primary" type="submit" data-i18n="settings.credSave">설정</button>
+            </form>
+            <div class="ai-set-group">
+              <div class="ai-set-row"><div class="ai-set-label"><strong data-i18n="settings.menuLogout">로그아웃</strong><small data-i18n="settings.logoutHint">이 기기에서 로그아웃합니다.</small></div><button id="ai-settings-logout" class="ai-set-btn" type="button" data-i18n="settings.menuLogout">로그아웃</button></div>
+              <div class="ai-set-row"><div class="ai-set-label"><strong data-i18n="settings.logoutAll">모든 기기에서 로그아웃</strong><small data-i18n="settings.logoutAllHint">이 계정을 모든 기기에서 로그아웃하고 열린 연결을 닫습니다. 이 기기도 로그인 화면으로 돌아갑니다.</small></div><button id="ai-settings-logout-all" class="ai-set-btn ai-admin-danger" type="button" data-i18n="settings.logoutAll">모든 기기에서 로그아웃</button></div>
+            </div>
+          </section>
+          <section class="ai-set-pane" id="ai-settings-rooms" data-settings-pane="rooms" aria-labelledby="ai-admin-h-rooms" hidden>
+            <h3 id="ai-admin-h-rooms" class="ai-set-title" data-i18n="roomAdmin.sectionRooms">방</h3>
+            <div class="ai-set-group">
+              <div class="ai-set-row"><div class="ai-set-label"><label for="ai-admin-room-picker"><strong data-i18n="roomAdmin.roomToManage">관리할 방</strong></label><small id="ai-admin-room-summary"></small></div><select id="ai-admin-room-picker" class="ai-set-select"></select></div>
+            </div>
+            <h4 id="ai-admin-h-invite" class="ai-set-group-title" data-i18n="roomAdmin.inviteCodes">초대 코드</h4>
+            <div class="ai-set-group">
+              <div class="ai-set-row"><div class="ai-set-label"><strong data-i18n="roomAdmin.createInvite">초대 코드 만들기</strong><small data-i18n="roomAdmin.inviteOnceNote">링크는 만든 직후 한 번만 표시됩니다.</small></div><button id="ai-admin-invite-create" class="ai-set-btn" type="button" data-i18n="roomAdmin.create">만들기</button></div>
+              <div id="ai-admin-invite-once" class="ai-admin-once hidden">
+                <code id="ai-admin-invite-url"></code>
+                <button id="ai-admin-invite-copy" class="ai-set-btn" type="button" data-i18n="roomAdmin.copy">복사</button>
+                <small data-i18n="roomAdmin.onceNote">이 링크는 지금 한 번만 표시됩니다. 창을 닫으면 다시 볼 수 없습니다.</small>
+              </div>
+              <ul id="ai-admin-invites" class="ai-admin-list"></ul>
+            </div>
+            <h4 id="ai-admin-h-members" class="ai-set-group-title" data-i18n="roomAdmin.members">멤버</h4>
+            <div class="ai-set-group">
+              <ul id="ai-admin-members" class="ai-admin-list"></ul>
+            </div>
+            <h4 id="ai-admin-h-snap" class="ai-set-group-title" data-i18n="roomAdmin.workFolder">작업 폴더</h4>
+            <div class="ai-set-group">
+              <div class="ai-set-row"><div class="ai-set-label"><strong data-i18n="roomAdmin.snapshotsTitle">작업 폴더 되돌리기</strong><small data-i18n="roomAdmin.snapshotsNote">AI가 일하기 전에 자동으로 만든 백업(최근 20개)으로 되돌립니다.</small></div><button id="ai-admin-snap-open" class="ai-set-btn" type="button" data-i18n="roomAdmin.viewBackups">백업 보기</button></div>
+            </div>
+            <div id="ai-admin-skills" class="hidden">
+              <h4 id="ai-admin-h-skills" class="ai-set-group-title" data-i18n="roomAdmin.skills">스킬</h4>
+              <div class="ai-set-group">
+                <div class="ai-set-row"><div class="ai-set-label"><strong data-i18n="roomAdmin.roomSkills">이 방의 스킬</strong><small data-i18n="roomAdmin.roomSkillsNote">이 방에서 AI가 쓸 스킬을 켜고 끄거나 새 스킬을 추가해요.</small></div><button id="ai-admin-skills-open" class="ai-set-btn" type="button" data-i18n="roomAdmin.manageSkills">스킬 관리</button></div>
+                <div id="ai-admin-skill-managers-row" class="ai-set-row hidden"><div class="ai-set-label"><label for="ai-admin-skill-managers"><strong data-i18n="roomAdmin.skillManagers">스킬 관리 권한</strong></label><small data-i18n="roomAdmin.skillManagersNote">멤버 이상으로 두면 멤버도 스킬을 켜고 끄고, 이 방 전용 스킬을 추가할 수 있어요. 열람자는 볼 수만 있어요.</small></div>
+                  <select id="ai-admin-skill-managers" class="ai-set-select" aria-label="스킬 관리 권한" data-i18n-attr="aria-label:roomAdmin.skillManagers"><option value="members" data-i18n="roomAdmin.membersUp">멤버 이상</option><option value="admins" data-i18n="roomAdmin.adminsOnly">관리자만</option></select></div>
+              </div>
+            </div>
+            <h4 id="ai-admin-h-room" class="ai-set-group-title" data-i18n="roomAdmin.newRoomTitle">새 방 만들기</h4>
+            <div class="ai-set-group">
+              <form id="ai-admin-room-form" class="ai-admin-form">
+                <label class="ai-tr-field"><span class="ai-tr-label" data-i18n="roomAdmin.newRoomName">새 방 이름</span><input class="ai-field" id="ai-admin-room-name" type="text" maxlength="60" placeholder="새 방 이름" aria-label="새 방 이름" autocomplete="off" data-i18n-attr="placeholder:roomAdmin.newRoomName; aria-label:roomAdmin.newRoomName"></label>
+                <label class="ai-tr-field"><span class="ai-tr-label" data-i18n="roomAdmin.newRoomDesc">새 방 설명</span><input class="ai-field" id="ai-admin-room-desc" type="text" maxlength="240" placeholder="설명 (선택)" aria-label="새 방 설명" autocomplete="off" data-i18n-attr="placeholder:roomAdmin.descPlaceholder; aria-label:roomAdmin.newRoomDesc"></label>
+                <button class="ai-set-btn is-primary" type="submit" data-i18n="roomAdmin.createRoomLabel">방 만들기</button>
+              </form>
+            </div>
+            <div id="ai-admin-archived-section" class="hidden" aria-labelledby="ai-admin-h-archived">
+              <h3 id="ai-admin-h-archived" class="ai-set-title" data-i18n="roomAdmin.archivedTitle">보관된 방</h3>
+              <p class="ai-set-note" data-i18n="roomAdmin.archivedNote">보관한 방은 방 목록에서 사라집니다. 복원하면 다시 나타나고, 영구 삭제하면 되돌릴 수 없습니다.</p>
+              <div class="ai-set-group">
+                <ul id="ai-admin-archived" class="ai-admin-list"></ul>
+              </div>
+            </div>
+          </section>
+          <section id="ai-settings-server" class="ai-set-pane" data-settings-pane="server" aria-labelledby="ai-admin-h-server" hidden>
+            <h3 id="ai-admin-h-server" class="ai-set-title" data-i18n="roomAdmin.sectionServer">서버</h3>
+            <p id="ai-admin-server-scope" class="ai-set-note"></p>
+            <h4 id="ai-admin-h-approval" class="ai-set-group-title" data-i18n="roomAdmin.approvalTitle">AI 승인 방식</h4>
+            <div id="ai-admin-approval" class="ai-set-group" aria-labelledby="ai-admin-h-approval">
+              <form id="ai-admin-approval-form" class="ai-admin-form">
+                <label class="ai-appr-opt"><input type="radio" name="ai-approval-level" value="always"> <span><strong data-i18n="roomAdmin.askAlways">항상 묻기</strong><small data-i18n="roomAdmin.askAlwaysNote">샌드박스 안의 읽기와 작업 폴더 파일 작업만 자동으로 하고, 나머지는 모두 관리자에게 물어요.</small></span></label>
+                <label class="ai-appr-opt"><input type="radio" name="ai-approval-level" value="risky"> <span><strong data-i18n="roomAdmin.askRisky">위험한 것만 묻기 (기본)</strong><small data-i18n="roomAdmin.askRiskyNote">샌드박스 안의 작업은 바로 실행해요. 아래 경우만 관리자에게 물어요. 작업 폴더는 자동 백업이 있어 되돌릴 수 있어요.</small></span></label>
+                <label class="ai-appr-opt"><input type="radio" name="ai-approval-level" value="never"> <span><strong data-i18n="roomAdmin.askNever">묻지 않기</strong><small data-i18n="roomAdmin.askNeverNote">샌드박스 밖에서 실행되는 도구(MCP 등)를 빼고는 묻지 않아요.</small></span></label>
+                <ul class="ai-appr-risky">
+                  <li data-i18n="roomAdmin.risk1">외부로 데이터를 보내는 명령 (curl 업로드, git push, scp, ssh 등)</li>
+                  <li data-i18n="roomAdmin.risk2">AI 계정 인증 정보에 접근하는 요청</li>
+                  <li data-i18n="roomAdmin.risk3">작업 폴더 전체를 지우는 명령</li>
+                  <li data-i18n="roomAdmin.risk4">샌드박스 밖 도구 (MCP 등, 모든 방식에서 물어요)</li>
+                  <li data-i18n="roomAdmin.risk5">아래 '항상 묻기 목록'에 있는 명령</li>
+                </ul>
+                <label class="ai-appr-opt"><input id="ai-approval-requester" type="checkbox"> <span><strong data-i18n="roomAdmin.requesterApproves">지시한 사람도 승인 가능</strong><small data-i18n="roomAdmin.requesterApprovesNote">AI에게 지시한 멤버가 그 작업의 승인 요청에 직접 답할 수 있어요.</small></span></label>
+                <label class="ai-appr-pat"><strong data-i18n="roomAdmin.alwaysList">항상 묻기 목록</strong><small data-i18n="roomAdmin.alwaysListNote">한 줄에 하나, 명령 앞부분 (예: git push)</small><textarea id="ai-approval-patterns" rows="3" maxlength="2000" spellcheck="false"></textarea></label>
+                <button id="ai-approval-save" class="ai-set-btn is-primary" type="submit" data-i18n="roomAdmin.save">저장</button>
+              </form>
+            </div>
+          </section>
+          <section id="ai-settings-routing" class="ai-set-pane" data-settings-pane="routing" aria-labelledby="ai-admin-h-routing" hidden>
+            <h3 id="ai-admin-h-routing" class="ai-set-title" data-i18n="roomAdmin.sectionRouting">AI·라우팅</h3>
+            <div id="ai-admin-clef" class="hidden">
+              <h4 class="ai-set-group-title" data-i18n="roomAdmin.clefTitle">의미 기반 작업 라우팅 (Clef)</h4>
+              <p class="ai-set-note" data-i18n="roomAdmin.clefNote">애매한 요청을 Cloudflare Workers AI의 Clef-flash로 분류해 조사·검증 단계를 붙입니다.</p>
+              <div class="ai-set-group">
+                <div class="ai-set-row"><div class="ai-set-label"><strong id="ai-clef-on-label" data-i18n="roomAdmin.clefOn">Clef 라우팅 사용</strong></div><button id="ai-clef-on" class="ai-sw" type="button" role="switch" aria-checked="false" aria-labelledby="ai-clef-on-label"></button></div>
+                <div class="ai-set-row"><label for="ai-decision-backend" data-i18n="roomAdmin.decisionBackend">결정 백엔드</label><select id="ai-decision-backend" class="ai-set-select"><option value="clef">Clef</option><option value="jev">JEV</option><option value="ensemble" data-i18n="roomAdmin.decisionEnsemble">Clef + JEV (앙상블)</option><option value="endpoint" data-i18n="roomAdmin.decisionEndpoint">자체 호스팅 엔드포인트</option></select></div>
+                <div class="ai-set-row ai-clef-row"><div class="ai-set-label"><strong id="ai-clef-auto-label" data-i18n="roomAdmin.clefAuto">모델 자동 선택</strong><small data-i18n="roomAdmin.clefAutoNote">켜면 AI를 지정하지 않은 요청에 알맞은 AI를 자동으로 고릅니다. 직접 고른 AI가 항상 우선하고, 실패하면 기본 방식으로 처리해요.</small></div><button id="ai-clef-auto" class="ai-sw" type="button" role="switch" aria-checked="false" aria-labelledby="ai-clef-auto-label"></button></div>
+                <div class="ai-set-row ai-clef-row"><div class="ai-set-label"><label for="ai-clef-abstain"><strong data-i18n="roomAdmin.clefAbstain">판단 보류 기준</strong></label><small data-i18n="roomAdmin.clefAbstainNote">확신이 이 값보다 낮으면 기본 방식으로 처리해요 (0.30–0.95).</small></div><input id="ai-clef-abstain" class="ai-clef-num" type="number" min="0.3" max="0.95" step="0.05" inputmode="decimal"></div>
+                <div class="ai-set-row ai-clef-row"><div class="ai-set-label"><strong id="ai-clef-store-label" data-i18n="roomAdmin.clefStore">요청 원문 저장 허용</strong><small data-i18n="roomAdmin.clefStoreNote">끄면 요청 원문 대신 해시만 기록해요.</small></div><button id="ai-clef-store" class="ai-sw" type="button" role="switch" aria-checked="false" aria-labelledby="ai-clef-store-label"></button></div>
+                <form id="ai-clef-form" class="ai-admin-form" autocomplete="off">
+                  <label class="ai-tr-field"><span class="ai-tr-label" data-i18n="roomAdmin.clefAccountId">Cloudflare 계정 ID</span><input class="ai-field" id="ai-clef-account" type="password" maxlength="300" aria-label="Cloudflare 계정 ID" placeholder="Cloudflare 계정 ID" data-i18n-attr="aria-label:roomAdmin.clefAccountId; placeholder:roomAdmin.clefAccountId" autocomplete="off" spellcheck="false"></label>
+                  <label class="ai-tr-field"><span class="ai-tr-label" data-i18n="roomAdmin.clefToken">Workers AI API 토큰</span><input class="ai-field" id="ai-clef-token" type="password" maxlength="300" aria-label="Workers AI API 토큰" placeholder="Workers AI API 토큰" data-i18n-attr="aria-label:roomAdmin.clefToken; placeholder:roomAdmin.clefToken" autocomplete="new-password" spellcheck="false"></label>
+                  <label class="ai-tr-field"><span class="ai-tr-label" data-i18n="roomAdmin.jevKey">JEV API 키</span><input class="ai-field" id="ai-jev-key" type="password" maxlength="300" aria-label="JEV API 키" placeholder="JEV API 키" data-i18n-attr="aria-label:roomAdmin.jevKey; placeholder:roomAdmin.jevKey" autocomplete="new-password" spellcheck="false"></label>
+                  <button class="ai-set-btn is-primary" type="submit" data-i18n="roomAdmin.clefSave">저장</button>
+                  <button id="ai-clef-clear" class="ai-set-btn" type="button" data-i18n="roomAdmin.clefClear">지우기</button>
+                </form>
+              </div>
+            </div>
+            <div id="ai-admin-localmodel" class="hidden">
+              <h4 class="ai-set-group-title" data-i18n="roomAdmin.lmTitle">추가 로컬 모델 서버</h4>
+              <p class="ai-set-note" data-i18n="roomAdmin.lmNote">OpenAI 호환 서버를 더 추가하면 그 모델이 로컬 모델 목록에 나타나요. API 키는 저장 후 다시 볼 수 없어요.</p>
+              <div class="ai-set-group">
+                <ul id="ai-lm-list" class="ai-admin-list"></ul>
+                <form id="ai-lm-form" class="ai-admin-form" autocomplete="off">
+                  <label class="ai-tr-field"><span class="ai-tr-label" data-i18n="roomAdmin.lmLabel">이름</span><input class="ai-field" id="ai-lm-label" type="text" maxlength="40" aria-label="이름" placeholder="이름" data-i18n-attr="aria-label:roomAdmin.lmLabel; placeholder:roomAdmin.lmLabel" autocomplete="off"></label>
+                  <label class="ai-tr-field"><span class="ai-tr-label" data-i18n="roomAdmin.lmUrl">서버 주소</span><input class="ai-field" id="ai-lm-url" type="url" maxlength="300" aria-label="서버 주소" placeholder="http://127.0.0.1:8000/v1" data-i18n-attr="aria-label:roomAdmin.lmUrl" autocomplete="off" spellcheck="false"></label>
+                  <label class="ai-tr-field"><span class="ai-tr-label" data-i18n="roomAdmin.lmKey">API 키 (선택)</span><input class="ai-field" id="ai-lm-key" type="password" maxlength="500" aria-label="API 키 (선택)" placeholder="API 키 (선택)" data-i18n-attr="aria-label:roomAdmin.lmKey; placeholder:roomAdmin.lmKey" autocomplete="new-password" spellcheck="false"></label>
+                  <button class="ai-set-btn is-primary" type="submit" data-i18n="roomAdmin.lmAdd">서버 추가</button>
+                </form>
+                <div class="ai-set-row"><div class="ai-set-label"><label for="ai-lm-title"><strong data-i18n="roomAdmin.lmTitleModel">세션 제목 생성 모델</strong></label><small data-i18n="roomAdmin.lmTitleModelNote">제목을 만들 때 쓸 로컬 모델이에요. 실패하면 세션의 기본 모델이 만들어요.</small></div><select id="ai-lm-title" class="ai-set-select"></select></div>
+                <div class="ai-set-row"><div class="ai-set-label"><strong data-i18n="roomAdmin.lmVerifiers">검증에 사용할 모델</strong><small data-i18n="roomAdmin.lmVerifiersNote">고른 모델이 AI가 한 작업의 결과를 글로만 보고 검증해요. 아무것도 고르지 않으면 지금처럼 동작해요.</small></div></div>
+                <ul id="ai-lm-verifiers" class="ai-admin-list"></ul>
+                <div class="ai-set-row"><div class="ai-set-label"><label for="ai-lm-vmode"><strong data-i18n="roomAdmin.lmVerifyMode">검증 방식</strong></label></div><select id="ai-lm-vmode" class="ai-set-select"><option value="single" data-i18n="roomAdmin.lmVerifySingle">하나만 (기본)</option><option value="cross" data-i18n="roomAdmin.lmVerifyCross">교차 검증 (모두)</option></select></div>
+                <div class="ai-set-row"><div class="ai-set-label"><label for="ai-lm-research"><strong data-i18n="roomAdmin.lmResearchModel">자료 조사에 사용할 모델</strong></label><small data-i18n="roomAdmin.lmResearchModelNote">최신 자료나 출처가 필요한 요청에서 먼저 조사를 맡아요. 실패하거나 고르지 않으면 조사 없이 기본 AI가 직접 답해요.</small></div><select id="ai-lm-research" class="ai-set-select"></select></div>
+              </div>
+            </div>
+          </section>
+          <section id="ai-settings-transcription" class="ai-set-pane" data-settings-pane="transcription" aria-labelledby="ai-admin-h-transcription" hidden>
+            <h3 id="ai-admin-h-transcription" class="ai-set-title" data-i18n="roomAdmin.sectionTranscription">전사·영상</h3>
+            <div id="ai-admin-transcription" class="hidden">
+              <h4 class="ai-set-group-title" data-i18n="transcription.title">음성 파일 전사</h4>
+              <p class="ai-set-note" data-i18n="transcription.note">음성 파일을 올리면 OpenAI 호환 음성 인식 서버로 보내 글로 바꾸고, AI가 그 글을 읽을 수 있게 합니다. 기본은 꺼짐입니다.</p>
+              <div class="ai-set-group">
+                <div class="ai-set-row"><div class="ai-set-label"><strong id="ai-tr-on-label" data-i18n="transcription.on">음성 전사 사용</strong></div><button id="ai-tr-on" class="ai-sw" type="button" role="switch" aria-checked="false" aria-labelledby="ai-tr-on-label"></button></div>
+                <div class="ai-set-row"><div class="ai-set-label"><strong id="ai-tr-von-label" data-i18n="transcription.videoOn">영상 분석 사용</strong></div><button id="ai-tr-von" class="ai-sw" type="button" role="switch" aria-checked="true" aria-labelledby="ai-tr-von-label"></button></div>
+                <div class="ai-set-row"><div class="ai-set-label"><strong id="ai-tr-vllm-label" data-i18n="transcription.videoLlm">AI로 강조 구간 찾기 (이 PC의 로컬 모델)</strong></div><button id="ai-tr-vllm" class="ai-sw" type="button" role="switch" aria-checked="true" aria-labelledby="ai-tr-vllm-label"></button></div>
+                <div class="ai-set-row"><div class="ai-set-label"><strong id="ai-tr-vvisual-label" data-i18n="transcription.videoVisual">판서·레이저 포인터 감지 (실험적)</strong><span class="ai-set-note" id="ai-tr-vvisual-note" data-i18n="transcription.videoVisualNote">잘못 감지할 수 있어요.</span></div><button id="ai-tr-vvisual" class="ai-sw" type="button" role="switch" aria-checked="false" aria-labelledby="ai-tr-vvisual-label"></button></div>
+                <form id="ai-tr-form" class="ai-admin-form" autocomplete="off">
+                  <label class="ai-tr-field"><span class="ai-tr-label" data-i18n="transcription.url">서버 주소</span><input class="ai-field" id="ai-tr-url" type="url" maxlength="300" aria-label="서버 주소" placeholder="http://127.0.0.1:8000/v1" data-i18n-attr="aria-label:transcription.url" autocomplete="off" spellcheck="false"></label>
+                  <label class="ai-tr-field"><span class="ai-tr-label" data-i18n="transcription.model">모델</span><input class="ai-field" id="ai-tr-model" type="text" maxlength="100" aria-label="모델" placeholder="whisper-1" data-i18n-attr="aria-label:transcription.model" autocomplete="off" spellcheck="false"></label>
+                  <label class="ai-tr-field"><span class="ai-tr-label" data-i18n="transcription.language">언어 (선택)</span><input class="ai-field" id="ai-tr-lang" type="text" maxlength="12" aria-label="언어 (선택)" placeholder="ko" data-i18n-attr="aria-label:transcription.language; placeholder:transcription.languagePh" autocomplete="off" spellcheck="false"></label>
+                  <label class="ai-tr-field"><span class="ai-tr-label" data-i18n="transcription.apiKey">API 키 (선택)</span><input class="ai-field" id="ai-tr-key" type="password" maxlength="300" aria-label="API 키 (선택)" placeholder="API 키 (선택)" data-i18n-attr="aria-label:transcription.apiKey; placeholder:transcription.apiKey" autocomplete="new-password" spellcheck="false"></label>
+                  <label class="ai-tr-field"><span class="ai-tr-label" data-i18n="transcription.videoTopK">강조 장면 수 (0–20)</span><input class="ai-field" id="ai-tr-vk" type="number" min="0" max="20" step="1" aria-label="강조 장면 수 (0–20)" placeholder="12" data-i18n-attr="aria-label:transcription.videoTopK" autocomplete="off"></label>
+                  <label class="ai-tr-field"><span class="ai-tr-label" data-i18n="transcription.videoMax">최대 영상 길이 (분)</span><input class="ai-field" id="ai-tr-vmax" type="number" min="1" max="600" step="1" aria-label="최대 영상 길이 (분)" placeholder="180" data-i18n-attr="aria-label:transcription.videoMax" autocomplete="off"></label>
+                  <button class="ai-set-btn is-primary" type="submit" data-i18n="transcription.save">저장</button>
+                </form>
+              </div>
+            </div>
+          </section>
+
+        </div>
+        <p id="ai-admin-status" class="ai-admin-status" role="status" aria-live="polite"></p>
+      </div>
+    </div>
+  </div>
+  <div id="ai-guide" class="ai-guide hidden" role="dialog" aria-modal="true" aria-labelledby="ai-guide-title" aria-describedby="ai-guide-body" lang="ko">
+    <div class="ai-settings-scrim" data-guide-close></div>
+    <div class="ai-guide-card">
+      <button id="ai-guide-close" class="ai-settings-close" type="button" aria-label="사용설명서 닫기" data-i18n-attr="aria-label:guide.closeAria">×</button>
+      <small class="ai-guide-kicker"><span id="ai-guide-kicker">Aigora 사용설명서</span> · <span id="ai-guide-step"></span></small>
+      <h2 id="ai-guide-title"></h2>
+      <div id="ai-guide-body" class="ai-guide-body"></div>
+      <div id="ai-guide-dots" class="ai-guide-dots" aria-hidden="true"></div>
+      <div class="ai-private-dialog-actions ai-guide-actions">
+        <button id="ai-guide-never" type="button" class="ai-guide-never" data-i18n="guide.never">다시 보지 않기</button>
+        <button id="ai-guide-prev" type="button" data-i18n="guide.prev">이전</button>
+        <button id="ai-guide-next" type="button" class="is-danger">다음</button>
+      </div>
+    </div>
+  </div>
+  <div id="ai-private-close-dialog"class="ai-private-dialog hidden" role="dialog" aria-modal="true" aria-labelledby="ai-private-close-title" lang="ko">
+    <div class="ai-private-dialog-card">
+      <h2 id="ai-private-close-title" data-i18n="privateChannels.closeDialogTitle">나만의 채널 닫기</h2>
+      <p id="ai-private-close-text"></p>
+      <div class="ai-private-dialog-actions">
+        <button type="button" data-private-close-cancel aria-label="채널 닫기 취소" data-i18n="privateChannels.cancel" data-i18n-attr="aria-label:privateChannels.closeCancelAria">취소</button>
+        <button type="button" class="is-danger" data-private-close-confirm aria-label="나만의 채널 닫기 확인" data-i18n="privateChannels.closeChannel" data-i18n-attr="aria-label:privateChannels.closeConfirmAria">채널 닫기</button>
+      </div>
+    </div>
+  </div>
+  <div id="ai-account-menu" class="ai-account-menu hidden" role="menu" aria-label="계정 메뉴" data-i18n-attr="aria-label:settings.accountMenu" lang="ko"></div>
+  <div id="ai-row-menu" class="ai-row-menu hidden" role="menu" aria-label="메뉴" data-i18n-attr="aria-label:rowMenus.menu" lang="ko"></div>
+  <div id="ai-row-confirm" class="ai-private-dialog ai-row-confirm hidden" role="dialog" aria-modal="true" aria-labelledby="ai-row-confirm-title" aria-describedby="ai-row-confirm-text" lang="ko">
+    <div class="ai-private-dialog-card">
+      <h2 id="ai-row-confirm-title"></h2>
+      <p id="ai-row-confirm-text"></p>
+      <div class="ai-private-dialog-actions">
+        <button type="button" data-row-cancel aria-label="취소" data-i18n-attr="aria-label:rowMenus.cancel" data-i18n="rowMenus.cancel">취소</button>
+        <button type="button" class="is-danger" data-row-confirm></button>
+      </div>
+    </div>
+  </div>
+  <div id="ai-rename" class="ai-private-dialog ai-rename hidden" role="dialog" aria-modal="true" aria-labelledby="ai-rename-title" aria-describedby="ai-rename-msg" lang="ko">
+    <div class="ai-private-dialog-card">
+      <h2 id="ai-rename-title"></h2>
+      <input id="ai-rename-input" class="ai-rename-input" type="text" autocomplete="off" aria-label="이름" data-i18n-attr="aria-label:renameDialog.nameLabel">
+      <p id="ai-rename-msg" class="ai-rename-msg ai-set-msg" role="status"></p>
+      <div class="ai-private-dialog-actions">
+        <button type="button" data-rename-cancel aria-label="이름 변경 취소" data-i18n-attr="aria-label:renameDialog.cancelLabel" data-i18n="renameDialog.cancel">취소</button>
+        <button type="button" class="is-danger" data-rename-save aria-label="이름 저장" data-i18n-attr="aria-label:renameDialog.saveLabel" data-i18n="renameDialog.save">저장</button>
+      </div>
+    </div>
+  </div>
+  <div id="ai-confirm" class="ai-private-dialog ai-confirm hidden" role="alertdialog" aria-modal="true" aria-labelledby="ai-confirm-title" aria-describedby="ai-confirm-text" lang="ko">
+    <div class="ai-private-dialog-card">
+      <h2 id="ai-confirm-title"></h2>
+      <p id="ai-confirm-text"></p>
+      <p id="ai-confirm-msg" class="ai-set-msg" role="status"></p>
+      <div class="ai-private-dialog-actions">
+        <button type="button" data-confirm-cancel></button>
+        <button type="button" class="is-danger" data-confirm-ok></button>
+      </div>
+    </div>
+  </div>
+  <div id="ai-skills" class="ai-skills hidden" role="dialog" aria-modal="true" aria-labelledby="ai-skills-title" lang="ko"></div>
+  <p id="ai-skills-live" class="ai-sr-only" role="status" aria-live="polite"></p>
+
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.468.0/dist/umd/lucide.min.js"></script>
+  <script type="module" src="aigora/client.js"></script>
+</body>
+</html>

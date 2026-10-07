@@ -1,0 +1,453 @@
+/* ==========================================================================
+   Diagnostics — Toast + Panel (lr-8294, epic lr-1a52)
+   Visually distinct from runtime errors: uses info/warning/error severity
+   colors but NOT the red error style of addSystemMessage.
+   ========================================================================== */
+
+/* --------------------------------------------------------
+   Diagnostics panel button (topbar)
+   -------------------------------------------------------- */
+#diagnostics-panel-btn {
+  position: relative;
+}
+#diagnostics-panel-btn.active {
+  color: var(--accent);
+}
+
+/* Badge on the panel toggle button */
+.diagnostics-panel-badge {
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  min-width: 15px;
+  height: 15px;
+  line-height: 15px;
+  border-radius: 8px;
+  font-size: 9px;
+  font-weight: 700;
+  text-align: center;
+  padding: 0 3px;
+  pointer-events: none;
+  font-family: inherit;
+  color: #fff;
+  background: var(--text-muted);
+}
+.diagnostics-panel-badge.hidden { display: none; }
+.diagnostics-badge-info    { background: var(--text-muted); }
+.diagnostics-badge-warning { background: var(--accent2, #4A7FE8); }
+.diagnostics-badge-error   { background: var(--error, #FF4D6A); }
+
+/* --------------------------------------------------------
+   Diagnostics panel (inside #info-panels)
+   Follows the usage-panel / team-panel pattern.
+   -------------------------------------------------------- */
+#diagnostics-panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+#diagnostics-panel.hidden { display: none; }
+#diagnostics-panel:focus { outline: none; }
+
+.diagnostics-panel-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0;
+  min-height: 0;
+}
+
+/* Header actions group: Clear all + Close, side by side (parity with the
+   Notifications panel's .notif-banner-clear-all placement). */
+.diagnostics-panel-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.diagnostics-panel-clear-all {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 8px;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-family: var(--font-mono, monospace);
+  font-size: 9.5px;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+}
+.diagnostics-panel-clear-all:hover {
+  color: var(--text);
+  border-color: var(--border-bright, var(--border));
+}
+.diagnostics-panel-clear-all:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+/* --------------------------------------------------------
+   Diagnostic items
+   -------------------------------------------------------- */
+.diagnostics-item {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border-subtle, var(--border));
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.diagnostics-item:last-child { border-bottom: none; }
+.diagnostics-item:hover { background: rgba(var(--overlay-rgb), 0.02); }
+
+/* Left-border severity indicator */
+.diagnostics-item-info    { border-left: 2px solid var(--text-muted); }
+.diagnostics-item-warning { border-left: 2px solid var(--accent2, #4A7FE8); }
+.diagnostics-item-error   { border-left: 2px solid var(--error, #FF4D6A); }
+
+.diagnostics-item-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Severity badge pill */
+.diagnostics-sev-badge {
+  font-family: var(--font-mono, monospace);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border-radius: 4px;
+  padding: 1px 5px;
+  line-height: 1.4;
+  flex-shrink: 0;
+}
+.diagnostics-sev-info {
+  background: rgba(var(--overlay-rgb), 0.06);
+  color: var(--text-muted);
+}
+.diagnostics-sev-warning {
+  background: var(--accent2-12, rgba(74, 127, 232, 0.12));
+  color: var(--accent2, #4A7FE8);
+}
+.diagnostics-sev-error {
+  background: var(--error-12, rgba(255, 77, 106, 0.12));
+  color: var(--error, #FF4D6A);
+}
+
+/* Source label */
+.diagnostics-source {
+  font-family: var(--font-mono, monospace);
+  font-size: 9.5px;
+  color: var(--text-dimmer);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* Per-entry dismiss (x) control, pushed to the end of the meta row. */
+.diagnostics-item-dismiss {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  flex-shrink: 0;
+  transition: color 0.15s, background 0.15s;
+}
+.diagnostics-item-dismiss:hover {
+  color: var(--text);
+  background: rgba(var(--overlay-rgb), 0.06);
+}
+.diagnostics-item-dismiss:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+.diagnostics-item-dismiss .lucide { width: 12px; height: 12px; }
+
+/* Message text */
+.diagnostics-message {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+/* Actionable hint */
+.diagnostics-actionable {
+  display: flex;
+  align-items: flex-start;
+  gap: 5px;
+  margin-top: 2px;
+  padding: 4px 6px;
+  background: var(--accent2-8, rgba(74, 127, 232, 0.08));
+  border-radius: 4px;
+}
+.diagnostics-actionable-icon {
+  flex-shrink: 0;
+  color: var(--accent2, #4A7FE8);
+  display: flex;
+  align-items: center;
+}
+.diagnostics-actionable-icon .lucide { width: 11px; height: 11px; }
+.diagnostics-actionable-text {
+  font-size: 11px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+/* lr-e85fec: actionable button — rendered instead of the plain hint icon+text
+   above when the client has a real handler for actionable.action (e.g.
+   "Restart to apply update"). A detector with no attached actuator was the
+   whole gap this closes, so a known action gets a real control, not just a
+   label. */
+.diagnostics-actionable-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  background: var(--accent2, #4A7FE8);
+  border: none;
+  border-radius: 6px;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.diagnostics-actionable-btn:hover { opacity: 0.85; }
+.diagnostics-actionable-btn:disabled { opacity: 0.5; cursor: default; }
+.diagnostics-actionable-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+.diagnostics-actionable-btn .lucide { width: 12px; height: 12px; }
+
+/* Empty state */
+.diagnostics-empty {
+  padding: 20px 14px;
+  font-size: 12px;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+/* --------------------------------------------------------
+   Diagnostic Toast container (lr-e901)
+   Fixed top-right corner stack, off the composer/input box.
+   The base .toast family (base.css) is center-bottom over the
+   input — fine for a single transient message, but diagnostic
+   toasts can arrive concurrently (lr-e901 doubling defect) and
+   that spot has no stacking room. Follows the existing corner-
+   anchored, flex-column-stacked container precedent already
+   used by .notif-banner-container (notifications-center.css)
+   rather than introducing a third pattern: normal flow + gap
+   handles stacking with no per-toast JS offset math needed.
+   -------------------------------------------------------- */
+#diagnostic-toast-container {
+  position: fixed;
+  top: 48px;
+  right: 8px;
+  z-index: 450;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+}
+
+/* --------------------------------------------------------
+   Diagnostic Toast
+   Extends the base .toast with richer layout; positioning now
+   comes from the parent #diagnostic-toast-container (lr-e901),
+   not from the element itself.
+   -------------------------------------------------------- */
+.toast-diagnostic {
+  position: relative;
+  /* lr-56fb36: the base .toast rule (base.css) sets left:50% and bottom:80px
+     for its own center-bottom, single-toast anchoring. .toast-diagnostic
+     already overrides transform (translateY only, no translateX) and
+     position (relative, not fixed), but left/bottom are separate properties
+     that were never reset here — the cascade lets them leak through
+     unchanged, offsetting this box away from the normal-flow position the
+     corner-anchored #diagnostic-toast-container (lr-e901) computes for it.
+     That leftover left:50% is what pushes the toast off past the right
+     viewport edge on both desktop and mobile despite the lr-fab390/lr-4ef618
+     width clamps, which only bound the box's own width, not its offset.
+     Reset both explicitly so this box's position comes entirely from normal
+     flow inside the container, matching the positioning-comes-from-the-
+     parent contract stated below. */
+  left: auto;
+  bottom: auto;
+  opacity: 0;
+  transform: translateY(-8px);
+  pointer-events: auto;
+  transition: opacity 0.2s, transform 0.2s;
+
+  background: var(--bg-alt);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(var(--shadow-rgb), 0.3);
+  min-width: 280px;
+  /* lr-fab390: the container is right:8px from the viewport edge, so the
+     box's available width is capped at (100vw - 16px) — clamp max-width to
+     whichever is smaller than the 400px intent so the box can never be
+     pushed past the right edge on a narrow/zoomed desktop viewport. The
+     min-width:280px floor is unchanged; it still fits down to ~296px
+     viewports, matching the mobile breakpoint below which the container
+     itself switches to a full-width layout. */
+  max-width: min(400px, calc(100vw - 16px));
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  box-sizing: border-box;
+}
+.toast-diagnostic.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Severity border accent */
+.toast-diagnostic-info    { border-left: 3px solid var(--text-muted); }
+.toast-diagnostic-warning { border-left: 3px solid var(--accent2, #4A7FE8); }
+.toast-diagnostic-error   { border-left: 3px solid var(--error, #FF4D6A); }
+
+.toast-diagnostic-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.toast-diagnostic-severity {
+  font-family: var(--font-mono, monospace);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border-radius: 4px;
+  padding: 1px 5px;
+  line-height: 1.4;
+  flex-shrink: 0;
+}
+.toast-diag-sev-info    { background: rgba(var(--overlay-rgb), 0.06); color: var(--text-muted); }
+.toast-diag-sev-warning { background: var(--accent2-12, rgba(74, 127, 232, 0.12)); color: var(--accent2, #4A7FE8); }
+.toast-diag-sev-error   { background: var(--error-12, rgba(255, 77, 106, 0.12)); color: var(--error, #FF4D6A); }
+
+.toast-diagnostic-source {
+  font-family: var(--font-mono, monospace);
+  font-size: 9.5px;
+  color: var(--text-dimmer);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  flex: 1;
+}
+
+.toast-diagnostic-dismiss {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: color 0.15s, background 0.15s;
+}
+.toast-diagnostic-dismiss:hover {
+  color: var(--text);
+  background: rgba(var(--overlay-rgb), 0.06);
+}
+.toast-diagnostic-dismiss:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+.toast-diagnostic-dismiss .lucide { width: 12px; height: 12px; }
+
+.toast-diagnostic-msg {
+  font-size: 12.5px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  /* lr-fab390: mirrors the mobile overflow-wrap:anywhere fix (lr-4ef618,
+     below) — word-break:break-word alone does not break long unbreakable
+     tokens (hook event names, absolute paths), letting them force the
+     flex child's intrinsic width past the container's right edge. */
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.toast-diagnostic-hint {
+  font-size: 10.5px;
+  color: var(--text-dimmer);
+  margin-top: 2px;
+}
+
+/* lr-e85fec: same actuator button as .diagnostics-actionable-btn, sized for
+   the toast's tighter layout — offered at the moment the operator first
+   sees the condition, not only once they open the panel. */
+.toast-diagnostic-action-btn {
+  align-self: flex-start;
+  margin-top: 4px;
+  padding: 5px 12px;
+  background: var(--accent2, #4A7FE8);
+  border: none;
+  border-radius: 6px;
+  color: #fff;
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.toast-diagnostic-action-btn:hover { opacity: 0.85; }
+.toast-diagnostic-action-btn:disabled { opacity: 0.5; cursor: default; }
+.toast-diagnostic-action-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+/* --------------------------------------------------------
+   Mobile
+   -------------------------------------------------------- */
+@media (max-width: 768px) {
+  /* lr-2fdd: bottom:80px occluded the bottom-nav / input box / content on
+     mobile (iOS screenshot showed the PREFLIGHT WARNING toast covering the
+     UPCOMING card just above the Projects/Chat/Team/More nav). Top-anchor
+     instead, matching the base .toast / .sw-update-banner mobile fix so the
+     whole toast family lands the same way. lr-e901 keeps this top-anchor
+     intact — only widens the container to full-width since the desktop
+     top-right corner box is too narrow/cramped on small viewports. */
+  #diagnostic-toast-container {
+    top: calc(var(--safe-top) + 12px);
+    right: 16px;
+    left: 16px;
+  }
+  .toast-diagnostic {
+    /* lr-4ef618: the clamped container (left:16px/right:16px above) only
+       constrains itself — the child kept min-width:280px and no width
+       bound, so long unbreakable tokens (hook event names, file paths)
+       pushed the child past the container's right edge and clipped
+       off-screen. Bind the child to the container and drop the desktop
+       min-width floor so it can shrink to fit. */
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    transform: translateY(-8px);
+  }
+  .toast-diagnostic.visible {
+    transform: translateY(0);
+  }
+  .toast-diagnostic-msg {
+    /* Long unbreakable identifiers (e.g. "PostToolUse", absolute paths)
+       must wrap instead of forcing the flex child's intrinsic width
+       past the clamped container. */
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+}

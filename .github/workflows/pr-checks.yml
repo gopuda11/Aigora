@@ -1,0 +1,90 @@
+name: PR Checks
+
+# Triggers: `pull_request` (not `pull_request_target`). A fork PR therefore
+# runs with a read-only token and NO secrets, so checking out and running PR
+# code is safe. `pull_request_target` was removed on purpose: it grants
+# secrets/write access to the base repo and must never check out or execute
+# PR code (iron-laws AI-110). Do not re-add it.
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR head (or pushed ref)
+        uses: actions/checkout@v4
+        with:
+          # Pin to the PR head SHA. On push events github.event.pull_request
+          # is null and this falls back to the pushed commit.
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # No npm install — checks only need the standard library.
+
+      - name: Verify client ES module imports resolve
+        run: node scripts/check-client-imports.js
+
+      - name: Syntax check server-side JS (CommonJS)
+        run: |
+          # Server-side .js is CommonJS in this project (no "type" in
+          # package.json). `node --check` parses without executing.
+          # Excludes lib/public (client ES modules — different parse mode,
+          # covered by the import-resolution check above).
+          set -e
+          fail=0
+          while IFS= read -r f; do
+            if ! node --check "$f"; then
+              echo "Syntax error in: $f" >&2
+              fail=1
+            fi
+          done < <(find bin lib -name '*.js' -not -path 'lib/public/*')
+          exit $fail
+
+      - name: Syntax check client-side JS (ES modules)
+        run: |
+          set -e
+          fail=0
+          while IFS= read -r f; do
+            if ! node --check --input-type=module < "$f" >/dev/null 2>&1; then
+              # Re-run without redirect to surface the error.
+              echo "Syntax error in: $f" >&2
+              node --check --input-type=module < "$f" || true
+              fail=1
+            fi
+          done < <(find lib/public -name '*.js')
+          exit $fail
+
+  test:
+    # lr-ae85d5: separate job running the full suite (`npm ci && npm test`).
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout PR head (or pushed ref)
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run test suite
+        run: npm test

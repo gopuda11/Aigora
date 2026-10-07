@@ -1,0 +1,33 @@
+# Example systemd USER unit for a per-user Aigora install (no root needed).
+#   mkdir -p ~/.config/systemd/user && cp deploy/aigora.service ~/.config/systemd/user/
+#   systemctl --user daemon-reload && systemctl --user enable --now aigora
+#   loginctl enable-linger "$USER"      # keep it running after you log out
+# Assumes `aigora` is on the PATH below (for example `npm install -g aigora` with
+# `npm config set prefix ~/.local`). Adjust ExecStart and PATH to your install.
+[Unit]
+Description=Aigora daemon
+After=network.target
+
+[Service]
+Type=simple
+# Plain `aigora` forks a detached daemon and exits, which systemd cannot supervise; --debug keeps the daemon in the
+# foreground (logs go to the journal). Complete first-run setup once by hand with `aigora` (then `aigora --shutdown`)
+# before enabling this unit.
+ExecStart=%h/.local/bin/aigora --debug --yes --no-update
+Restart=always
+RestartSec=5
+# EX_CONFIG (78) is a fatal configuration error (mis-set AIGORA_HOME, unsupported Node): do not restart-loop
+RestartPreventExitStatus=78
+KillMode=mixed
+TimeoutStopSec=20
+SendSIGKILL=yes
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=aigora
+Environment=PATH=%h/.local/bin:/usr/local/bin:/usr/bin:/bin
+# Data directory (default is ~/.aigora). Set it to keep data elsewhere.
+Environment=AIGORA_HOME=%h/.aigora
+Environment=AIGORA_MAX_CONCURRENT_SESSIONS=50
+
+[Install]
+WantedBy=default.target

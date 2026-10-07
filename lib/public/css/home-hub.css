@@ -1,0 +1,715 @@
+/* ==========================================================================
+   Home Hub — Personalized command center & dashboard
+   ========================================================================== */
+
+/* Hub covers #main-area (sidebar + chat), sits inside it with absolute */
+#home-hub {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow-y: auto;
+  background: var(--bg);
+  z-index: 200;
+  padding: 48px 24px 40px;
+  border-top-left-radius: 8px;
+  animation: hubFadeIn 0.35s ease;
+}
+/* Close button (X / ESC) */
+.home-hub-close-btn {
+  position: absolute;
+  top: 16px;
+  right: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid var(--text-dimmer);
+  background: none;
+  color: var(--text-dimmer);
+  cursor: pointer;
+  padding: 0;
+  justify-content: center;
+  transition: border-color 0.15s, color 0.15s;
+  z-index: 5;
+}
+.home-hub-close-btn .lucide {
+  width: 18px;
+  height: 18px;
+}
+.home-hub-close-btn span {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  position: absolute;
+  top: calc(100% + 6px);
+  font-family: inherit;
+}
+.home-hub-close-btn:hover {
+  border-color: var(--text-secondary);
+  color: var(--text-secondary);
+}
+.home-hub-close-btn.hidden {
+  display: none;
+}
+
+#home-hub.hidden {
+  display: none;
+}
+
+@keyframes hubFadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes hubCardIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.home-hub-inner {
+  width: 100%;
+  max-width: 720px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+
+/* --- Hub search bar (delegates to command palette on interaction) --- */
+.hub-search-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--bg-alt);
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  padding: 10px 14px;
+  cursor: text;
+  animation: hubCardIn 0.35s ease;
+}
+
+.hub-search-bar .lucide {
+  width: 16px;
+  height: 16px;
+  color: var(--text-dimmer);
+  flex-shrink: 0;
+}
+
+.hub-search-bar input {
+  flex: 1;
+  min-width: 0;
+  background: none;
+  border: none;
+  outline: none;
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--text);
+  cursor: text;
+}
+
+.hub-search-bar input::placeholder {
+  color: var(--text-dimmer);
+}
+
+/* --- Greeting --- */
+.hub-greeting {
+  text-align: center;
+  padding: 8px 0 4px;
+}
+.hub-greeting h1 {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+  letter-spacing: -0.5px;
+}
+.hub-greeting p {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin: 6px 0 0;
+  font-weight: 400;
+}
+/* Twemoji sizing inherited from global img.emoji in base.css */
+
+/* --- Card base --- */
+.hub-card {
+  background: var(--bg-alt);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  padding: 16px;
+}
+.hub-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.hub-card-title {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--text-muted);
+}
+.hub-card-count {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent);
+  background: var(--accent-12);
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+/* --- Two-column layout --- */
+.hub-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  animation: hubCardIn 0.4s ease 0.08s both;
+}
+
+/* --- Upcoming tasks --- */
+.hub-upcoming-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.hub-upcoming-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.hub-upcoming-item:hover {
+  background: rgba(var(--overlay-rgb), 0.06);
+}
+.hub-upcoming-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: var(--accent);
+}
+.hub-upcoming-time {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-muted);
+  min-width: 56px;
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}
+.hub-upcoming-name {
+  font-size: 13px;
+  color: var(--text);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.hub-upcoming-project {
+  font-size: 11px;
+  color: var(--text-dimmer);
+  flex-shrink: 0;
+  max-width: 80px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.hub-upcoming-more {
+  font-size: 12px;
+  color: var(--text-dimmer);
+  text-align: center;
+  padding: 4px 0;
+}
+/* Empty state */
+.hub-upcoming-empty {
+  text-align: center;
+  padding: 16px 8px;
+}
+.hub-upcoming-empty-icon {
+  font-size: 24px;
+  margin-bottom: 8px;
+  opacity: 0.5;
+}
+.hub-upcoming-empty-text {
+  font-size: 13px;
+  color: var(--text-dimmer);
+  margin-bottom: 12px;
+}
+.hub-upcoming-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--border-subtle);
+  background: none;
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+.hub-upcoming-cta:hover {
+  background: var(--accent-12);
+  border-color: var(--accent);
+}
+.hub-upcoming-cta svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* --- Projects summary --- */
+.hub-projects-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.hub-project-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.hub-project-item:hover {
+  background: rgba(var(--overlay-rgb), 0.06);
+}
+.hub-project-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: var(--text-dimmer);
+  transition: background 0.3s ease;
+}
+.hub-project-dot.processing {
+  background: var(--success);
+  box-shadow: 0 0 6px rgba(80, 250, 123, 0.4);
+}
+/* Multi-user tone (lr-66c118): ring shape, see .hub-recent-dot.other */
+.hub-project-dot.other {
+  background: transparent;
+  border: 1.5px solid var(--activity-other, #B77BF3);
+  box-shadow: 0 0 4px rgba(183, 123, 243, 0.4);
+}
+.hub-project-icon {
+  font-size: 14px;
+  width: 20px;
+  text-align: center;
+  flex-shrink: 0;
+}
+.hub-project-name {
+  font-size: 13px;
+  color: var(--text);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.hub-project-sessions {
+  font-size: 11px;
+  color: var(--text-dimmer);
+  background: rgba(var(--overlay-rgb), 0.06);
+  padding: 2px 7px;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+/* --- Week strip --- */
+.hub-week {
+  animation: hubCardIn 0.4s ease 0.16s both;
+}
+.hub-week-strip {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  text-align: center;
+}
+.hub-week-day {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 4px;
+  border-radius: 10px;
+  cursor: default;
+  transition: background 0.15s ease;
+}
+.hub-week-day:hover {
+  background: rgba(var(--overlay-rgb), 0.04);
+}
+.hub-week-day.today {
+  background: var(--accent-12);
+}
+.hub-week-day.today .hub-week-num {
+  background: var(--accent);
+  color: var(--bg);
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.hub-week-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-dimmer);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+.hub-week-num {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.hub-week-dots {
+  display: flex;
+  gap: 3px;
+  justify-content: center;
+  min-height: 6px;
+}
+.hub-week-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+/* --- Tip Card --- */
+.hub-tip {
+  background: var(--bg-alt);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  padding: 16px 18px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  animation: hubCardIn 0.4s ease 0.24s both;
+}
+.hub-tip-icon {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: var(--accent-12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+.hub-tip-body {
+  flex: 1;
+  min-width: 0;
+}
+.hub-tip-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--accent);
+  margin-bottom: 4px;
+}
+.hub-tip-text {
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+.hub-tip-nav {
+  flex-shrink: 0;
+  display: flex;
+  gap: 2px;
+  align-items: center;
+}
+.hub-tip-prev,
+.hub-tip-next {
+  background: none;
+  border: none;
+  color: var(--text-dimmer);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+  transition: color 0.15s, background 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.hub-tip-prev:hover,
+.hub-tip-next:hover {
+  color: var(--text-muted);
+  background: rgba(var(--overlay-rgb), 0.06);
+}
+.hub-tip-prev svg,
+.hub-tip-next svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* --- Recent Sessions --- */
+.hub-recent-sessions {
+  animation: hubCardIn 0.4s ease 0.08s both;
+}
+.hub-recent-sessions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.hub-recent-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.hub-recent-item:hover {
+  background: rgba(var(--overlay-rgb), 0.06);
+}
+.hub-recent-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: var(--text-dimmer);
+  opacity: 0.35;
+  transition: background 0.3s ease, opacity 0.3s ease, box-shadow 0.3s ease;
+}
+.hub-recent-dot.processing {
+  background: var(--success);
+  opacity: 1;
+  box-shadow: 0 0 6px rgba(80, 250, 123, 0.4);
+}
+/* Alert state — color precedence LOCKED (andy, lr-0aa7b6), promoted into
+   activity-state.js's indicatorClass() as the canonical derivation for
+   every surface (lr-66c118): alert(red) > processing(green) > idle(grey).
+   ("live" never existed as a separate CSS class from "processing" anywhere
+   in the codebase — the old 4-state comment here was aspirational, not
+   real; reconciled to the 3 states actually shipped.) This class is applied
+   instead of .processing when the row's session is notifying, so red always
+   wins visually even if the session is also active. Same red used by
+   .icon-strip-project-badge (unread badge), now tokenized as --danger.
+   Formerly a SEPARATE right-side dot (.hub-recent-alert-dot, removed) — now
+   just another color state of the single left dot. */
+.hub-recent-dot.alert {
+  background: var(--danger, #e74c3c);
+  opacity: 1;
+  box-shadow: 0 0 6px rgba(231, 76, 60, 0.5);
+}
+/* Multi-user tone (lr-66c118): another user's activity — distinct violet
+   hue AND a ring shape (transparent center, colored border) instead of a
+   filled disc, so the state is distinguishable at 7px even under a
+   red/green color-vision deficiency (hue alone must not ship alone). */
+.hub-recent-dot.other {
+  background: transparent;
+  opacity: 1;
+  border: 1.5px solid var(--activity-other, #B77BF3);
+  box-shadow: 0 0 4px rgba(183, 123, 243, 0.4);
+}
+.hub-recent-project-icon {
+  font-size: 14px;
+  width: 20px;
+  text-align: center;
+  flex-shrink: 0;
+}
+/* Fallback badge for projects with no emoji/custom icon set — same "two
+   letters from the project name" abbreviation sidebar-projects.js and
+   sidebar-mobile.js render via getProjectAbbrev() for the identical
+   null-icon case (lr-e5faff), sized to fit the Recent Sessions row. */
+.hub-recent-project-icon--abbrev {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  background: rgba(var(--overlay-rgb), 0.08);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+  color: var(--text-secondary);
+  vertical-align: middle;
+}
+.hub-recent-title {
+  font-size: 13px;
+  color: var(--text);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.hub-recent-agent {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--accent);
+  background: var(--accent-12);
+  padding: 1px 6px;
+  border-radius: 6px;
+  flex-shrink: 0;
+  max-width: 70px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.hub-recent-time {
+  font-size: 11px;
+  color: var(--text-dimmer);
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+  min-width: 52px;
+  text-align: right;
+}
+.hub-recent-empty {
+  font-size: 13px;
+  color: var(--text-dimmer);
+  text-align: center;
+  padding: 16px 8px;
+}
+
+/* Hide user island when hub is visible */
+#main-area:has(#home-hub:not(.hidden)) ~ #user-island,
+#layout-body:has(#home-hub:not(.hidden)) #user-island {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+/* --- Mobile --- */
+@media (max-width: 768px) {
+  #home-hub {
+    padding: 32px 16px calc(80px + var(--safe-bottom, 0px));
+  }
+  /* Close button (top:16px, 40px circle, right:20px) occupies the top-right
+     corner of #home-hub's padding box. Push the inner content down so the
+     search bar — full-width at this breakpoint — clears the button instead
+     of running underneath it (lr-ea6c65). */
+  .home-hub-inner {
+    max-width: 100%;
+    margin-top: 44px;
+  }
+  .hub-greeting h1 {
+    font-size: 22px;
+  }
+  .hub-columns {
+    grid-template-columns: 1fr;
+  }
+  .hub-week-label {
+    font-size: 10px;
+  }
+  .hub-week-num {
+    font-size: 13px;
+  }
+}
+
+/* ==========================================================================
+   Home Hub — Mate Avatars (horizontal scroll)
+   ========================================================================== */
+
+.home-hub-mates {
+  display: flex;
+  gap: 16px;
+  padding: 0 4px 16px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.home-hub-mates::-webkit-scrollbar {
+  display: none;
+}
+
+.home-hub-mates.hidden {
+  display: none;
+}
+
+.home-hub-mate-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  min-width: 64px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.home-hub-mate-item:active .home-hub-mate-avatar {
+  transform: scale(0.92);
+}
+
+.home-hub-mate-avatar-wrap {
+  position: relative;
+  width: 48px;
+  height: 48px;
+}
+
+.home-hub-mate-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(var(--overlay-rgb), 0.12);
+  transition: transform 0.1s;
+}
+
+.home-hub-mate-dot {
+  position: absolute;
+  bottom: 1px;
+  right: 1px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--success);
+  border: 2px solid var(--bg);
+}
+
+.home-hub-mate-dot.responding {
+  background: var(--accent);
+}
+
+.home-hub-mate-name {
+  font-size: 11px;
+  color: var(--text-muted);
+  max-width: 64px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+}
+.home-hub-mate-primary .home-hub-mate-name {
+  color: var(--text);
+  font-weight: 600;
+}
+.home-hub-mate-primary .home-hub-mate-avatar {
+  box-shadow: 0 0 0 2px #00b894;
+}
+.home-hub-mate-primary-star {
+  color: #00b894;
+  font-size: 8px;
+  margin-left: 2px;
+  vertical-align: super;
+}
+
+/* ==========================================================================
+   (Certificate section removed — now handled by Trust Certificate playbook)
+   ========================================================================== */
+

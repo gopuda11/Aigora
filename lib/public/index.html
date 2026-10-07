@@ -1,0 +1,2110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<script>
+(function(){
+  var isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
+  if(!isIOS){var l=document.createElement("link");l.rel="manifest";l.href="/manifest.json";document.head.appendChild(l)}
+})();
+</script>
+<meta name="theme-color" content="#282a36">
+<link rel="icon" type="image/x-icon" href="favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<title>Aⁱgora</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=DM+Mono:wght@300;400;500&family=Roboto+Mono:wght@400;500;700&family=Nunito:wght@700;800&family=IBM+Plex+Sans+KR:wght@400;500;600&family=Gowun+Batang:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@xterm/xterm@5/css/xterm.min.css">
+<script>
+(function(){try{var k="aigora-theme-vars",kOld="clagentic-theme-vars",v=localStorage.getItem(k)||localStorage.getItem(kOld)||localStorage.getItem("clay-theme-vars"),r=document.documentElement;if(v){var o=JSON.parse(v),p;for(p in o)r.style.setProperty(p,o[p]);var vt=localStorage.getItem(k.replace("-vars","-variant"))||localStorage.getItem(kOld.replace("-vars","-variant"))||localStorage.getItem("clay-theme-variant");if(vt==="light"){r.classList.add("light-theme");r.classList.remove("dark-theme")}else{r.classList.add("dark-theme");r.classList.remove("light-theme")}var m=document.querySelector('meta[name="theme-color"]');if(m&&o["--bg"])m.setAttribute("content",o["--bg"])}else{var sl=window.matchMedia&&window.matchMedia("(prefers-color-scheme: light)").matches;if(sl){r.classList.add("light-theme");r.classList.remove("dark-theme")}}}catch(e){}})();
+</script>
+<script>if(window.navigator.standalone||window.matchMedia("(display-mode:standalone)").matches){document.documentElement.classList.add("pwa-standalone")}</script>
+<link rel="stylesheet" href="style.css?v=20260929">
+<style>
+@media(max-width:768px){
+  /* User messages: vertical stack, avatar on top, right-aligned */
+  body.wide-view .msg-user{flex-direction:column!important;align-items:flex-end!important;gap:4px!important;max-width:100%!important;padding:0 16px!important;margin:0 0 8px!important;justify-content:initial!important}
+  body.wide-view .msg-user .dm-bubble-avatar-me{order:-1!important}
+  body.wide-view .msg-user .dm-bubble-content{display:flex!important;flex-direction:column!important;align-items:flex-end!important;width:100%!important;flex:initial!important}
+  body.wide-view .msg-user .bubble{background:var(--user-bubble)!important;border-radius:20px 20px 4px 20px!important;padding:12px 18px!important;max-width:85%!important;width:fit-content!important;font-size:15px!important;line-height:1.55!important;white-space:pre-wrap!important;word-wrap:break-word!important}
+  body.wide-view .msg-user:hover{background:initial!important}
+  /* Assistant messages: row (avatar left), keep channel style */
+  body.wide-view .msg-assistant{max-width:100%!important;padding:4px 16px!important;margin:0 0 12px!important}
+  body.wide-view .msg-assistant .md-content{background:initial!important;border-radius:initial!important;padding:initial!important}
+  body.wide-view .thinking-item,
+  body.wide-view .tool-item,
+  body.wide-view .tool-group{max-width:100%!important}
+  body.wide-view .turn-meta{max-width:100%!important}
+}
+</style>
+</head>
+<body>
+<div id="layout">
+  <!-- === Top Bar (full width, forms reverse-ㄱ with icon strip) === -->
+  <div id="top-bar">
+    <div class="top-bar-left-pills">
+      <button id="pwa-install-pill" class="top-bar-install-btn hidden" title="Open as app"><i data-lucide="download"></i> Open as app</button>
+      <div id="update-pill-wrap" class="top-bar-update hidden">
+        <button id="update-pill" class="top-bar-update-btn"><i data-lucide="arrow-up-circle"></i> <span id="update-version"></span> is available. Update now</button>
+      <div id="update-popover" class="top-bar-popover">
+        <div class="popover-row"><button id="update-now" class="popover-action popover-action-primary"><i data-lucide="download"></i> Update now</button></div>
+        <div class="popover-row"><div class="popover-label">Or run manually:</div><div class="popover-cmd"><code id="update-manual-cmd">aigora</code><button class="popover-copy" title="Copy"><i data-lucide="copy"></i></button></div></div>
+      </div>
+    </div>
+    </div>
+    <button id="cmd-palette-btn" class="cmd-palette-searchbar" title="Command palette"><i data-lucide="search"></i><span class="cmd-palette-searchbar-text">Search sessions, projects, and commands</span><kbd class="cmd-palette-searchbar-kbd"></kbd></button>
+    <div class="top-bar-actions">
+      <!-- Pill badges -->
+      <div id="skip-perms-pill" class="top-bar-pill pill-error hidden"><i data-lucide="shield-off"></i> <span>Skip perms</span></div>
+      <div id="client-count" class="top-bar-pill pill-accent hidden"><i data-lucide="users"></i> <span id="client-count-text"></span></div>
+      <button id="share-pill" title="Share"><i data-lucide="share-2"></i></button>
+      <button id="diagnostics-panel-btn" title="Diagnostics" aria-label="Diagnostics" aria-expanded="false"><i data-lucide="activity"></i><span id="diagnostics-panel-badge" class="diagnostics-panel-badge hidden" aria-hidden="true">0</span></button>
+      <button id="notif-center-btn" title="Notifications"><i data-lucide="bell"></i><span id="notif-center-badge" class="notif-badge hidden">0</span></button>
+      <button id="server-settings-btn" title="Server settings"><i data-lucide="settings"></i></button>
+    </div>
+  </div>
+
+  <!-- === Bottom row === -->
+  <div id="layout-body">
+
+  <!-- === Icon Strip === -->
+  <div id="icon-strip">
+    <div class="icon-strip-home" title="Aigora">
+      <span class="icon-strip-pill"></span>
+      <svg class="icon-strip-logo" width="38" height="38" viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Aigora">
+        <defs>
+          <linearGradient id="cg-strip" gradientUnits="userSpaceOnUse" x1="6" y1="10" x2="66" y2="62">
+            <stop offset="0%"   stop-color="#00CFFF"/>
+            <stop offset="50%"  stop-color="#4A7FE8"/>
+            <stop offset="100%" stop-color="#7B3FE4"/>
+          </linearGradient>
+        </defs>
+        <!-- Outer frame -->
+        <rect x="6" y="10" width="60" height="52" rx="5" ry="5" fill="none" stroke="url(#cg-strip)" stroke-width="3.5"/>
+        <!-- Vertical divider -->
+        <line x1="24" y1="10" x2="24" y2="62" stroke="url(#cg-strip)" stroke-width="2" stroke-opacity="0.6"/>
+        <!-- Left panel lines -->
+        <line x1="10" y1="22" x2="20" y2="22" stroke="url(#cg-strip)" stroke-width="1.8" stroke-linecap="round"/>
+        <line x1="10" y1="28" x2="19" y2="28" stroke="url(#cg-strip)" stroke-width="1.8" stroke-linecap="round"/>
+        <line x1="10" y1="37" x2="20" y2="37" stroke="url(#cg-strip)" stroke-width="1.8" stroke-linecap="round"/>
+        <line x1="10" y1="43" x2="17" y2="43" stroke="url(#cg-strip)" stroke-width="1.8" stroke-linecap="round"/>
+        <!-- Bottom-left square -->
+        <rect x="10" y="49" width="9" height="7" rx="1.5" fill="none" stroke="url(#cg-strip)" stroke-width="1.8"/>
+        <!-- Right panel lines -->
+        <line x1="29" y1="19" x2="58" y2="19" stroke="url(#cg-strip)" stroke-width="1.8" stroke-linecap="round"/>
+        <line x1="29" y1="25" x2="54" y2="25" stroke="url(#cg-strip)" stroke-width="1.8" stroke-linecap="round"/>
+        <line x1="29" y1="31" x2="56" y2="31" stroke="url(#cg-strip)" stroke-width="1.8" stroke-linecap="round"/>
+        <line x1="29" y1="37" x2="50" y2="37" stroke="url(#cg-strip)" stroke-width="1.8" stroke-linecap="round"/>
+        <line x1="29" y1="43" x2="55" y2="43" stroke="url(#cg-strip)" stroke-width="1.8" stroke-linecap="round"/>
+        <line x1="29" y1="49" x2="58" y2="49" stroke="url(#cg-strip)" stroke-width="1.8" stroke-linecap="round"/>
+        <line x1="29" y1="55" x2="46" y2="55" stroke="url(#cg-strip)" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <button type="button" class="icon-strip-team-btn" id="icon-strip-team-btn" title="Team" aria-label="Team"><i data-lucide="users"></i></button>
+    <div class="icon-strip-separator"></div>
+    <button type="button" class="icon-strip-hint" id="icon-strip-hint-project" data-switcher-mode="project" aria-label="Switch project"></button>
+    <div class="icon-strip-projects" id="icon-strip-projects">
+      <div class="skeleton-icon-strip-item"></div>
+      <div class="skeleton-icon-strip-item"></div>
+    </div>
+    <button class="icon-strip-add" id="icon-strip-add" title="Add project"><i data-lucide="plus"></i></button>
+    <div class="icon-strip-me" id="icon-strip-me"></div>
+  </div>
+
+  <!-- === Main Area (sidebar + resize-handle + main-column) === -->
+  <div id="main-area">
+    <div id="home-hub" class="hidden">
+      <button id="home-hub-close" class="home-hub-close-btn hidden">
+        <i data-lucide="x"></i>
+        <span>ESC</span>
+      </button>
+      <div class="home-hub-inner">
+        <div class="hub-search-bar">
+          <i data-lucide="search"></i>
+          <input type="text" id="hub-search-input" placeholder="Search sessions, projects, commands…" autocomplete="off" spellcheck="false" />
+        </div>
+        <div class="hub-greeting">
+          <h1 id="hub-greeting-text"></h1>
+          <p id="hub-greeting-date"></p>
+        </div>
+
+        <div class="hub-card hub-recent-sessions">
+          <div class="hub-card-header">
+            <span class="hub-card-title">Recent Sessions</span>
+          </div>
+          <div class="hub-recent-sessions-list" id="hub-recent-sessions-list"></div>
+        </div>
+
+        <div class="hub-columns">
+          <div class="hub-card hub-upcoming">
+            <div class="hub-card-header">
+              <span class="hub-card-title">Upcoming</span>
+              <span class="hub-card-count" id="hub-upcoming-count"></span>
+            </div>
+            <div class="hub-upcoming-list" id="hub-upcoming-list"></div>
+          </div>
+          <div class="hub-card hub-projects-summary">
+            <div class="hub-card-header">
+              <span class="hub-card-title">Projects</span>
+            </div>
+            <div class="hub-projects-list" id="hub-projects-list"></div>
+          </div>
+        </div>
+
+        <div class="hub-card hub-week">
+          <div class="hub-card-header">
+            <span class="hub-card-title">This Week</span>
+          </div>
+          <div class="hub-week-strip" id="hub-week-strip"></div>
+        </div>
+
+      </div>
+    </div>
+    <div id="sidebar-column">
+      <div class="ag-production-brand" aria-label="Aigora">
+        <strong>A<sup>i</sup>gora</strong>
+        <span>우리 팀의 Ai 작업실</span>
+      </div>
+      <div class="title-bar-sidebar">
+        <button class="title-bar-project-dropdown" id="title-bar-project-dropdown">
+          <span class="title-bar-project-icon" id="title-bar-project-icon"></span>
+          <span class="title-bar-project-name" id="title-bar-project-name"></span>
+          <i data-lucide="chevron-down" class="title-bar-chevron"></i>
+        </button>
+        <span id="sidebar-presence" class="sidebar-presence"></span>
+        <button id="sidebar-toggle-btn" class="sidebar-collapse-btn" title="Collapse sidebar"><i data-lucide="panel-left-close"></i></button>
+      </div>
+      <div id="agora-room-rail" class="ag-rail hidden" lang="ko"></div>
+      <p id="agora-rail-notice" class="ag-notice" role="status" aria-live="polite" lang="ko"></p>
+      <div id="sidebar">
+        <div id="sidebar-tools">
+          <div class="sidebar-tools-header">
+            <span class="sidebar-section-label">Tools</span>
+            <span class="sidebar-tools-hint" data-palette="session" title="Show keyboard hotkeys"></span>
+            <button type="button" class="tool-palette-edit-btn" data-palette="session" aria-label="Edit tool palette" title="Edit palette"><i data-lucide="pencil"></i></button>
+          </div>
+          <div id="session-actions"></div>
+          <div id="session-actions-hidden" class="tool-palette-hidden-section hidden"></div>
+        </div>
+        <div id="sidebar-sessions-header">
+          <div id="sessions-header-content">
+            <div class="sidebar-sessions-header-row">
+              <span class="sidebar-section-label">Sessions</span>
+              <span id="session-filter-count" class="session-filter-count hidden"></span>
+              <div id="session-header-search-inline" class="sidebar-sessions-search-inline hidden">
+                <input id="session-header-search-input" type="text" placeholder="Search sessions..." autocomplete="off" spellcheck="false" />
+                <button id="session-header-search-clear" type="button" aria-label="Clear search"><i data-lucide="x"></i></button>
+              </div>
+              <button id="session-header-search-btn" type="button" aria-label="Search sessions" title="Search sessions"><i data-lucide="search"></i></button>
+            </div>
+          </div>
+          <div id="files-header-content" class="hidden"></div>
+        </div>
+        <div id="ralph-loop-section"></div>
+        <div id="sidebar-panel-projects" class="sidebar-panel hidden">
+          <div id="project-list"></div>
+        </div>
+        <div id="sidebar-panel-sessions" class="sidebar-panel">
+          <div id="session-list">
+            <div class="skeleton-session-group">
+              <div class="skeleton-session-label"></div>
+              <div class="skeleton-session-item"></div>
+              <div class="skeleton-session-item"></div>
+              <div class="skeleton-session-item"></div>
+            </div>
+          </div>
+        </div>
+        <div id="sidebar-panel-files" class="sidebar-panel hidden">
+          <div class="fb-titlebar">
+            <button id="file-panel-refresh" type="button" title="Refresh file tree"><i data-lucide="refresh-cw"></i></button>
+            <span class="fb-titlebar-title">File Browser</span>
+            <button id="file-panel-close" type="button" title="Close file browser"><i data-lucide="x"></i></button>
+          </div>
+          <div class="fb-search-bar">
+            <i data-lucide="search" class="fb-search-icon"></i>
+            <input id="fb-search-input" type="text" placeholder="Search files..." autocomplete="off" spellcheck="false" />
+          </div>
+          <div id="file-tree"></div>
+          <div class="fb-kb-hint">
+            <kbd>&#8593;&#8595;</kbd><span>nav</span>
+            <kbd>&#8592;&#8594;</kbd><span>fold</span>
+            <kbd>&#8629;</kbd><span>open</span>
+          </div>
+        </div>
+      </div>
+      <div class="ag-production-owner">
+        <strong>방 관리자 · <span id="ag-production-owner-name">admin1</span></strong>
+        <span>초대 코드와 멤버 권한은 관리자만 변경할 수 있습니다.</span>
+      </div>
+      <div id="ai-usage" class="ai-usage ai-usage-sidebar">
+        <button id="ai-usage-btn" class="ai-usage-btn" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="ai-usage-popover" aria-label="AI 사용량 불러오는 중" data-level="unknown"><span class="ai-usage-btn-dot" aria-hidden="true"></span><span class="ai-usage-btn-label">AI 사용량</span><span id="ai-usage-value" class="ai-usage-btn-value">불러오는 중</span><i data-lucide="chevron-up" aria-hidden="true"></i></button>
+        <div id="ai-usage-popover" class="ai-usage-popover" role="dialog" aria-label="AI 사용량" hidden>
+          <div class="ai-usage-head"><span class="ai-usage-title">AI 사용량</span><button id="ai-usage-refresh" class="ai-usage-refresh" type="button" aria-label="AI 사용량 새로고침"><i data-lucide="refresh-cw"></i></button></div>
+          <div id="ai-usage-list" class="ai-usage-list" aria-live="polite"></div>
+          <div id="ai-usage-fresh" class="ai-usage-fresh"></div>
+        </div>
+      </div>
+    </div>
+    <div id="sidebar-resize-handle"></div>
+    <div id="sidebar-overlay"></div>
+
+
+    <div id="main-column">
+      <div class="dm-header-bar" id="dm-header-bar">
+        <img id="dm-header-avatar" class="dm-header-avatar" alt="">
+        <span id="dm-header-name" class="dm-header-name"></span>
+      </div>
+      <header id="agora-room-header" class="ag-room-header hidden" lang="ko"></header>
+      <div class="title-bar-content">
+        <div id="header-left">
+          <button id="sidebar-expand-btn" title="Open sidebar"><i data-lucide="panel-left-open"></i></button>
+          <button id="hamburger-btn" aria-label="Toggle sidebar" title="Toggle sidebar"><i data-lucide="menu"></i></button>
+          <span class="header-title" id="header-title">Connecting...</span>
+          <button id="header-info-btn" type="button" title="Session info"><i data-lucide="info"></i></button>
+          <button id="header-rename-btn" type="button" title="Rename session"><i data-lucide="pencil"></i></button>
+        </div>
+        <div id="todo-sticky" class="hidden"></div>
+        <div id="ralph-sticky" class="hidden"></div>
+        <div class="status">
+          <button id="find-in-session-btn" title="Search in session (Ctrl+F)"><i data-lucide="search"></i></button>
+          <button id="terminal-toggle-btn" title="Terminal"><i data-lucide="square-terminal"></i><span id="terminal-count" class="hidden"></span></button>
+        </div>
+      </div>
+      <div id="main-panels">
+      <div id="app">
+    <div id="connect-overlay">
+      <svg id="console-logo-svg" viewBox="0 0 112 112" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"></svg>
+      <p id="connect-overlay-msg">Reconnecting to server…</p>
+      <button id="connect-overlay-signin-btn" class="hidden">Sign in again</button>
+    </div>
+    <div id="sticky-notes-container" class="hidden"></div>
+    <div id="replay-loading" class="hidden">
+      <div class="replay-loading-bar"></div>
+      <span class="replay-loading-label">Loading session…</span>
+    </div>
+    <div id="messages"></div>
+
+    <div id="info-panels">
+      <div id="usage-panel" class="hidden">
+        <div class="usage-panel-header">
+          <span>Usage</span>
+          <button id="usage-panel-close" aria-label="Close"><i data-lucide="x"></i></button>
+        </div>
+        <div class="usage-panel-body">
+          <div class="usage-section-label">Session</div>
+          <div class="usage-row"><span class="usage-label">Cost</span><span id="usage-cost" class="usage-value">$0.0000</span></div>
+          <div class="usage-row"><span class="usage-label">Context</span><span id="usage-context" class="usage-value">-</span></div>
+          <div class="usage-row"><span class="usage-label">Output tokens</span><span id="usage-output" class="usage-value">0</span></div>
+          <div class="usage-row"><span class="usage-label">Cache write</span><span id="usage-cache-write" class="usage-value">0</span></div>
+          <div class="usage-row"><span class="usage-label">Turns</span><span id="usage-turns" class="usage-value">0</span></div>
+        </div>
+      </div>
+      <div id="status-panel" class="hidden">
+        <div class="usage-panel-header">
+          <span>Status</span>
+          <button id="status-panel-close" aria-label="Close"><i data-lucide="x"></i></button>
+        </div>
+        <div class="usage-panel-body">
+          <div class="usage-section-label">Process</div>
+          <div class="usage-row"><span class="usage-label">PID</span><span id="status-pid" class="usage-value">-</span></div>
+          <div class="usage-row"><span class="usage-label">Uptime</span><span id="status-uptime" class="usage-value">-</span></div>
+          <div class="usage-row"><span class="usage-label">RSS Memory</span><span id="status-rss" class="usage-value">-</span></div>
+          <div class="usage-row"><span class="usage-label">Heap Used</span><span id="status-heap-used" class="usage-value">-</span></div>
+          <div class="usage-row"><span class="usage-label">Heap Total</span><span id="status-heap-total" class="usage-value">-</span></div>
+          <div class="usage-row"><span class="usage-label">External</span><span id="status-external" class="usage-value">-</span></div>
+          <div class="usage-divider"></div>
+          <div class="usage-section-label">Sessions</div>
+          <div class="usage-row"><span class="usage-label">Active</span><span id="status-sessions" class="usage-value">-</span></div>
+          <div class="usage-row"><span class="usage-label">Processing</span><span id="status-processing" class="usage-value">-</span></div>
+          <div class="usage-row"><span class="usage-label">Clients</span><span id="status-clients" class="usage-value">-</span></div>
+          <div class="usage-row"><span class="usage-label">Terminals</span><span id="status-terminals" class="usage-value">-</span></div>
+        </div>
+      </div>
+      <div id="team-panel" class="hidden">
+        <div class="usage-panel-header">
+          <span>Team <span class="beta-badge">Beta</span></span>
+          <button id="team-panel-close" aria-label="Close"><i data-lucide="x"></i></button>
+        </div>
+        <div id="team-panel-body" class="usage-panel-body team-panel-body"></div>
+      </div>
+      <!-- Diagnostics panel (lr-8294, epic lr-1a52) -->
+      <div id="diagnostics-panel" class="hidden" role="region" aria-label="Diagnostics" aria-expanded="false" tabindex="-1">
+        <div class="usage-panel-header">
+          <span>Diagnostics</span>
+          <div class="diagnostics-panel-header-actions">
+            <button class="diagnostics-panel-clear-all" aria-label="Clear all diagnostics">Clear all</button>
+            <button class="diagnostics-panel-close" aria-label="Close diagnostics panel"><i data-lucide="x"></i></button>
+          </div>
+        </div>
+        <div class="usage-panel-body diagnostics-panel-body">
+          <div id="diagnostics-panel-list">
+            <div class="diagnostics-empty">No diagnostics this session.</div>
+          </div>
+        </div>
+      </div>
+      <div id="context-panel" class="hidden">
+        <div class="usage-panel-header">
+          <span>Context</span>
+          <div class="usage-panel-actions">
+            <button id="context-panel-minimize" aria-label="Minimize" title="Minimize to input"><i data-lucide="minus"></i></button>
+            <button id="context-panel-close" aria-label="Close"><i data-lucide="x"></i></button>
+          </div>
+        </div>
+        <div class="usage-panel-body">
+          <div class="usage-section-label">Context Window</div>
+          <div class="context-bar-wrap">
+            <div class="context-bar">
+              <div class="context-bar-fill" id="context-bar-fill"></div>
+            </div>
+            <span class="context-bar-pct" id="context-bar-pct">0%</span>
+          </div>
+          <div class="usage-row"><span class="usage-label">Used</span><span id="context-used" class="usage-value">-</span></div>
+          <div class="usage-row"><span class="usage-label">Window</span><span id="context-window" class="usage-value">-</span></div>
+          <div class="usage-row"><span class="usage-label">Max output</span><span id="context-max-output" class="usage-value">-</span></div>
+          <div class="usage-row hidden"><span class="usage-label">Reasoning</span><span id="context-reasoning" class="usage-value">-</span></div>
+          <div class="usage-divider"></div>
+          <div class="usage-section-label">Model</div>
+          <div class="usage-row"><span class="usage-label">Name</span><span id="context-model" class="usage-value">-</span></div>
+          <div class="usage-row"><span class="usage-label">Cost</span><span id="context-cost" class="usage-value">$0.0000</span></div>
+          <div class="usage-row"><span class="usage-label">Turns</span><span id="context-turns" class="usage-value">0</span></div>
+        </div>
+      </div>
+    </div>
+    <button id="new-msg-btn" class="hidden" aria-label="Scroll to bottom"></button>
+    <div id="input-area">
+      <div id="input-wrapper">
+        <div id="mention-menu"></div>
+        <div id="slash-menu"></div>
+        <div id="input-row">
+          <div id="context-mini" class="hidden">
+            <div class="context-mini-bar">
+              <div class="context-mini-fill" id="context-mini-fill"></div>
+            </div>
+            <span class="context-mini-label" id="context-mini-label">0%</span>
+          </div>
+          <div id="image-preview-bar"></div>
+          <div id="suggestion-chips" class="hidden"></div>
+          <div id="input-textarea-wrap">
+            <textarea id="input" rows="1" placeholder="Message Claude..." enterkeyhint="send" dir="auto"></textarea>
+            <div id="ghost-suggestion" class="hidden" aria-hidden="true"></div>
+          </div>
+          <div id="input-bottom">
+            <div id="attach-wrap">
+              <span id="input-project-indicator" aria-hidden="true" data-tip=""></span>
+              <button id="input-more-btn" type="button" aria-label="추가" title="추가" aria-haspopup="menu" aria-controls="input-add-menu" aria-expanded="false"><i data-lucide="plus"></i></button>
+              <div id="input-add-menu" class="hidden" role="menu" aria-label="추가">
+                <button type="button" role="menuitem" data-add-action="file"><i data-lucide="paperclip"></i><span><strong>파일 및 폴더</strong><small>자료를 대화에 첨부</small></span></button>
+                <button type="button" role="menuitem" data-add-action="image"><i data-lucide="image"></i><span><strong>이미지</strong><small>사진 또는 스크린샷</small></span></button>
+                <button type="button" role="menuitem" data-add-action="addon"><i data-lucide="puzzle"></i><span><strong>스킬 / 플러그인 추가</strong><small>GitHub 링크만 붙여넣기</small></span></button>
+              </div>
+              <button id="attach-file-btn" type="button" aria-label="Attach file" title="Attach file" class="desktop-only"><i data-lucide="paperclip"></i></button>
+              <button id="attach-image-btn" type="button" aria-label="Attach image" title="Attach image" class="desktop-only"><i data-lucide="image"></i></button>
+              <button id="stt-btn" type="button" aria-label="Voice input" title="Voice input"><i data-lucide="mic"></i></button>
+              <button id="schedule-btn" type="button" aria-label="Schedule message" title="Schedule message"><i data-lucide="clock"></i></button>
+              <div id="context-sources-btn-wrap" class="desktop-only">
+                <button id="context-sources-add" type="button" title="Add context sources"><i data-lucide="library"></i><span class="ctx-label">Context</span></button>
+                <div id="context-sources-picker" class="hidden">
+                  <div class="context-picker-section" id="context-picker-terminals"></div>
+                  <div class="context-picker-section" id="context-picker-tabs"></div>
+                </div>
+              </div>
+            </div>
+            <div id="input-bottom-right">
+              <div id="vendor-toggle-wrap">
+                <button id="vendor-btn-claude" class="vendor-toggle-btn active" data-vendor="claude">
+                  <img src="/avatar-claude.svg" class="vendor-toggle-icon" alt="Claude">
+                  <span class="vendor-toggle-label">Claude</span>
+                </button>
+                <button id="vendor-btn-codex" class="vendor-toggle-btn" data-vendor="codex">
+                  <img src="/avatar-codex.svg" class="vendor-toggle-icon" alt="Codex">
+                  <span class="vendor-toggle-label">Codex</span>
+                </button>
+                <button id="vendor-btn-local" class="vendor-toggle-btn hidden" data-vendor="local" title="로컬 (Ollama) · 내 컴퓨터에서 실행 · 느려요">
+                  <i class="vendor-toggle-icon" data-lucide="cpu"></i>
+                  <span class="vendor-toggle-label">로컬 (Ollama)</span>
+                </button>
+              </div>
+              <div id="config-chip-wrap" class="hidden">
+                <button id="config-chip" title="Model, mode, and effort settings">
+                  <i class="config-chip-icon" data-lucide="sliders-horizontal"></i>
+                  <span id="config-chip-label"></span>
+                  <i data-lucide="chevron-down"></i>
+                </button>
+                <div id="config-popover" class="hidden">
+                  <div class="config-section">
+                    <div class="config-section-label">MODEL</div>
+                    <div id="config-model-scope" class="config-scope-label">This session only</div>
+                    <div id="config-model-list" class="config-radio-list"></div>
+                  </div>
+                  <div class="config-section">
+                    <div class="config-section-label">MODE</div>
+                    <div id="config-mode-list" class="config-radio-list"></div>
+                  </div>
+                  <div id="config-effort-section" class="config-section">
+                    <div class="config-section-label">EFFORT</div>
+                    <div id="config-effort-bar" class="config-segmented"></div>
+                  </div>
+                  <div id="config-thinking-section" class="config-section">
+                    <div class="config-section-label">THINKING</div>
+                    <div id="config-thinking-bar" class="config-segmented"></div>
+                    <div id="config-thinking-budget-row" class="config-budget-row" style="display:none">
+                      <label class="config-budget-label">Budget tokens</label>
+                      <input id="config-thinking-budget" type="number" class="config-budget-input"
+                             min="1024" max="128000" step="1024" value="10000">
+                    </div>
+                  </div>
+                  <div id="config-beta-section" class="config-section" style="display:none">
+                    <div class="config-section-label">BETA</div>
+                    <div class="config-toggle-row">
+                      <span class="config-toggle-label">1M Context</span>
+                      <button id="config-beta-1m" class="config-toggle-btn" role="switch" aria-checked="false">
+                        <span class="config-toggle-knob"></span>
+                      </button>
+                    </div>
+                  </div>
+                  <div id="config-approval-section" class="config-section" style="display:none">
+                    <div class="config-section-label">APPROVAL</div>
+                    <div id="config-approval-bar" class="config-segmented"></div>
+                  </div>
+                  <div id="config-sandbox-section" class="config-section" style="display:none">
+                    <div class="config-section-label">SANDBOX</div>
+                    <div id="config-sandbox-bar" class="config-segmented"></div>
+                  </div>
+                  <div id="config-websearch-section" class="config-section" style="display:none">
+                    <div class="config-section-label">WEB SEARCH</div>
+                    <div id="config-websearch-bar" class="config-segmented"></div>
+                  </div>
+                </div>
+              </div>
+              <button id="send-btn" disabled aria-label="Send"><i data-lucide="arrow-up"></i></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="github-addon-modal" class="admin-modal-overlay hidden">
+    <div class="admin-modal github-addon-dialog">
+      <div class="admin-modal-header"><h3>스킬 / 플러그인 추가</h3><button class="admin-modal-close" type="button"><i data-lucide="x"></i></button></div>
+      <div class="admin-modal-body"><p class="admin-modal-desc">Claude 호환 GitHub 저장소 링크를 붙여넣으면 Aⁱgora가 Codex를 포함한 지원 에이전트에 연결합니다. 관리자만 사용할 수 있습니다.</p>
+        <input id="github-addon-url" class="admin-smtp-input" type="url" placeholder="https://github.com/owner/repository" autocomplete="off">
+        <div class="github-addon-kind"><label><input type="radio" name="addon-kind" value="skill" checked> 스킬</label><label><input type="radio" name="addon-kind" value="plugin"> 플러그인</label></div>
+        <div id="github-addon-status" class="admin-user-meta"></div></div>
+      <div class="admin-modal-footer"><button id="github-addon-install" class="admin-modal-save" type="button">추가하기</button><button class="admin-modal-cancel" type="button">취소</button></div>
+    </div>
+  </div>
+  <!-- Mobile input-more bottom sheet: attach / image + context sources -->
+  <div id="input-more-sheet" class="hidden">
+    <div class="input-more-backdrop"></div>
+    <div class="input-more-content">
+      <div class="input-more-handle"></div>
+      <div class="input-more-actions">
+        <button class="input-more-action" id="input-more-attach">
+          <i data-lucide="paperclip"></i>
+          <span>Attach file</span>
+        </button>
+        <button class="input-more-action" id="input-more-image">
+          <i data-lucide="image"></i>
+          <span>Image</span>
+        </button>
+      </div>
+      <div class="input-more-divider"></div>
+      <div class="input-more-section-label">
+        <i data-lucide="library"></i>
+        <span>Context sources</span>
+      </div>
+      <div class="input-more-context-body" id="input-more-context-body">
+        <div class="context-picker-section" id="context-picker-terminals-mobile"></div>
+        <div class="context-picker-section" id="context-picker-tabs-mobile"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile fullscreen sheet overlay (Projects / Sessions) -->
+  <div id="mobile-sheet" class="hidden">
+    <div class="mobile-sheet-backdrop"></div>
+    <div class="mobile-sheet-content">
+      <div class="mobile-sheet-handle"></div>
+      <div class="mobile-sheet-header">
+        <span class="mobile-sheet-title"></span>
+        <button class="mobile-sheet-close"><i data-lucide="x"></i></button>
+      </div>
+      <div class="mobile-sheet-list"></div>
+    </div>
+  </div>
+
+  <!-- Mobile bottom tab bar -->
+  <div id="mobile-tab-bar">
+    <button class="mobile-tab" data-tab="projects" id="mob-tab-projects"><i data-lucide="layout-grid"></i><span class="mobile-tab-label">Projects</span><span class="mobile-tab-projects-badge hidden"></span></button>
+    <button class="mobile-tab" data-tab="chat" id="mob-tab-chat"><i data-lucide="message-square"></i><span class="mobile-tab-label">Chat</span></button>
+    <button class="mobile-tab-home" id="mobile-home-btn">
+      <svg class="mobile-home-icon" viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Home">
+        <defs>
+          <linearGradient id="cg-mobile" gradientUnits="userSpaceOnUse" x1="6" y1="10" x2="66" y2="62">
+            <stop offset="0%"   stop-color="#00CFFF"/>
+            <stop offset="50%"  stop-color="#4A7FE8"/>
+            <stop offset="100%" stop-color="#7B3FE4"/>
+          </linearGradient>
+        </defs>
+        <!-- Outer frame -->
+        <rect x="6" y="10" width="60" height="52" rx="5" ry="5" fill="none" stroke="url(#cg-mobile)" stroke-width="3.5"/>
+        <!-- Vertical divider -->
+        <line x1="24" y1="10" x2="24" y2="62" stroke="url(#cg-mobile)" stroke-width="2" stroke-opacity="0.6"/>
+        <!-- Left panel lines -->
+        <line x1="10" y1="22" x2="20" y2="22" stroke="url(#cg-mobile)" stroke-width="1.8" stroke-linecap="round"/>
+        <line x1="10" y1="28" x2="19" y2="28" stroke="url(#cg-mobile)" stroke-width="1.8" stroke-linecap="round"/>
+        <line x1="10" y1="37" x2="20" y2="37" stroke="url(#cg-mobile)" stroke-width="1.8" stroke-linecap="round"/>
+        <line x1="10" y1="43" x2="17" y2="43" stroke="url(#cg-mobile)" stroke-width="1.8" stroke-linecap="round"/>
+        <!-- Bottom-left square -->
+        <rect x="10" y="49" width="9" height="7" rx="1.5" fill="none" stroke="url(#cg-mobile)" stroke-width="1.8"/>
+        <!-- Right panel lines -->
+        <line x1="29" y1="19" x2="58" y2="19" stroke="url(#cg-mobile)" stroke-width="1.8" stroke-linecap="round"/>
+        <line x1="29" y1="25" x2="54" y2="25" stroke="url(#cg-mobile)" stroke-width="1.8" stroke-linecap="round"/>
+        <line x1="29" y1="31" x2="56" y2="31" stroke="url(#cg-mobile)" stroke-width="1.8" stroke-linecap="round"/>
+        <line x1="29" y1="37" x2="50" y2="37" stroke="url(#cg-mobile)" stroke-width="1.8" stroke-linecap="round"/>
+        <line x1="29" y1="43" x2="55" y2="43" stroke="url(#cg-mobile)" stroke-width="1.8" stroke-linecap="round"/>
+        <line x1="29" y1="49" x2="58" y2="49" stroke="url(#cg-mobile)" stroke-width="1.8" stroke-linecap="round"/>
+        <line x1="29" y1="55" x2="46" y2="55" stroke="url(#cg-mobile)" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>
+    </button>
+    <button class="mobile-tab" data-tab="team" id="mob-tab-team"><i data-lucide="users"></i><span class="mobile-tab-label">Team</span></button>
+    <button class="mobile-tab" data-tab="more" id="mob-tab-more"><i data-lucide="ellipsis"></i><span class="mobile-tab-label">More</span></button>
+  </div>
+
+  <div id="file-viewer" class="hidden">
+    <div class="file-viewer-header">
+      <span class="file-viewer-path" id="file-viewer-path"></span>
+      <button class="file-viewer-btn hidden" id="file-viewer-render" title="Toggle rendered view"><i data-lucide="book-open"></i></button>
+      <button class="file-viewer-btn hidden" id="file-viewer-pdf" title="Export PDF"><i data-lucide="file-down"></i></button>
+      <button class="file-viewer-btn hidden" id="file-viewer-history" title="Edit history"><i data-lucide="clock"></i></button>
+      <button class="file-viewer-btn" id="file-viewer-refresh" title="Refresh"><i data-lucide="refresh-cw"></i></button>
+      <button class="file-viewer-btn" id="file-viewer-copy" title="Copy contents"><i data-lucide="copy"></i></button>
+      <button class="file-viewer-btn" id="file-viewer-fullscreen" title="Toggle fullscreen"><i data-lucide="maximize-2"></i></button>
+      <button class="file-viewer-btn" id="file-viewer-close" title="Close"><i data-lucide="x"></i></button>
+    </div>
+    <div class="file-viewer-body" id="file-viewer-body"></div>
+  </div>
+  <div id="project-settings" class="hidden panel-fullscreen">
+    <div class="project-settings-layout">
+      <div class="project-settings-nav">
+        <div class="project-settings-nav-inner">
+          <div class="server-settings-nav-header" id="ps-nav-title">-</div>
+          <button id="ps-nav-pill" class="settings-nav-pill" aria-haspopup="dialog" aria-expanded="false">
+            <span class="settings-nav-pill-group" id="ps-nav-pill-group">General</span>
+            <span class="settings-nav-pill-divider"></span>
+            <span class="settings-nav-pill-label" id="ps-nav-pill-label">Profile</span>
+            <span class="settings-nav-pill-chevron"><i data-lucide="chevron-down"></i></span>
+          </button>
+          <div class="server-settings-nav-items">
+            <div class="settings-nav-category">General</div>
+            <button class="settings-nav-item active" data-section="profile"><span>Profile</span></button>
+            <button class="settings-nav-item" data-section="defaults"><span>Model</span></button>
+            <div class="settings-nav-separator"></div>
+            <div class="settings-nav-category">Config</div>
+            <button class="settings-nav-item" data-section="instructions"><span>Instructions</span></button>
+            <button class="settings-nav-item" data-section="environment"><span>Environment</span></button>
+            <button class="settings-nav-item hidden" data-section="lite" id="ps-nav-lite"><span>Lite</span></button>
+          </div>
+        </div>
+      </div>
+      <div class="project-settings-content">
+        <div class="project-settings-content-inner">
+          <!-- Profile -->
+          <div class="ps-section active" data-section="profile">
+            <h2>Profile</h2>
+            <div class="settings-card">
+              <div class="settings-field">
+                <label class="settings-label">Project Name</label>
+                <div class="ps-name-row">
+                  <span class="settings-value" id="ps-project-name">-</span>
+                  <button class="settings-btn-sm" id="ps-rename-btn">Rename</button>
+                </div>
+                <div class="ps-rename-form hidden" id="ps-rename-form">
+                  <input type="text" class="ps-text-input" id="ps-rename-input" autocomplete="off" spellcheck="false">
+                  <div class="ps-rename-actions">
+                    <button class="settings-btn-sm" id="ps-rename-save">Save</button>
+                    <button class="settings-btn-sm settings-btn-ghost" id="ps-rename-cancel">Cancel</button>
+                  </div>
+                </div>
+              </div>
+              <div class="settings-field">
+                <label class="settings-label">Icon</label>
+                <div class="ps-icon-row">
+                  <span class="ps-icon-preview" id="ps-icon-preview"></span>
+                  <button class="settings-btn-sm" id="ps-icon-btn">Change</button>
+                  <button class="settings-btn-sm settings-btn-ghost hidden" id="ps-icon-remove-btn">Remove</button>
+                </div>
+                <div id="ps-emoji-picker-anchor"></div>
+              </div>
+              <div class="settings-field" id="ps-owner-field" style="display:none">
+                <label class="settings-label">Owner</label>
+                <div class="settings-hint">The user whose Claude account is used for all sessions in this project.</div>
+                <div class="ps-owner-row">
+                  <span class="settings-value" id="ps-owner-name">-</span>
+                  <button class="settings-btn-sm" id="ps-transfer-btn">Transfer</button>
+                  <span class="ps-owner-locked-hint hidden" id="ps-owner-locked-hint">Ownership of home directory projects cannot be transferred.</span>
+                </div>
+                <div class="ps-transfer-form hidden" id="ps-transfer-form">
+                  <select class="ps-select" id="ps-transfer-select"></select>
+                  <div class="ps-rename-actions">
+                    <button class="settings-btn-sm" id="ps-transfer-save">Transfer</button>
+                    <button class="settings-btn-sm settings-btn-ghost" id="ps-transfer-cancel">Cancel</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Defaults -->
+          <div class="ps-section" data-section="defaults">
+            <h2>Model</h2>
+            <p class="ps-section-desc">Configure which model to use and how Claude behaves during sessions.</p>
+            <div class="settings-card">
+              <div class="settings-field">
+                <label class="settings-label">Model</label>
+                <div class="settings-hint">Choose the Claude model to use. Larger models are slower but more capable.</div>
+                <div id="ps-model-scope" class="config-scope-label"></div>
+                <div id="ps-model-list" class="settings-model-list"></div>
+              </div>
+            </div>
+            <div class="settings-card" id="ps-beta-card" style="display:none">
+              <div class="settings-field">
+                <label class="settings-label">Extended Context (Beta)</label>
+                <div class="settings-hint">Enable 1M token context window for Sonnet models. Allows processing much larger codebases and files, but may increase latency.</div>
+                <label class="settings-toggle-row ps-beta-toggle-row">
+                  <div>
+                    <span class="settings-label">1M Context</span>
+                  </div>
+                  <input type="checkbox" id="ps-beta-1m">
+                  <span class="toggle-track"><span class="toggle-thumb"></span></span>
+                </label>
+              </div>
+            </div>
+            <div class="settings-card">
+              <div class="settings-field">
+                <label class="settings-label">Mode</label>
+                <div class="settings-hint">Controls how Claude handles tool use and file edits.</div>
+                <div id="ps-mode-list" class="settings-model-list"></div>
+              </div>
+            </div>
+            <div class="settings-card" id="ps-effort-card">
+              <div class="settings-field">
+                <label class="settings-label">Effort</label>
+                <div class="settings-hint">Controls how much thinking effort Claude puts into responses. Higher effort means longer, more thorough responses.</div>
+                <div class="settings-btn-group" id="ps-effort-bar"></div>
+              </div>
+            </div>
+            <div class="settings-card" id="ps-thinking-card">
+              <div class="settings-field">
+                <label class="settings-label">Thinking</label>
+                <div class="settings-hint">Controls whether Claude shows its reasoning process. Budget mode lets you set a token limit.</div>
+                <div class="settings-btn-group" id="ps-thinking-bar"></div>
+                <div id="ps-thinking-budget-row" class="settings-budget-row" style="display:none">
+                  <label class="settings-budget-label">Budget tokens</label>
+                  <input id="ps-thinking-budget" type="number" class="settings-budget-input" min="1024" max="128000" step="1024" value="10000">
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Instructions -->
+          <div class="ps-section" data-section="instructions">
+            <h2>CLAUDE.md</h2>
+            <p class="ps-section-desc">Edit the CLAUDE.md file for this project. These instructions are passed to Claude at the start of every session.</p>
+            <div class="settings-card">
+              <div class="settings-field">
+                <div id="ps-instructions-status" class="settings-hint"></div>
+                <textarea class="ps-textarea" id="ps-instructions-editor" rows="20" spellcheck="false" placeholder="# Project Instructions&#10;&#10;Write instructions for Claude here..."></textarea>
+                <div class="ps-textarea-actions">
+                  <button class="settings-btn-sm" id="ps-instructions-save">Save</button>
+                  <span class="ps-save-status" id="ps-instructions-save-status"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Aigora Lite -->
+          <div class="ps-section hidden" data-section="lite" id="ps-section-lite">
+            <h2>Aigora Lite</h2>
+            <p class="ps-section-desc">Aigora Lite adds agentic gates, memory, and audit trails to this project.</p>
+            <div class="settings-card">
+              <div class="settings-field-row">
+                <div>
+                  <label class="settings-label">Enrollment Status</label>
+                  <div class="settings-hint">Whether this project is enrolled in Aigora Lite.</div>
+                </div>
+                <span class="settings-value settings-badge" id="ps-lite-status-text">-</span>
+              </div>
+              <div class="settings-field-row" style="margin-top: 8px;">
+                <button class="settings-btn-sm hidden" id="ps-lite-enroll-btn">Enroll</button>
+                <button class="settings-btn-sm hidden" id="ps-lite-unenroll-btn">Unenroll</button>
+              </div>
+              <div class="settings-hint" id="ps-lite-error" style="color: var(--error, #f38ba8); margin-top: 6px;"></div>
+            </div>
+          </div>
+          <!-- Environment -->
+          <div class="ps-section" data-section="environment">
+            <h2>Environment</h2>
+            <p class="ps-section-desc">Store API keys, tokens, and config for this project. Paste a <code>.env</code> file to import multiple variables at once.</p>
+            <div class="settings-hint ps-env-notice hidden" id="ps-env-override-notice">
+              <i data-lucide="info"></i> A <code>.envrc</code> file exists in the project directory and will take precedence over these settings.
+            </div>
+            <div class="ps-env-tabs">
+              <button class="ps-env-tab active" data-tab="project">Project</button>
+              <button class="ps-env-tab" data-tab="shared">Shared</button>
+            </div>
+            <div class="ps-env-tab-content active" data-tab="project">
+              <div class="ps-env-header">
+                <button class="settings-btn-sm" id="ps-env-add-btn"><i data-lucide="plus"></i> Add Variable</button>
+                <span class="ps-save-status" id="ps-env-save-status"></span>
+              </div>
+              <div class="ps-env-list" id="ps-env-list">
+                <!-- rows rendered by JS -->
+              </div>
+            </div>
+            <div class="ps-env-tab-content" data-tab="shared">
+              <p class="settings-hint" style="margin-bottom: 12px;">Shared variables apply to all projects. Project-level variables take precedence.</p>
+              <div class="ps-env-header">
+                <button class="settings-btn-sm" id="ps-shared-env-add-btn"><i data-lucide="plus"></i> Add Variable</button>
+                <span class="ps-save-status" id="ps-shared-env-save-status"></span>
+              </div>
+              <div class="ps-env-list" id="ps-shared-env-list">
+                <!-- rows rendered by JS -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="project-settings-close-col">
+        <button class="server-settings-close-btn" id="project-settings-close" title="Close">
+          <i data-lucide="x"></i>
+          <span>ESC</span>
+        </button>
+      </div>
+    </div>
+  </div>
+  <div id="ps-palette" class="settings-palette hidden" role="dialog" aria-modal="true" aria-label="Jump to setting">
+    <div class="settings-palette-backdrop"></div>
+    <div class="settings-palette-dialog">
+      <div class="settings-palette-input-row">
+        <i data-lucide="search" class="settings-palette-search-icon"></i>
+        <input id="ps-palette-input" class="settings-palette-input" type="text" placeholder="Jump to setting…" autocomplete="off" spellcheck="false" />
+        <span class="settings-palette-esc-hint">esc</span>
+      </div>
+      <div id="ps-palette-results" class="settings-palette-results"></div>
+    </div>
+  </div>
+  <div id="terminal-container" class="hidden">
+    <div class="terminal-header">
+      <div id="terminal-tabs" class="terminal-tabs"></div>
+      <button class="terminal-new-tab-btn" id="terminal-new-tab" title="New tab"><i data-lucide="plus"></i></button>
+      <div class="terminal-header-actions">
+        <button class="file-viewer-btn" id="terminal-fullscreen" title="Toggle fullscreen"><i data-lucide="maximize-2"></i></button>
+        <button class="file-viewer-btn" id="terminal-close" title="Hide panel"><i data-lucide="minus"></i></button>
+      </div>
+    </div>
+    <div id="terminal-toolbar" class="hidden">
+      <button class="term-key" data-key="tab">Tab</button>
+      <button class="term-key term-key-toggle" data-key="ctrl">Ctrl</button>
+      <button class="term-key" data-key="esc">Esc</button>
+      <span class="term-key-spacer"></span>
+      <button class="term-key term-key-arrow" data-key="up">&#9650;</button>
+      <button class="term-key term-key-arrow" data-key="down">&#9660;</button>
+      <button class="term-key term-key-arrow" data-key="left">&#9664;</button>
+      <button class="term-key term-key-arrow" data-key="right">&#9654;</button>
+      <span class="term-key-spacer"></span>
+      <button class="term-key term-key-toggle" data-key="alt">Alt</button>
+      <button class="term-key" data-key="pipe">|</button>
+      <button class="term-key" data-key="slash">/</button>
+      <button class="term-key" data-key="tilde">~</button>
+    </div>
+    <div id="terminal-body"></div>
+  </div>
+      <aside id="agora-context" class="ag-context hidden" aria-label="방 작업 패널"></aside>
+  </div><!-- /main-panels -->
+  </div><!-- /main-column -->
+  </div><!-- /main-area -->
+
+  <!-- === Club Agora: mobile room switcher + overlay scrim === -->
+  <aside id="agora-room-sheet" class="ag-sheet" role="dialog" aria-label="방 전환" lang="ko"><p id="agora-sheet-notice" class="ag-notice ag-notice-sheet" role="status" aria-live="polite"></p><div id="agora-room-sheet-body"></div></aside>
+  <div id="agora-scrim" class="ag-scrim"></div>
+
+  <!-- === User Island === -->
+  <div id="user-island">
+    <div class="user-island-profile">
+      <div class="user-island-avatar"><span class="user-island-avatar-letter">?</span></div>
+      <div class="user-island-info">
+        <span class="user-island-name"></span>
+        <span class="user-island-cta hidden">Personalize your name</span>
+      </div>
+    </div>
+    <div class="user-island-actions">
+      <button id="user-theme-toggle-btn" title="Switch theme" aria-label="Switch theme"><i data-lucide="moon"></i></button>
+      <button id="user-settings-btn" title="User settings"><i data-lucide="settings"></i></button>
+    </div>
+  </div>
+
+  </div><!-- /layout-body -->
+</div><!-- /layout -->
+
+<!-- QR / Share overlay -->
+<div id="qr-overlay" class="hidden">
+  <div id="qr-overlay-inner">
+    <div id="qr-canvas"></div>
+    <div id="qr-url"></div>
+    <button id="qr-share-btn" class="qr-share-btn hidden"><i data-lucide="share-2"></i> Share</button>
+  </div>
+</div>
+
+<!-- Hidden notification toggles (synced by server-settings) -->
+<div id="notif-menu-wrap" style="display:none">
+  <button id="notif-btn"></button>
+  <div id="notif-menu">
+    <label class="notif-option" id="notif-push-row">
+      <span>Push notifications</span>
+      <input type="checkbox" id="notif-toggle-push">
+      <span class="toggle-track"><span class="toggle-thumb"></span></span>
+    </label>
+    <label class="notif-option">
+      <span>Browser alerts</span>
+      <input type="checkbox" id="notif-toggle-alert">
+      <span class="toggle-track"><span class="toggle-thumb"></span></span>
+    </label>
+    <div id="notif-blocked-hint" class="hidden">Blocked by browser. <a href="#" id="notif-learn-more">Learn more</a></div>
+    <label class="notif-option">
+      <span>Sound</span>
+      <input type="checkbox" id="notif-toggle-sound">
+      <span class="toggle-track"><span class="toggle-thumb"></span></span>
+    </label>
+  </div>
+</div>
+
+<!-- === User Settings (modal dialog) === -->
+<div id="user-settings" class="hidden">
+  <div class="confirm-backdrop" id="user-settings-backdrop"></div>
+  <div class="us-modal">
+    <div class="us-modal-header">
+      <span class="us-modal-title">User Settings</span>
+      <button class="us-modal-close" id="user-settings-close" title="Close"><i data-lucide="x"></i></button>
+    </div>
+    <div class="us-modal-body">
+      <nav class="us-modal-nav">
+        <select id="user-settings-nav-dropdown" class="settings-nav-dropdown">
+          <option value="us-account" selected>Account</option>
+          <option value="us-appearance">Appearance</option>
+          <option value="us-chat">Chat</option>
+        </select>
+        <div class="us-modal-nav-items">
+          <button class="us-nav-item active" data-section="us-account"><span>Account</span></button>
+          <button class="us-nav-item" data-section="us-appearance"><span>Appearance</span></button>
+          <button class="us-nav-item" data-section="us-chat"><span>Chat</span></button>
+          <div class="us-nav-separator"></div>
+          <button class="us-nav-item us-nav-danger" data-section="us-logout"><span>Log Out</span></button>
+        </div>
+      </nav>
+      <div class="us-modal-content">
+
+        <!-- Account section -->
+        <div class="us-section" data-section="us-account">
+          <h2>Account</h2>
+          <div class="settings-card">
+            <div class="us-account-hero">
+              <div class="us-account-avatar" aria-hidden="true">
+                <img id="us-account-avatar-img" class="us-account-avatar-img hidden" alt="">
+                <span id="us-account-avatar-fallback" class="us-account-avatar-fallback">?</span>
+              </div>
+              <div class="us-account-hero-copy">
+                <div class="us-account-name" id="us-account-name">-</div>
+                <div class="us-account-subline" id="us-account-subline">-</div>
+                <div class="settings-hint">Your profile is stored on this server and used across sessions.</div>
+              </div>
+            </div>
+          </div>
+          <h3>Security</h3>
+          <div class="settings-card">
+            <div class="settings-field-row">
+              <div>
+                <label class="settings-label">PIN</label>
+                <div class="settings-hint">Protect the web UI with a 6-digit PIN.</div>
+              </div>
+              <button class="settings-btn-sm" id="us-pin-set-btn">Set PIN</button>
+            </div>
+            <div class="settings-field hidden" id="us-pin-form">
+              <div class="settings-pin-form-title" id="us-pin-form-title">Change PIN</div>
+              <div class="settings-pin-current-row" id="us-pin-current-row">
+                <label class="settings-label" for="us-pin-current-input">Current PIN</label>
+                <input type="password" class="us-text-input us-pin-input" id="us-pin-current-input" maxlength="6" inputmode="numeric" pattern="[0-9]*" placeholder="000000" autocomplete="off">
+              </div>
+              <div class="settings-pin-row">
+                <div class="settings-pin-field">
+                  <label class="settings-label" for="us-pin-input">New PIN</label>
+                  <input type="password" class="us-text-input us-pin-input" id="us-pin-input" maxlength="6" inputmode="numeric" pattern="[0-9]*" placeholder="000000" autocomplete="off">
+                </div>
+                <div class="settings-pin-field">
+                  <label class="settings-label" for="us-pin-confirm-input">Confirm PIN</label>
+                  <input type="password" class="us-text-input us-pin-input" id="us-pin-confirm-input" maxlength="6" inputmode="numeric" pattern="[0-9]*" placeholder="000000" autocomplete="off">
+                </div>
+              </div>
+              <div class="settings-pin-actions-row">
+                <button class="us-btn" id="us-pin-save" disabled>Save</button>
+                <button class="settings-btn-sm settings-btn-ghost" id="us-pin-cancel">Cancel</button>
+              </div>
+              <div class="settings-hint settings-pin-error hidden" id="us-pin-msg"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Appearance section -->
+        <div class="us-section" data-section="us-appearance">
+          <h2>Appearance</h2>
+          <div class="settings-card">
+            <div class="settings-label" style="margin-bottom:10px;">Brand</div>
+            <div class="layout-switcher" id="us-brand-switcher">
+              <button class="layout-option" data-brand="aigora">
+                <span class="layout-option-icon">✦</span>
+                <span class="layout-option-label">Aigora</span>
+                <span class="layout-option-desc">Spacey and minimal. Cyan-to-violet on near-void dark.</span>
+              </button>
+              <button class="layout-option" data-brand="classic">
+                <span class="layout-option-icon">◈</span>
+                <span class="layout-option-label">Classic</span>
+                <span class="layout-option-desc">The original Aigora look. Dracula dark, Ayu light.</span>
+              </button>
+            </div>
+          </div>
+          <div class="settings-card">
+            <div class="settings-label" style="margin-bottom:10px;">Theme</div>
+            <div class="layout-switcher" id="us-theme-switcher">
+              <button class="layout-option" data-theme="light">
+                <span class="layout-option-icon">☀️</span>
+                <span class="layout-option-label">Light</span>
+                <span class="layout-option-desc">For people who open curtains. Bright, clean, productive.</span>
+              </button>
+              <button class="layout-option" data-theme="dark">
+                <span class="layout-option-icon">🌙</span>
+                <span class="layout-option-label">Dark</span>
+                <span class="layout-option-desc">For those who thrive after sunset. Your screen, your cave.</span>
+              </button>
+            </div>
+          </div>
+          <div class="settings-card">
+            <div class="settings-label" style="margin-bottom:10px;">Chat layout</div>
+            <div class="layout-switcher" id="us-layout-switcher">
+              <button class="layout-option" data-layout="bubble">
+                <span class="layout-option-icon">💬</span>
+                <span class="layout-option-label">Bubble</span>
+                <span class="layout-option-desc">Centered and quiet. Just you and the AI, no distractions.</span>
+              </button>
+              <button class="layout-option" data-layout="channel">
+                <span class="layout-option-icon">💻</span>
+                <span class="layout-option-label">Channel</span>
+                <span class="layout-option-desc">Full-width with faces. Feels like your team is right there.</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chat section -->
+        <div class="us-section" data-section="us-chat">
+          <h2>Chat</h2>
+          <div class="settings-card">
+            <div class="settings-field">
+              <label class="settings-label" for="us-lang-select">Voice Input Language</label>
+              <div class="settings-hint">Used by speech-to-text when you dictate messages.</div>
+              <select id="us-lang-select" class="settings-select us-lang-select">
+                <option value="en-US">English</option>
+                <option value="ko-KR">Korean</option>
+                <option value="ja-JP">Japanese</option>
+                <option value="zh-CN">Chinese</option>
+                <option value="es-ES">Spanish</option>
+                <option value="fr-FR">French</option>
+                <option value="de-DE">German</option>
+              </select>
+            </div>
+          </div>
+          <div class="settings-card">
+            <label class="settings-toggle-row">
+              <div>
+                <span class="settings-label">Auto-continue</span>
+                <div class="settings-hint">Automatically resume the conversation when a rate limit clears.</div>
+              </div>
+              <input type="checkbox" id="us-auto-continue">
+              <span class="toggle-track"><span class="toggle-thumb"></span></span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Log out section -->
+        <div class="us-section" data-section="us-logout">
+          <h2>Log Out</h2>
+          <div class="settings-card settings-card-danger">
+            <div class="settings-field">
+              <p class="settings-hint" style="margin:0 0 12px;font-size:14px;color:var(--text-secondary)">End your current session. You can sign back in anytime.</p>
+              <button class="us-btn us-btn-danger" id="us-logout-btn">Log Out</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- === Server Settings (full-screen overlay) === -->
+<div id="server-settings" class="hidden">
+  <div class="server-settings-layout">
+    <div class="server-settings-nav">
+      <div class="server-settings-nav-inner">
+        <div class="server-settings-nav-header" id="settings-server-name"></div>
+        <button id="settings-nav-pill" class="settings-nav-pill" aria-haspopup="dialog" aria-expanded="false">
+          <span class="settings-nav-pill-group" id="settings-nav-pill-group">General</span>
+          <span class="settings-nav-pill-divider"></span>
+          <span class="settings-nav-pill-label" id="settings-nav-pill-label">Status</span>
+          <span class="settings-nav-pill-chevron"><i data-lucide="chevron-down"></i></span>
+        </button>
+        <div class="server-settings-nav-items">
+          <div class="settings-nav-category">General</div>
+          <button class="settings-nav-item active" data-section="overview"><span>Status</span></button>
+          <button class="settings-nav-item" data-section="notifications"><span>Notifications</span></button>
+          <button class="settings-nav-item" data-section="security"><span>Security</span></button>
+          <div class="settings-nav-separator"></div>
+          <div class="settings-nav-category">Defaults</div>
+          <button class="settings-nav-item" data-section="models"><span>Model</span></button>
+          <div class="settings-nav-separator"></div>
+          <div class="settings-nav-category">Config</div>
+          <button class="settings-nav-item" data-section="claudemd"><span>Instructions</span></button>
+          <button class="settings-nav-item" data-section="environment"><span>Environment</span></button>
+          <button class="settings-nav-item" data-section="storage"><span>Storage</span></button>
+          <button class="settings-nav-item" data-section="custom-icons"><span>Custom Icons</span></button>
+          <div class="settings-nav-separator settings-admin-only"></div>
+          <div class="settings-nav-category settings-admin-only">Admin</div>
+          <button class="settings-nav-item settings-admin-only" data-section="admin-users"><span>Users</span></button>
+          <button class="settings-nav-item settings-admin-only" data-section="admin-rooms"><span>Rooms</span></button>
+          <button class="settings-nav-item settings-admin-only" data-section="admin-invites"><span>Invites</span></button>
+          <button class="settings-nav-item settings-admin-only" data-section="admin-projects"><span>Projects</span></button>
+          <button class="settings-nav-item settings-admin-only" data-section="admin-smtp"><span>Email</span></button>
+          <div class="settings-nav-separator"></div>
+          <div class="settings-nav-category">Aigora</div>
+          <button class="settings-nav-item" data-section="lite" id="settings-aigora-nav"><span>Lite</span></button>
+          <div class="settings-nav-separator"></div>
+          <div class="settings-nav-category">Server</div>
+          <button class="settings-nav-item" data-section="advanced" id="settings-advanced-nav"><span>Advanced</span></button>
+          <button class="settings-nav-item" data-section="restart"><span>Restart</span></button>
+          <button class="settings-nav-item settings-nav-danger" data-section="shutdown"><span>Shutdown</span></button>
+        </div>
+      </div>
+    </div>
+    <div class="server-settings-content">
+      <div class="server-settings-content-inner">
+        <div class="server-settings-section active" data-section="overview">
+          <h2>Status</h2>
+          <div class="settings-card">
+            <div class="settings-field">
+              <label class="settings-label">Host</label>
+              <div class="settings-value" id="settings-hostname">-</div>
+              <div class="settings-value settings-mono" id="settings-lan-ip" style="font-size:12px;color:var(--text-muted)"></div>
+            </div>
+            <div class="settings-field">
+              <label class="settings-label">Server Version</label>
+              <div class="settings-value" id="settings-server-version">-</div>
+              <button class="settings-btn-sm settings-btn-update" id="settings-update-check"><i data-lucide="refresh-cw"></i> Check for updates</button>
+            </div>
+            <label class="settings-toggle-row">
+              <div>
+                <span class="settings-label">Early Access</span>
+                <div class="settings-hint">Receive pre-release updates before they reach the stable channel.</div>
+              </div>
+              <input type="checkbox" id="settings-update-channel">
+              <span class="toggle-track"><span class="toggle-thumb"></span></span>
+            </label>
+            <div class="settings-field-row">
+              <label class="settings-label">Port</label>
+              <span class="settings-value settings-mono" id="settings-port">-</span>
+            </div>
+            <div class="settings-field-row">
+              <label class="settings-label">HTTPS</label>
+              <span class="settings-value settings-badge" id="settings-tls">-</span>
+            </div>
+            <div class="settings-field-row">
+              <div>
+                <label class="settings-label">Skip Permissions</label>
+                <div class="settings-hint">Auto-approves all tool executions. Restart with <code style="font-size:12px">--dangerously-skip-permissions</code> to enable.</div>
+              </div>
+              <span class="settings-value settings-badge" id="settings-skip-perms">Disabled</span>
+            </div>
+            <div class="settings-field-row">
+              <label class="settings-label">Debug</label>
+              <span class="settings-value settings-badge" id="settings-debug">-</span>
+            </div>
+          </div>
+          <h3>Server Status</h3>
+          <div class="settings-card">
+            <div class="settings-field-row">
+              <label class="settings-label">PID</label>
+              <span class="settings-value settings-mono" id="settings-status-pid">-</span>
+            </div>
+            <div class="settings-field-row">
+              <label class="settings-label">Uptime</label>
+              <span class="settings-value" id="settings-status-uptime">-</span>
+            </div>
+            <div class="settings-field-row">
+              <label class="settings-label">Memory (RSS)</label>
+              <span class="settings-value" id="settings-status-rss">-</span>
+            </div>
+            <div class="settings-field-row">
+              <label class="settings-label">Active Sessions</label>
+              <span class="settings-value" id="settings-status-sessions">-</span>
+            </div>
+            <div class="settings-field-row">
+              <label class="settings-label">Connected Clients</label>
+              <span class="settings-value" id="settings-status-clients">-</span>
+            </div>
+          </div>
+          <div class="settings-card">
+            <div class="settings-field-row">
+              <label class="settings-label">WebSocket Path</label>
+              <span class="settings-value settings-mono" id="settings-ws-path">-</span>
+            </div>
+            <div class="settings-field-row">
+              <label class="settings-label">Project Slug</label>
+              <span class="settings-value settings-mono" id="settings-project-slug">-</span>
+            </div>
+          </div>
+          <h3>Agent Catalog</h3>
+          <div class="settings-card">
+            <div class="settings-field">
+              <label class="settings-label">Refresh Agent Catalog</label>
+              <div class="settings-hint">Re-scans for installed agents and updates the picker for all connected users. Happens automatically when you open the agent picker — use this to push an update immediately.</div>
+              <div style="margin-top: 12px;">
+                <button class="settings-btn-sm" id="settings-refresh-agents-btn"><i data-lucide="refresh-cw" style="width:14px;height:14px;vertical-align:-2px;margin-right:4px;"></i>Refresh agents</button>
+              </div>
+              <div class="settings-hint hidden" id="settings-refresh-agents-status" style="margin-top: 8px;"></div>
+            </div>
+          </div>
+        </div>
+        <div class="server-settings-section" data-section="models">
+          <h2>Model</h2>
+          <p class="settings-hint" style="margin-bottom: 20px;">Configure which model to use and how Claude behaves during sessions.</p>
+          <div class="settings-card">
+            <div class="settings-field">
+              <label class="settings-label">Model</label>
+              <div class="settings-hint">Choose the Claude model to use. Larger models are slower but more capable.</div>
+              <div id="ss-model-scope" class="config-scope-label"></div>
+              <div id="ss-model-list" class="settings-model-list"></div>
+            </div>
+          </div>
+          <div class="settings-card" id="ss-beta-card" style="display:none">
+            <div class="settings-field">
+              <label class="settings-label">Extended Context (Beta)</label>
+              <div class="settings-hint">Enable 1M token context window for Sonnet models. Allows processing much larger codebases and files, but may increase latency.</div>
+              <label class="settings-toggle-row ss-beta-toggle-row">
+                <div>
+                  <span class="settings-label">1M Context</span>
+                </div>
+                <input type="checkbox" id="ss-beta-1m">
+                <span class="toggle-track"><span class="toggle-thumb"></span></span>
+              </label>
+            </div>
+          </div>
+          <div class="settings-card">
+            <div class="settings-field">
+              <label class="settings-label">Mode</label>
+              <div class="settings-hint">Controls how Claude handles tool use and file edits.</div>
+              <div id="ss-mode-list" class="settings-model-list"></div>
+            </div>
+          </div>
+          <div class="settings-card" id="ss-effort-card">
+            <div class="settings-field">
+              <label class="settings-label">Effort</label>
+              <div class="settings-hint">Controls how much thinking effort Claude puts into responses. Higher effort means longer, more thorough responses.</div>
+              <div class="settings-btn-group" id="ss-effort-bar"></div>
+            </div>
+          </div>
+          <div class="settings-card" id="ss-thinking-card">
+            <div class="settings-field">
+              <label class="settings-label">Thinking</label>
+              <div class="settings-hint">Controls whether Claude shows its reasoning process. Budget mode lets you set a token limit.</div>
+              <div class="settings-btn-group" id="ss-thinking-bar"></div>
+              <div id="ss-thinking-budget-row" class="settings-budget-row" style="display:none">
+                <label class="settings-budget-label">Budget tokens</label>
+                <input id="ss-thinking-budget" type="number" class="settings-budget-input" min="1024" max="128000" step="1024" value="10000">
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="server-settings-section" data-section="security">
+          <h2>Security</h2>
+          <div class="settings-card">
+            <div class="settings-field-row">
+              <div>
+                <label class="settings-label">PIN Status</label>
+                <div class="settings-hint">Require a 6-digit PIN to access the web UI.</div>
+              </div>
+              <span class="settings-value settings-badge" id="settings-pin-status">-</span>
+            </div>
+            <div class="settings-field-row" id="settings-pin-actions">
+              <div>
+                <label class="settings-label" id="settings-pin-action-label">Set PIN</label>
+                <div class="settings-hint">Protect access to the web interface with a PIN code.</div>
+              </div>
+              <div class="settings-pin-btns">
+                <button class="settings-btn-sm" id="settings-pin-set-btn">Set PIN</button>
+                <button class="settings-btn-sm settings-btn-danger hidden" id="settings-pin-remove-btn">Remove</button>
+              </div>
+            </div>
+            <div class="settings-field hidden" id="settings-pin-form">
+              <label class="settings-label">Enter 6-digit PIN</label>
+              <div class="settings-pin-input-row">
+                <input type="text" id="settings-pin-input" maxlength="6" inputmode="numeric" pattern="[0-9]*" placeholder="000000" autocomplete="off" spellcheck="false">
+                <button class="settings-btn-sm" id="settings-pin-save-btn">Save</button>
+                <button class="settings-btn-sm settings-btn-ghost" id="settings-pin-cancel-btn">Cancel</button>
+              </div>
+              <div class="settings-hint settings-pin-error hidden" id="settings-pin-error">PIN must be exactly 6 digits.</div>
+            </div>
+          </div>
+        </div>
+        <div class="server-settings-section" data-section="notifications">
+          <h2>Notifications</h2>
+          <div class="settings-card">
+            <label class="settings-toggle-row">
+              <div>
+                <span class="settings-label">Push Notifications</span>
+                <div class="settings-hint">Receive push notifications when tasks complete.</div>
+              </div>
+              <input type="checkbox" id="settings-notif-push">
+              <span class="toggle-track"><span class="toggle-thumb"></span></span>
+            </label>
+            <label class="settings-toggle-row">
+              <div>
+                <span class="settings-label">Browser Alerts</span>
+                <div class="settings-hint">Show browser notification alerts when tasks finish.</div>
+              </div>
+              <input type="checkbox" id="settings-notif-alert">
+              <span class="toggle-track"><span class="toggle-thumb"></span></span>
+            </label>
+            <label class="settings-toggle-row">
+              <div>
+                <span class="settings-label">Sound</span>
+                <div class="settings-hint">Play a sound when tasks are completed.</div>
+              </div>
+              <input type="checkbox" id="settings-notif-sound">
+              <span class="toggle-track"><span class="toggle-thumb"></span></span>
+            </label>
+          </div>
+        </div>
+        <div class="server-settings-section" data-section="claudemd">
+          <h2>CLAUDE.md</h2>
+          <p class="ps-section-desc">Edit the global CLAUDE.md file. These instructions apply to all projects and sessions on this server.</p>
+          <div class="settings-card">
+            <div class="settings-field">
+              <div id="ss-claudemd-status" class="settings-hint"></div>
+              <textarea class="ps-textarea" id="ss-claudemd-editor" rows="20" spellcheck="false" placeholder="# Global Instructions&#10;&#10;Write instructions for Claude here..."></textarea>
+              <div class="ps-textarea-actions">
+                <button class="settings-btn-sm" id="ss-claudemd-save">Save</button>
+                <span class="ps-save-status" id="ss-claudemd-save-status"></span>
+              </div>
+            </div>
+          </div>
+          <div class="settings-hint" style="margin-top: 8px;">
+            <i data-lucide="info" style="width: 14px; height: 14px; vertical-align: -2px;"></i>
+            This file is stored at <code>~/.claude/CLAUDE.md</code>. Project-level CLAUDE.md files take precedence over this global file.
+          </div>
+        </div>
+        <div class="server-settings-section" data-section="environment">
+          <h2>Environment</h2>
+          <p class="settings-hint" style="margin-bottom: 16px;">Define environment variables shared across all projects. Project-level variables take precedence over shared ones.</p>
+          <div class="ps-env-header">
+            <button class="settings-btn-sm" id="ss-env-add-btn"><i data-lucide="plus"></i> Add Variable</button>
+            <span class="ps-save-status" id="ss-env-save-status"></span>
+          </div>
+          <div class="ps-env-list" id="ss-env-list">
+            <!-- rows rendered by JS -->
+          </div>
+        </div>
+        <div class="server-settings-section" data-section="storage">
+          <h2>Storage</h2>
+          <div class="settings-card">
+            <label class="settings-toggle-row">
+              <div>
+                <span class="settings-label">Image retention</span>
+                <div class="settings-hint">Automatically delete chat images older than this period.</div>
+              </div>
+              <select id="settings-image-retention" class="settings-select">
+                <option value="0">Forever</option>
+                <option value="3">3 days</option>
+                <option value="7" selected>7 days</option>
+                <option value="14">14 days</option>
+                <option value="30">30 days</option>
+                <option value="90">90 days</option>
+              </select>
+            </label>
+          </div>
+        </div>
+        <div class="server-settings-section" data-section="custom-icons">
+          <h2>Custom Icons</h2>
+          <p class="settings-hint" style="margin-bottom: 16px;">Manage uploaded custom icons available to any project or folder across this server. Uploads are stored server-wide, not per-project.</p>
+          <div class="custom-icons-header">
+            <input type="text" id="custom-icons-filter-input" class="settings-btn-sm custom-icons-filter-input" placeholder="Filter by name…" autocomplete="off" spellcheck="false">
+            <button class="settings-btn-sm" id="custom-icons-upload-btn"><i data-lucide="upload"></i> Upload</button>
+            <input type="file" id="custom-icons-file-input" accept="image/png,image/jpeg,image/gif,image/webp" style="display:none">
+          </div>
+          <div id="custom-icons-list">
+            <!-- rows rendered by JS (custom-icons-settings.js) -->
+          </div>
+        </div>
+        <!-- Aigora Lite — always rendered; JS toggles installed vs not-installed sub-states -->
+        <div class="server-settings-section" data-section="lite" id="settings-aigora-section">
+          <h2>Aigora Lite</h2>
+          <!-- shown when Lite is installed -->
+          <div id="settings-aigora-installed" class="hidden">
+            <div class="settings-card">
+              <label class="settings-toggle-row">
+                <div>
+                  <span class="settings-label">Auto-enroll new projects</span>
+                  <div class="settings-hint">Automatically enroll projects in Aigora Lite when they are added.</div>
+                </div>
+                <input type="checkbox" id="settings-lite-auto-enroll">
+                <span class="toggle-track"><span class="toggle-thumb"></span></span>
+              </label>
+            </div>
+          </div>
+          <!-- shown when Lite is not installed -->
+          <div id="settings-aigora-not-installed">
+            <p class="settings-hint" style="margin-bottom: 16px;">Aigora Lite adds agentic gates, session memory, and audit trails to any repo.</p>
+          </div>
+        </div>
+        <!-- Advanced: groups power-user settings (Keep Awake + Memory) -->
+        <div class="server-settings-section" data-section="advanced">
+          <h2>Advanced</h2>
+          <p class="settings-hint" style="margin-bottom: 16px;">Power-user settings. Changes here affect daemon behavior and stability.</p>
+
+          <!-- Keep Awake subsection (macOS only — JS shows/hides this block) -->
+          <div id="settings-keep-awake-section" class="hidden">
+            <h3 class="settings-subsection-title">Keep Awake</h3>
+            <div class="settings-card" style="margin-bottom: 24px;">
+              <label class="settings-toggle-row">
+                <div>
+                  <span class="settings-label">Keep Awake</span>
+                  <div class="settings-hint">Prevent the system from sleeping while the server is running (macOS only).</div>
+                </div>
+                <input type="checkbox" id="settings-keep-awake">
+                <span class="toggle-track"><span class="toggle-thumb"></span></span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Memory subsection -->
+          <h3 class="settings-subsection-title">Memory</h3>
+          <p class="settings-hint" style="margin-bottom: 12px;">Fine-tune memory pressure gates that protect daemon stability under load.</p>
+          <div class="settings-card" style="border-left: 3px solid var(--warn, #f9e2af); padding-left: 12px;">
+            <div class="settings-hint" style="color: var(--warn, #f9e2af);">
+              <i data-lucide="alert-triangle" style="width:14px;height:14px;vertical-align:-2px;margin-right:4px;"></i>
+              These settings affect daemon stability. Misconfiguration can cause sessions to be blocked or the daemon to restart.
+            </div>
+          </div>
+          <div class="settings-card" style="margin-top: 16px;">
+            <button id="settings-advanced-memory-toggle" class="settings-field-row" style="background:none;border:none;cursor:pointer;width:100%;text-align:left;padding:0;" aria-expanded="false">
+              <div>
+                <span class="settings-label">Advanced</span>
+                <span class="settings-hint">Expand to configure memory thresholds</span>
+              </div>
+              <i data-lucide="chevron-right" class="settings-adv-chevron" style="flex-shrink:0;transition:transform 0.15s;"></i>
+            </button>
+            <div id="settings-advanced-memory-body" class="hidden" style="padding-top: 16px;">
+              <div class="settings-field">
+                <label class="settings-label" for="settings-mem-available-min">Min available memory (MB)</label>
+                <div class="settings-hint">Minimum system memory required to start a new session. Increase if you experience OOM restarts.</div>
+                <input type="number" id="settings-mem-available-min" class="settings-budget-input" min="0" max="65536" step="128" value="1024" style="margin-top: 8px; width: 120px;">
+                <div class="settings-hint" id="settings-mem-available-min-default-note" style="margin-top: 4px;"></div>
+              </div>
+              <div class="settings-field" style="margin-top: 16px;">
+                <label class="settings-label" for="settings-tokens-per-mb-headroom">Context tokens per MB headroom</label>
+                <div class="settings-hint">Controls how large a session's context can grow relative to available cgroup memory. Lower = more conservative. Default (240) is derived from this daemon's own observed cgroup memory.peak against a confirmed large-session token count (lr-93e3c8) -- not a fixed model assumption.</div>
+                <input type="number" id="settings-tokens-per-mb-headroom" class="settings-budget-input" min="10" max="500" step="1" value="240" style="margin-top: 8px; width: 120px;">
+                <div class="settings-hint" id="settings-tokens-per-mb-headroom-default-note" style="margin-top: 4px;"></div>
+              </div>
+              <div class="ps-textarea-actions" style="margin-top: 8px;">
+                <button class="settings-btn-sm" id="ss-memory-save-btn">Save</button>
+                <span class="ps-save-status" id="ss-memory-save-status"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="server-settings-section" data-section="restart">
+          <h2>Restart</h2>
+          <p class="settings-hint" style="margin-bottom: 16px;">Restart the Aigora daemon process. All active sessions will be briefly interrupted and clients will automatically reconnect.</p>
+          <div class="settings-card">
+            <div class="settings-field">
+              <label class="settings-label">Restart Daemon</label>
+              <div class="settings-hint">Spawns a new daemon process and gracefully shuts down the current one.</div>
+              <div style="margin-top: 12px;">
+                <button class="settings-btn-sm" id="settings-restart-btn"><i data-lucide="refresh-cw" style="width:14px;height:14px;vertical-align:-2px;margin-right:4px;"></i>Restart</button>
+              </div>
+              <div class="settings-hint settings-restart-error hidden" id="settings-restart-error" style="margin-top: 8px;"></div>
+            </div>
+          </div>
+        </div>
+        <div class="server-settings-section" data-section="shutdown">
+          <h2>Shutdown</h2>
+          <div class="settings-danger-zone">
+            <div class="settings-danger-icon"><i data-lucide="alert-triangle"></i></div>
+            <div class="settings-danger-body">
+              <h3 class="settings-danger-title">Danger Zone</h3>
+              <p class="settings-danger-desc">Shutting down the server will terminate all active sessions, disconnect all clients, and stop the Aigora daemon process. This action cannot be undone.</p>
+            </div>
+          </div>
+          <div class="settings-card settings-card-danger">
+            <div class="settings-field">
+              <label class="settings-label">Confirm Shutdown</label>
+              <div class="settings-hint">Type <strong>shutdown</strong> below to confirm.</div>
+              <div class="settings-shutdown-input-row">
+                <input type="text" id="settings-shutdown-input" placeholder="Type shutdown to confirm" autocomplete="off" spellcheck="false">
+                <button class="settings-btn-sm settings-btn-shutdown" id="settings-shutdown-btn" disabled>Shutdown</button>
+              </div>
+              <div class="settings-hint settings-shutdown-error hidden" id="settings-shutdown-error"></div>
+            </div>
+          </div>
+        </div>
+        <!-- Admin sections (multi-user, admin only) -->
+        <div class="server-settings-section settings-admin-only" data-section="admin-users">
+          <h2>Users</h2>
+          <div class="settings-card" id="admin-users-body"></div>
+        </div>
+        <div class="server-settings-section settings-admin-only" data-section="admin-rooms">
+          <h2>Rooms</h2>
+          <p class="settings-section-desc">프로젝트별 대화방, 초대 링크, 멤버 접근 권한을 관리합니다.</p>
+          <div class="settings-card" id="admin-rooms-body"></div>
+        </div>
+        <div class="server-settings-section settings-admin-only" data-section="admin-invites">
+          <h2>Invites</h2>
+          <div class="settings-card" id="admin-invites-body"></div>
+        </div>
+        <div class="server-settings-section settings-admin-only" data-section="admin-projects">
+          <h2>Project Access</h2>
+          <div class="settings-card" id="admin-projects-body"></div>
+        </div>
+        <div class="server-settings-section settings-admin-only" data-section="admin-smtp">
+          <h2>Email</h2>
+          <p class="settings-hint" style="margin-bottom: 20px;">Configure SMTP to send invite links and one-time login codes via email. Without SMTP, users log in with a PIN instead.</p>
+          <div class="settings-card" id="admin-smtp-body"></div>
+        </div>
+
+        </div>
+      </div>
+    </div>
+    <div class="server-settings-close-col">
+      <button id="server-settings-close" class="server-settings-close-btn">
+        <i data-lucide="x"></i>
+        <span>ESC</span>
+      </button>
+    </div>
+  </div>
+  <div id="settings-palette" class="settings-palette hidden" role="dialog" aria-modal="true" aria-label="Jump to setting">
+    <div class="settings-palette-backdrop"></div>
+    <div class="settings-palette-dialog">
+      <div class="settings-palette-input-row">
+        <i data-lucide="search" class="settings-palette-search-icon"></i>
+        <input id="settings-palette-input" class="settings-palette-input" type="text" placeholder="Jump to setting…" autocomplete="off" spellcheck="false" />
+        <span class="settings-palette-esc-hint">esc</span>
+      </div>
+      <div id="settings-palette-results" class="settings-palette-results"></div>
+    </div>
+  </div>
+</div>
+
+<div id="paste-modal" class="hidden">
+  <div class="confirm-backdrop"></div>
+  <div class="confirm-dialog paste-modal-dialog">
+    <div class="paste-modal-header">
+      <span class="paste-modal-title">Pasted content</span>
+      <div class="paste-modal-actions">
+        <button class="paste-modal-copy" title="Copy to clipboard"><i data-lucide="copy" style="width:15px;height:15px"></i></button>
+        <button class="paste-modal-close"><i data-lucide="x" style="width:16px;height:16px"></i></button>
+      </div>
+    </div>
+    <pre class="paste-modal-body" id="paste-modal-body"></pre>
+  </div>
+</div>
+
+<div id="image-modal" class="hidden">
+  <div class="confirm-backdrop"></div>
+  <div class="image-modal-dialog">
+    <img id="image-modal-img" src="" alt="">
+    <button class="image-modal-close"><i data-lucide="x" style="width:18px;height:18px"></i></button>
+  </div>
+</div>
+
+<div id="mermaid-modal" class="hidden">
+  <div class="confirm-backdrop"></div>
+  <div class="mermaid-modal-dialog">
+    <div class="mermaid-modal-header">
+      <span class="mermaid-modal-title">Diagram</span>
+      <div class="mermaid-modal-actions">
+        <button class="mermaid-modal-btn" id="mermaid-download-btn" title="Download PNG"><i data-lucide="download" style="width:16px;height:16px"></i></button>
+        <button class="mermaid-modal-btn" title="Close"><i data-lucide="x" style="width:16px;height:16px"></i></button>
+      </div>
+    </div>
+    <div class="mermaid-modal-body" id="mermaid-modal-body"></div>
+  </div>
+</div>
+
+<div id="notif-help-modal" class="hidden">
+  <div class="confirm-backdrop"></div>
+  <div class="confirm-dialog" style="max-width: 380px;">
+    <div class="notif-help-title">Notifications blocked</div>
+    <div class="notif-help-body">
+      <p>Your browser has blocked notification permissions for this site. To re-enable:</p>
+      <ol>
+        <li>Open your browser's notification settings by pasting the address below</li>
+        <li>Find this site and change the permission to <strong>Allow</strong></li>
+        <li>Reload the page</li>
+      </ol>
+      <div class="notif-help-url">
+        <code id="notif-settings-url">chrome://settings/content/notifications</code>
+        <button id="notif-url-copy" class="popover-copy" title="Copy"><i data-lucide="copy"></i></button>
+      </div>
+    </div>
+    <div class="confirm-actions">
+      <button class="confirm-btn confirm-cancel" id="notif-help-close">Close</button>
+    </div>
+  </div>
+</div>
+
+<div id="resume-modal" class="hidden">
+  <div class="confirm-backdrop"></div>
+  <div class="confirm-dialog resume-picker-dialog">
+    <div class="resume-modal-title">Resume CLI session</div>
+    <div class="resume-picker-body">
+      <div id="resume-picker-loading" class="resume-picker-loading">
+        <div class="resume-picker-spinner"></div>
+        <span>Loading sessions...</span>
+      </div>
+      <div id="resume-picker-empty" class="resume-picker-empty hidden">
+        No CLI sessions found for this project.
+      </div>
+      <div id="resume-picker-list" class="resume-picker-list hidden"></div>
+    </div>
+    <div class="confirm-actions">
+      <button class="confirm-btn confirm-cancel" id="resume-cancel">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div id="rewind-modal" class="hidden">
+  <div class="confirm-backdrop"></div>
+  <div class="confirm-dialog">
+    <div class="rewind-modal-title">Rewind to this point?</div>
+    <div class="rewind-modal-body">
+      <p id="rewind-summary"></p>
+      <div id="rewind-mode-options">
+        <label><input type="radio" name="rewind-mode" value="both" checked> Conversation and files</label>
+        <label><input type="radio" name="rewind-mode" value="chat"> Conversation only</label>
+        <label><input type="radio" name="rewind-mode" value="files"> Files only</label>
+      </div>
+      <div id="rewind-files-list"></div>
+    </div>
+    <div class="confirm-actions">
+      <button class="confirm-btn confirm-cancel" id="rewind-cancel">Cancel</button>
+      <button class="confirm-btn confirm-ok" id="rewind-confirm">Rewind</button>
+    </div>
+  </div>
+</div>
+
+<div id="confirm-modal" class="hidden">
+  <div class="confirm-backdrop"></div>
+  <div class="confirm-dialog">
+    <div class="confirm-text" id="confirm-text"></div>
+    <div class="confirm-actions">
+      <button class="confirm-btn confirm-cancel" id="confirm-cancel">Cancel</button>
+      <button class="confirm-btn confirm-delete" id="confirm-ok">Delete</button>
+    </div>
+  </div>
+</div>
+
+<div id="skill-install-modal" class="hidden">
+  <div class="confirm-backdrop"></div>
+  <div class="confirm-dialog skill-install-dialog">
+    <div class="skill-install-title" id="skill-install-title"></div>
+    <div class="skill-install-reason" id="skill-install-reason"></div>
+    <div class="skill-install-list" id="skill-install-list"></div>
+    <div id="skill-install-status" class="hidden"></div>
+    <div class="confirm-actions">
+      <button class="confirm-btn confirm-cancel" id="skill-install-cancel">Cancel</button>
+      <button class="confirm-btn confirm-delete" id="skill-install-ok">Install</button>
+    </div>
+  </div>
+</div>
+
+<div id="add-project-modal" class="hidden">
+  <div class="confirm-backdrop"></div>
+  <div class="confirm-dialog add-project-dialog">
+    <div class="add-project-title">Add project</div>
+    <div id="add-project-removed" class="hidden"></div>
+    <div class="add-project-modes">
+      <button class="add-project-mode-btn active" data-mode="existing">Existing directory</button>
+      <button class="add-project-mode-btn" data-mode="create">New project</button>
+      <button class="add-project-mode-btn" data-mode="clone">Clone from GitHub</button>
+    </div>
+    <div class="add-project-body">
+      <div class="add-project-panel active" data-panel="existing">
+        <div class="add-project-input-wrap">
+          <span id="add-project-prefix" class="add-project-prefix hidden"></span>
+          <input type="text" id="add-project-input" placeholder="/" autocomplete="off" spellcheck="false">
+          <div id="add-project-suggestions" class="hidden"></div>
+        </div>
+      </div>
+      <div class="add-project-panel" data-panel="create">
+        <input type="text" id="add-project-create-input" placeholder="Project name" autocomplete="off" spellcheck="false">
+      </div>
+      <div class="add-project-panel" data-panel="clone">
+        <input type="text" id="add-project-clone-input" placeholder="https://github.com/user/repo" autocomplete="off" spellcheck="false">
+        <div id="add-project-clone-progress" class="hidden"><span class="clone-spinner"></span><span id="add-project-clone-text">Cloning...</span></div>
+      </div>
+      <div id="add-project-error" class="hidden"></div>
+    </div>
+    <div class="confirm-actions">
+      <button class="confirm-btn confirm-cancel" id="add-project-cancel">Cancel</button>
+      <button class="confirm-btn confirm-ok" id="add-project-ok">Add</button>
+    </div>
+  </div>
+</div>
+
+<div id="skills-modal" class="hidden">
+  <div class="confirm-backdrop"></div>
+  <div class="confirm-dialog skills-dialog">
+    <div class="skills-header">
+      <span class="skills-title"><i data-lucide="puzzle"></i> Skills <span class="skills-powered-by">powered by <a href="https://skills.sh" target="_blank" rel="noopener noreferrer">skills.sh</a></span></span>
+      <div class="skills-header-actions">
+        <button class="skills-back-btn hidden" id="skills-back-btn"><i data-lucide="arrow-left"></i></button>
+        <button class="skills-close" id="skills-modal-close"><i data-lucide="x"></i></button>
+      </div>
+    </div>
+    <div class="skills-search" id="skills-search">
+      <i data-lucide="search"></i>
+      <input type="text" id="skills-search-input" placeholder="Search skills ..." spellcheck="false" />
+      <kbd class="skills-search-hint" id="skills-search-hint">/</kbd>
+      <button class="skills-search-clear hidden" id="skills-search-clear"><i data-lucide="x"></i></button>
+    </div>
+    <div class="skills-tabs">
+      <button class="skills-tab active" data-tab="all">All Time</button>
+      <button class="skills-tab" data-tab="trending">Trending</button>
+      <button class="skills-tab" data-tab="hot">Hot</button>
+      <button class="skills-tab" data-tab="installed">Installed</button>
+    </div>
+    <div class="skills-content" id="skills-content">
+      <div class="skills-loading"><div class="skills-spinner"></div> Loading skills...</div>
+    </div>
+  </div>
+</div>
+
+<!-- MCP Servers Modal -->
+<div id="mcp-modal" class="hidden">
+  <div class="confirm-backdrop"></div>
+  <div class="confirm-dialog mcp-dialog">
+    <div class="mcp-header">
+      <span class="mcp-title"><i data-lucide="cable"></i> MCP Servers</span>
+      <button class="skills-close" id="mcp-modal-close"><i data-lucide="x"></i></button>
+    </div>
+    <div class="mcp-content" id="mcp-content">
+      <p class="mcp-no-servers">No MCP servers detected. Configure in Aigora Chrome Extension.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Ralph Wizard -->
+<div id="ralph-wizard" class="hidden">
+  <div class="ralph-wizard-backdrop"></div>
+  <div class="ralph-wizard-card">
+    <div class="ralph-wizard-header">
+      <span>New Loop</span>
+      <button id="ralph-wizard-close">&times;</button>
+    </div>
+    <div class="ralph-wizard-progress">
+      <span class="ralph-dot active" data-step="1"></span>
+      <span class="ralph-dot" data-step="2"></span>
+      <span class="ralph-dot" data-step="3"></span>
+    </div>
+    <div class="ralph-wizard-steps">
+      <div class="ralph-step active" data-step="1">
+        <h3>Choose loop mode</h3>
+        <div id="ralph-install-status" class="hidden"></div>
+        <div class="ralph-mode-preview" id="ralph-mode-preview">
+          <div class="ralph-mode-preview-judge">
+            <div class="ralph-intro-diagram">
+              <div class="ralph-dia-row">
+                <span class="ralph-dia-node">Coding agent</span>
+                <span class="ralph-dia-fwd">&rarr;</span>
+                <span class="ralph-dia-node">Judge reviews</span>
+                <span class="ralph-dia-fwd">&rarr;</span>
+                <span class="ralph-dia-done">Done</span>
+              </div>
+              <div class="ralph-dia-loop">
+                <svg class="ralph-dia-svg" viewBox="0 0 200 28" preserveAspectRatio="none">
+                  <path d="M170 2 C190 2 196 14 190 24 L10 24 C4 24 -2 14 10 2" fill="none" stroke="currentColor" stroke-width="1.2" stroke-dasharray="4 3"/>
+                  <polygon points="14,-1 6,5 14,5" fill="currentColor" transform="translate(0,0)"/>
+                </svg>
+                <span class="ralph-dia-loop-label">Fail &mdash; retry</span>
+              </div>
+            </div>
+            <p class="ralph-mode-preview-text">Each iteration is reviewed by a separate judge session that decides pass or fail. The coding agent does not see the judge's result. On fail, a fresh session retries from scratch. The loop ends on pass or when the max iteration count is reached. Best suited for tasks with clear success criteria, like making tests pass or matching a spec.</p>
+          </div>
+          <div class="ralph-mode-preview-simple" style="display:none">
+            <div class="ralph-intro-diagram">
+              <div class="ralph-dia-row">
+                <span class="ralph-dia-node">Coding agent</span>
+                <span class="ralph-dia-fwd">&rarr;</span>
+                <span class="ralph-dia-node">Repeat N times</span>
+                <span class="ralph-dia-fwd">&rarr;</span>
+                <span class="ralph-dia-done">Done</span>
+              </div>
+            </div>
+            <p class="ralph-mode-preview-text">The original Ralph Loop. The prompt runs a set number of times with no review step in between. Each iteration starts a fresh session. There is no judge and no pass/fail. Useful when the task itself is the goal, not a specific outcome. Suited for bulk refactoring, repeated migrations, or running the same operation across multiple targets.</p>
+          </div>
+        </div>
+        <div class="ralph-mode-choice">
+          <button class="ralph-mode-card active" data-loop-mode="judge">
+            <span class="ralph-mode-card-icon"><i data-lucide="scale"></i></span>
+            <span class="ralph-mode-card-title">Console Loop</span>
+            <span class="ralph-mode-card-sub">Loop + Judge</span>
+          </button>
+          <button class="ralph-mode-card" data-loop-mode="simple">
+            <span class="ralph-mode-card-icon"><i data-lucide="repeat"></i></span>
+            <span class="ralph-mode-card-title">Ralph Loop</span>
+            <span class="ralph-mode-card-sub">Loop only</span>
+          </button>
+        </div>
+      </div>
+      <div class="ralph-step" data-step="2">
+        <h3>Who writes the instructions?</h3>
+        <p class="ralph-hint">Choose who provides each file.</p>
+        <div class="ralph-authorship-rows">
+          <div class="ralph-authorship-row">
+            <div class="ralph-authorship-info">
+              <span class="ralph-authorship-label">PROMPT</span>
+              <span class="ralph-authorship-desc">The instructions the coding agent follows each iteration.</span>
+            </div>
+            <div class="config-segmented ralph-authorship-toggle" data-file="prompt">
+              <button class="config-segment-btn" data-author="me">Me</button>
+              <button class="config-segment-btn active" data-author="aigora">Console</button>
+            </div>
+          </div>
+          <div class="ralph-authorship-row" id="ralph-judge-authorship-row">
+            <div class="ralph-authorship-info">
+              <span class="ralph-authorship-label">JUDGE</span>
+              <span class="ralph-authorship-desc">The criteria used to evaluate each iteration as pass or fail.</span>
+            </div>
+            <div class="config-segmented ralph-authorship-toggle" data-file="judge">
+              <button class="config-segment-btn" data-author="me">Me</button>
+              <button class="config-segment-btn active" data-author="aigora">Console</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="ralph-step" data-step="3">
+        <h3>Provide details</h3>
+        <div id="ralph-input-task-section" class="hidden">
+          <label class="ralph-field-label" for="ralph-task">Task description <span class="ralph-field-req">*</span></label>
+          <p class="ralph-hint">Write a rough idea. Aigora will refine it into detailed instructions.</p>
+          <textarea id="ralph-task" rows="5" placeholder="e.g. Add dark mode toggle to the settings page"></textarea>
+        </div>
+        <div id="ralph-input-prompt-section" class="hidden">
+          <label class="ralph-field-label" for="ralph-prompt-input">PROMPT.md <span class="ralph-field-req">*</span></label>
+          <textarea id="ralph-prompt-input" rows="5" placeholder="Paste your PROMPT.md content here"></textarea>
+        </div>
+        <div id="ralph-input-judge-section" class="hidden">
+          <label class="ralph-field-label" for="ralph-judge-input" style="margin-top: 8px;">JUDGE.md <span class="ralph-field-req">*</span></label>
+          <textarea id="ralph-judge-input" rows="4" placeholder="Paste your JUDGE.md content here"></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="ralph-wizard-footer">
+      <button id="ralph-wizard-back" class="ralph-btn secondary">Back</button>
+      <div>
+        <button id="ralph-wizard-skip" class="ralph-btn tertiary">Skip</button>
+        <button id="ralph-wizard-next" class="ralph-btn primary">Next</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Ralph Preview Modal (also serves as the execution modal) -->
+<div id="ralph-preview-modal" class="hidden">
+  <div class="confirm-backdrop"></div>
+  <div class="ralph-preview-dialog">
+    <div class="ralph-preview-header">
+      <span class="ralph-preview-name" id="ralph-preview-name">Loop</span>
+      <div class="ralph-preview-actions">
+        <button class="ralph-preview-action-icon" id="ralph-preview-delete" title="Cancel and discard"><i data-lucide="trash-2"></i></button>
+      </div>
+    </div>
+    <div class="ralph-preview-tabs">
+      <button class="ralph-tab active" data-tab="prompt">PROMPT.md</button>
+      <button class="ralph-tab" data-tab="judge">JUDGE.md</button>
+      <button class="ralph-tab" data-tab="model">Model</button>
+    </div>
+    <div id="ralph-preview-body" class="ralph-preview-body"></div>
+    <div class="ralph-preview-footer" id="ralph-preview-footer">
+      <button class="ralph-run-combo" id="ralph-preview-run">
+        <span class="ralph-run-combo-label" id="ralph-run-combo-label">Run</span>
+        <span class="ralph-run-combo-sep"></span>
+        <input type="number" id="ralph-preview-iterations" class="ralph-run-combo-input" value="20" min="1" max="100" onclick="event.stopPropagation()">
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Knowledge Editor Modal removed: now inline 3-panel layout -->
+
+<!-- Scheduler panel is dynamically created in #app by scheduler.js -->
+
+<!-- Schedule Edit Modal -->
+
+<!-- Schedule Create Popover (inline) -->
+<div id="schedule-create-popover" class="sched-create-popover hidden">
+  <input type="hidden" id="sched-create-date" value="">
+  <!-- Top row: date + time + recurrence + close -->
+  <div class="sched-create-top-row">
+    <div class="sched-create-date-chips">
+      <input type="date" class="sched-create-date-input" id="sched-create-date-picker" value="">
+      <input type="time" class="sched-create-time-input" id="sched-create-time" value="09:00">
+    </div>
+    <button class="sched-create-close-btn" id="sched-create-cancel" title="Close"><i data-lucide="x"></i></button>
+  </div>
+  <!-- Title with color picker -->
+  <div class="sched-create-title-row">
+    <div class="sched-create-color-picker-wrap">
+      <button class="sched-create-color-btn" id="sched-create-color-btn" title="Pick color"><span class="sched-create-color-dot" id="sched-create-color-dot"></span></button>
+      <div class="sched-create-color-palette hidden" id="sched-create-color-palette">
+        <button class="sched-color-swatch" data-color="#ffb86c" style="background:#ffb86c"></button>
+        <button class="sched-color-swatch" data-color="#f87171" style="background:#f87171"></button>
+        <button class="sched-color-swatch" data-color="#fbbf24" style="background:#fbbf24"></button>
+        <button class="sched-color-swatch" data-color="#34d399" style="background:#34d399"></button>
+        <button class="sched-color-swatch" data-color="#22d3ee" style="background:#22d3ee"></button>
+        <button class="sched-color-swatch" data-color="#f472b6" style="background:#f472b6"></button>
+        <button class="sched-color-swatch" data-color="#6366f1" style="background:#6366f1"></button>
+        <button class="sched-color-swatch" data-color="#a78bfa" style="background:#a78bfa"></button>
+        <button class="sched-color-swatch" data-color="#3b82f6" style="background:#3b82f6"></button>
+        <button class="sched-color-swatch" data-color="#e879f9" style="background:#e879f9"></button>
+        <button class="sched-color-swatch" data-color="#10b981" style="background:#10b981"></button>
+        <button class="sched-color-swatch" data-color="#8b5cf6" style="background:#8b5cf6"></button>
+      </div>
+    </div>
+    <input type="text" class="sched-create-title-input" id="sched-create-title" placeholder="Schedule Title" maxlength="80" spellcheck="false" autocomplete="off">
+  </div>
+  <!-- Task -->
+  <div class="sched-create-row">
+    <i data-lucide="list-todo" class="sched-create-row-icon"></i>
+    <div class="sched-create-task-dropdown" id="sched-create-task-wrap">
+      <button class="sched-create-task-btn" id="sched-create-task-btn" type="button">
+        <span class="sched-create-task-label" id="sched-create-task-label">Select a task</span>
+        <i data-lucide="chevron-down"></i>
+      </button>
+      <input type="hidden" id="sched-create-task" value="">
+      <div class="sched-create-task-list hidden" id="sched-create-task-list"></div>
+    </div>
+  </div>
+  <!-- Review toggle -->
+  <div class="sched-create-row">
+    <div class="sched-create-row-icon-spacer"></div>
+    <label class="sched-review-toggle">
+      <input type="checkbox" id="sched-review-check">
+      <span class="sched-review-label">Review multiple times</span>
+      <span class="sched-review-count hidden" id="sched-review-count">
+        <input type="number" id="sched-create-iterations" min="2" max="100" value="3" class="sched-create-iter-input">
+        <span class="sched-create-iter-hint">x</span>
+      </span>
+    </label>
+  </div>
+  <!-- Description (shown only when editing a record that has one) -->
+  <div class="sched-create-row hidden" id="sched-create-desc-row">
+    <i data-lucide="align-left" class="sched-create-row-icon"></i>
+    <textarea class="sched-create-row-textarea" id="sched-create-desc" rows="2" placeholder="Description"></textarea>
+  </div>
+  <!-- Repeat accordion -->
+  <div class="sched-accordion" id="sched-accordion-repeat">
+    <div class="sched-accordion-divider"></div>
+    <button class="sched-accordion-header" id="sched-accordion-repeat-header" type="button">
+      <div class="sched-accordion-header-left">
+        <i data-lucide="repeat" class="sched-accordion-icon"></i>
+        <div class="sched-accordion-text">
+          <span class="sched-accordion-title">Repeat</span>
+          <span class="sched-accordion-subtitle" id="sched-accordion-repeat-subtitle">Which days to run</span>
+        </div>
+      </div>
+      <div class="sched-accordion-header-right">
+        <span class="sched-accordion-clear hidden" id="sched-accordion-repeat-clear" title="Clear"><i data-lucide="x"></i></span>
+        <i data-lucide="chevron-right" class="sched-accordion-chevron"></i>
+      </div>
+    </button>
+    <div class="sched-accordion-body hidden" id="sched-accordion-repeat-body">
+      <div class="sched-custom-row">
+        <span class="sched-custom-label">Every</span>
+        <input type="number" class="sched-custom-interval" id="sched-custom-interval" value="1" min="1" max="99">
+        <select class="sched-field-select sched-custom-unit" id="sched-custom-unit">
+          <option value="day">Day</option>
+          <option value="week" selected>Week</option>
+          <option value="month">Month</option>
+          <option value="year">Year</option>
+        </select>
+      </div>
+      <div class="sched-custom-dow-section" id="sched-custom-dow-section">
+        <span class="sched-custom-label">On</span>
+        <div class="sched-dow-row" id="sched-custom-dow-row">
+          <button class="sched-dow-btn" data-dow="0">Su</button>
+          <button class="sched-dow-btn" data-dow="1">Mo</button>
+          <button class="sched-dow-btn" data-dow="2">Tu</button>
+          <button class="sched-dow-btn" data-dow="3">We</button>
+          <button class="sched-dow-btn" data-dow="4">Th</button>
+          <button class="sched-dow-btn" data-dow="5">Fr</button>
+          <button class="sched-dow-btn" data-dow="6">Sa</button>
+        </div>
+      </div>
+      <div class="sched-custom-row sched-custom-end-row" id="sched-custom-end-row">
+        <span class="sched-custom-label">End</span>
+        <div class="sched-custom-end-dropdown" id="sched-custom-end-wrap">
+          <button class="sched-custom-end-btn" id="sched-custom-end-btn" type="button">
+            <span id="sched-custom-end-label">Never</span>
+            <i data-lucide="chevron-down"></i>
+          </button>
+          <input type="hidden" id="sched-custom-end" value="never">
+          <div class="sched-custom-end-list hidden" id="sched-custom-end-list">
+            <button class="sched-custom-end-item active" data-value="never" type="button">Never</button>
+            <button class="sched-custom-end-item" data-value="until" type="button">Until</button>
+            <button class="sched-custom-end-item" data-value="after" type="button">After</button>
+          </div>
+        </div>
+        <button class="sched-custom-end-date-btn hidden" id="sched-custom-end-date-btn" type="button">
+          <span id="sched-custom-end-date-label">Pick date</span>
+        </button>
+        <div class="sched-custom-end-after hidden" id="sched-custom-end-after-wrap">
+          <input type="number" class="sched-custom-interval sched-custom-end-after-input" id="sched-custom-end-after" value="10" min="1" max="999">
+          <span class="sched-custom-end-after-suffix">times</span>
+        </div>
+      </div>
+      <div class="sched-custom-end-calendar hidden" id="sched-custom-end-calendar">
+        <div class="sched-cal-header">
+          <span class="sched-cal-title" id="sched-cal-title">April 2026</span>
+          <div class="sched-cal-nav">
+            <button class="sched-cal-nav-btn" id="sched-cal-prev"><i data-lucide="chevron-left"></i></button>
+            <button class="sched-cal-nav-btn" id="sched-cal-next"><i data-lucide="chevron-right"></i></button>
+          </div>
+        </div>
+        <div class="sched-cal-weekdays">
+          <span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span>
+        </div>
+        <div class="sched-cal-grid" id="sched-cal-grid"></div>
+      </div>
+    </div>
+  </div>
+  <!-- Interval accordion -->
+  <div class="sched-accordion" id="sched-accordion-interval">
+    <div class="sched-accordion-divider"></div>
+    <button class="sched-accordion-header" id="sched-accordion-interval-header" type="button">
+      <div class="sched-accordion-header-left">
+        <i data-lucide="timer" class="sched-accordion-icon"></i>
+        <div class="sched-accordion-text">
+          <span class="sched-accordion-title">Interval</span>
+          <span class="sched-accordion-subtitle" id="sched-accordion-interval-subtitle">How often within each day</span>
+        </div>
+      </div>
+      <div class="sched-accordion-header-right">
+        <span class="sched-accordion-clear hidden" id="sched-accordion-interval-clear" title="Clear"><i data-lucide="x"></i></span>
+        <i data-lucide="chevron-right" class="sched-accordion-chevron"></i>
+      </div>
+    </button>
+    <div class="sched-accordion-body hidden" id="sched-accordion-interval-body">
+      <div class="sched-interval-custom-row">
+        <span class="sched-custom-label">Every</span>
+        <input type="number" class="sched-custom-interval" id="sched-interval-custom-value" value="10" min="1" max="999">
+        <div class="sched-interval-unit-toggle" id="sched-interval-custom-unit">
+          <button type="button" class="sched-interval-seg active" data-unit="minute">min</button><button type="button" class="sched-interval-seg" data-unit="hour">hrs</button>
+        </div>
+      </div>
+      <div class="sched-interval-end-section hidden" id="sched-interval-end-section">
+        <div class="sched-interval-end-divider"></div>
+        <div class="sched-interval-end-options">
+          <button class="sched-interval-end-opt active" data-iend="allday">All day</button>
+          <button class="sched-interval-end-opt" data-iend="after">Stop after</button>
+          <button class="sched-interval-end-opt" data-iend="until">Stop at</button>
+        </div>
+        <div class="sched-interval-end-after hidden" id="sched-interval-end-after-row">
+          <input type="number" class="sched-interval-end-input" id="sched-interval-end-after" value="5" min="1" max="999">
+          <span class="sched-interval-end-label">runs</span>
+        </div>
+        <div class="sched-interval-end-until hidden" id="sched-interval-end-until-row">
+          <input type="time" class="sched-interval-end-time" id="sched-interval-end-time" value="18:00">
+        </div>
+      </div>
+      <div class="sched-skip-running-row" id="sched-skip-running-row">
+        <label class="sched-switch-label" for="sched-skip-running">
+          <div class="sched-switch">
+            <input type="checkbox" id="sched-skip-running" checked>
+            <span class="sched-switch-slider"></span>
+          </div>
+          <span class="sched-switch-text">Skip if previous run still active</span>
+        </label>
+      </div>
+    </div>
+  </div>
+  <!-- Bottom bar -->
+  <div class="sched-create-bottom">
+    <div class="sched-create-bottom-left">
+      <button class="sched-create-delete-btn hidden" id="sched-create-delete" title="Delete"><i data-lucide="trash-2"></i></button>
+    </div>
+    <div class="sched-create-bottom-right">
+      <button class="sched-create-save-btn" id="sched-create-submit">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete recurring event dialog -->
+<div class="sched-delete-dialog-backdrop hidden" id="sched-delete-dialog">
+  <div class="sched-delete-dialog">
+    <div class="sched-delete-dialog-title">Delete recurring event</div>
+    <div class="sched-delete-dialog-body">
+      <button class="sched-delete-option" data-delete="this">This event only</button>
+      <button class="sched-delete-option" data-delete="following">This and following events</button>
+      <button class="sched-delete-option" data-delete="all">All events</button>
+    </div>
+    <div class="sched-delete-dialog-footer">
+      <button class="sched-delete-option cancel" data-delete="cancel">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Schedule Popover -->
+<div id="schedule-popover" class="schedule-popover hidden"></div>
+
+<script src="/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3/dist/purify.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/highlight.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lucide@0.468.0/dist/umd/lucide.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/twemoji@14.0.2/dist/twemoji.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@xterm/xterm@5/lib/xterm.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@xterm/addon-fit@0/lib/addon-fit.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@xterm/addon-web-links@0/lib/addon-web-links.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@xterm/addon-webgl@0/lib/addon-webgl.min.js"></script>
+<script type="module" src="app.js"></script>
+<div id="pwa-install-modal" class="pwa-modal hidden">
+  <div class="pwa-modal-backdrop"></div>
+  <div class="pwa-modal-card">
+    <div class="pwa-modal-icon">📲</div>
+    <h3 class="pwa-modal-title">Add to Home Screen</h3>
+    <p class="pwa-modal-desc">Add Aigora to your home screen for a better experience.</p>
+    <ul class="pwa-modal-benefits">
+      <li><i data-lucide="maximize" class="pwa-benefit-icon"></i>Full-screen — no browser toolbar</li>
+      <li><i data-lucide="bell" class="pwa-benefit-icon"></i>Push notifications when tasks finish</li>
+      <li><i data-lucide="zap" class="pwa-benefit-icon"></i>Instant launch from home screen</li>
+    </ul>
+    <div class="pwa-modal-buttons">
+      <button id="pwa-modal-confirm" class="pwa-modal-btn primary">Continue</button>
+      <button id="pwa-modal-cancel" class="pwa-modal-btn secondary">Not now</button>
+    </div>
+  </div>
+</div>
+</body>
+</html>

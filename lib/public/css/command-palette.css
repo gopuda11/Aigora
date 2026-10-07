@@ -1,0 +1,559 @@
+/* ==========================================================================
+   Command Palette (Cmd+K)
+   ========================================================================== */
+
+/* --- Top bar search bar trigger (Slack-style) --- */
+.cmd-palette-searchbar {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 24px;
+  padding: 0 10px;
+  background: rgba(var(--overlay-rgb), 0.04);
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 12px;
+  color: var(--text-dimmer);
+  transition: background 0.15s, border-color 0.15s;
+  width: min(520px, 40%);
+}
+
+.cmd-palette-searchbar:hover {
+  background: rgba(var(--overlay-rgb), 0.08);
+  border-color: var(--border);
+  color: var(--text-muted);
+}
+
+.cmd-palette-searchbar .lucide {
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
+}
+
+.cmd-palette-searchbar-text {
+  flex: 1;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cmd-palette-searchbar-kbd {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: rgba(var(--overlay-rgb), 0.08);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0 5px;
+  font-family: inherit;
+  line-height: 16px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+  .cmd-palette-searchbar {
+    max-width: none;
+  }
+  .cmd-palette-searchbar-text {
+    display: none;
+  }
+  .cmd-palette-searchbar-kbd {
+    display: none;
+  }
+}
+
+.cmd-palette {
+  position: fixed;
+  inset: 0;
+  z-index: 400;
+}
+
+.cmd-palette.hidden { display: none; }
+
+.cmd-palette-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(var(--shadow-rgb), 0.3);
+}
+
+.cmd-palette-dialog {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: 0;
+  background: var(--bg-alt);
+  border: 1px solid var(--border);
+  border-top: none;
+  border-radius: 0 0 12px 12px;
+  width: min(560px, 44%);
+  box-shadow: 0 8px 32px rgba(var(--shadow-rgb), 0.4);
+  display: flex;
+  flex-direction: column;
+  max-height: 70vh;
+  animation: cmdPaletteExpand 0.15s ease-out;
+}
+
+@keyframes cmdPaletteExpand {
+  from { opacity: 0; max-height: 0; }
+  to { opacity: 1; max-height: 70vh; }
+}
+
+/* --- Search input row --- */
+.cmd-palette-input-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.cmd-palette-input-row .lucide {
+  width: 16px;
+  height: 16px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.cmd-palette-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  min-width: 0;
+}
+
+.cmd-palette-input::placeholder {
+  color: var(--text-muted);
+}
+
+.cmd-palette-kbd {
+  font-size: 11px;
+  color: var(--text-dimmer);
+  cursor: pointer;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cmd-palette-kbd .lucide {
+  width: 18px;
+  height: 18px;
+}
+
+/* --- Results area --- */
+.cmd-palette-results {
+  overflow-y: auto;
+  padding: 6px 0;
+  flex: 1;
+  min-height: 0;
+}
+
+.cmd-palette-group-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  padding: 8px 16px 4px;
+}
+
+.cmd-palette-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: background 0.1s;
+}
+
+.cmd-palette-item:hover,
+.cmd-palette-item.active {
+  background: rgba(var(--overlay-rgb), 0.06);
+}
+
+.cmd-palette-item-icon {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+  border-radius: 6px;
+  background: rgba(var(--overlay-rgb), 0.04);
+}
+
+.cmd-palette-item-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.cmd-palette-item-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cmd-palette-item-title {
+  font-size: 13px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.cmd-palette-item-date {
+  font-size: 11px;
+  color: var(--text-dimmer);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.cmd-palette-item-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.cmd-palette-item-project {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--text-muted);
+}
+
+.cmd-palette-item-snippet {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-style: italic;
+  color: var(--text-muted);
+  max-width: 300px;
+}
+
+.cmd-palette-item-arrow {
+  color: var(--text-dimmer);
+  flex-shrink: 0;
+}
+
+.cmd-palette-item-arrow .lucide {
+  width: 14px;
+  height: 14px;
+}
+
+/* --- Empty / loading --- */
+.cmd-palette-empty {
+  padding: 24px 16px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.cmd-palette-loading {
+  padding: 24px 16px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+/* --- Footer --- */
+.cmd-palette-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 14px;
+  border-top: 1px solid var(--border-subtle);
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.cmd-palette-brand {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-family: "Nunito", sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+.cmd-palette-brand img {
+  border-radius: 3px;
+}
+
+.cmd-palette-brand:hover {
+  color: var(--text-secondary);
+}
+
+.cmd-palette-footer-shortcuts {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cmd-palette-footer kbd {
+  font-size: 10px;
+  color: var(--text-secondary);
+  background: rgba(var(--overlay-rgb), 0.08);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 0 4px;
+  font-family: inherit;
+}
+
+/* --- Mobile: bottom sheet style --- */
+@media (max-width: 768px) {
+  /* Hide the top-bar search trigger on mobile */
+  .cmd-palette-searchbar {
+    display: none !important;
+  }
+
+  /* Palette dialog: bottom sheet instead of top dropdown */
+  .cmd-palette-dialog {
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    transform: none;
+    width: 100%;
+    max-height: 85dvh;
+    border-radius: 16px 16px 0 0;
+    border: none;
+    border-top: 1px solid var(--border-subtle);
+    animation: cmdPaletteMobileUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  @keyframes cmdPaletteMobileUp {
+    from { opacity: 0; transform: translateY(100%); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Bigger input for touch */
+  .cmd-palette-input-row {
+    padding: 14px 16px;
+  }
+
+  .cmd-palette-input {
+    font-size: 16px; /* prevents iOS zoom */
+  }
+
+  /* Bigger tap targets */
+  .cmd-palette-item {
+    padding: 12px 16px;
+    min-height: 44px;
+  }
+
+  .cmd-palette-item-snippet {
+    display: none;
+  }
+
+  /* Hide keyboard shortcut hints */
+  .cmd-palette-footer-shortcuts {
+    display: none;
+  }
+}
+
+/* --- Project switcher (Cmd/Ctrl+E) ---
+   macOS Cmd+Tab-style quick switcher: centered modal with a darker
+   backdrop than the command palette, projects laid out horizontally
+   as icon+label tiles that wrap to multiple rows when there are many.
+   Reuses .cmd-palette shell so positioning/animations stay consistent. */
+.project-switcher .cmd-palette-backdrop {
+  background: rgba(var(--shadow-rgb), 0.55);
+}
+.project-switcher-dialog {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-top: 1px solid var(--border);
+  border-radius: 16px;
+  width: min(820px, 85vw);
+  max-height: 80vh;
+  background: var(--bg-alt);
+  box-shadow: 0 20px 60px rgba(var(--shadow-rgb), 0.5);
+  animation: projSwitcherIn 0.12s ease-out;
+}
+@keyframes projSwitcherIn {
+  from { opacity: 0; transform: translate(-50%, -50%) scale(0.96); }
+  to   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+.project-switcher-header {
+  padding: 14px 20px 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-dimmer);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.project-switcher-dialog .cmd-palette-results {
+  padding: 12px 16px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-start;
+  overflow-y: auto;
+  max-height: calc(80vh - 110px);
+}
+.project-switcher-item {
+  flex: 0 0 auto;
+  width: 96px;
+  height: 104px;
+  padding: 10px 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  border: 2px solid transparent;
+  border-radius: 12px;
+  background: transparent;
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s;
+  text-align: center;
+}
+/* Icon-strip-style treatment: rounded bg-alt fill that turns accent
+   on hover/active, and a 4-direction drop-shadow + white glow on the
+   emoji img for readability on either background. */
+.project-switcher-item .cmd-palette-item-icon {
+  width: 44px;
+  height: 44px;
+  font-size: 28px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background: var(--bg-alt);
+  color: var(--text-secondary);
+  flex-shrink: 0;
+  transition: background 0.15s, color 0.15s;
+}
+.project-switcher-item .cmd-palette-item-icon .lucide {
+  width: 22px;
+  height: 22px;
+}
+.project-switcher-item .cmd-palette-item-icon img.emoji {
+  width: 26px;
+  height: 26px;
+  vertical-align: middle;
+  margin: 0;
+  filter:
+    drop-shadow(1px 0 0 rgba(0,0,0,0.25))
+    drop-shadow(-1px 0 0 rgba(0,0,0,0.25))
+    drop-shadow(0 1px 0 rgba(0,0,0,0.25))
+    drop-shadow(0 -1px 0 rgba(0,0,0,0.25))
+    drop-shadow(0 0 4px rgba(255,255,255,0.35));
+}
+.project-switcher-item:hover .cmd-palette-item-icon,
+.project-switcher-item.active .cmd-palette-item-icon {
+  background: var(--accent);
+  color: #fff;
+}
+.project-switcher-avatar {
+  width: 100%;
+  height: 100%;
+  border-radius: 12px;
+  object-fit: cover;
+}
+.project-switcher-item .cmd-palette-item-body {
+  width: 100%;
+  display: block;
+}
+.project-switcher-item .cmd-palette-item-title-row {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  width: 100%;
+}
+.project-switcher-item .cmd-palette-item-title {
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.2;
+  color: var(--text-secondary);
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: block;
+}
+.project-switcher-item:hover {
+  background: transparent;
+}
+.project-switcher-item.active {
+  border-color: var(--accent);
+  background: transparent;
+}
+.project-switcher-item.active .cmd-palette-item-title {
+  color: var(--text);
+}
+
+.project-switcher-current {
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--text-dimmer);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Disabled tile (e.g. worktree with worktreeAccessible: false). Not a
+   valid switch target, so skip highlight, skip click, visually dim. */
+.project-switcher-item.disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+.project-switcher-item.disabled:hover {
+  background: transparent;
+}
+.project-switcher-item.disabled.active {
+  border-color: transparent;
+  background: transparent;
+}
+.project-switcher-disabled-reason {
+  font-size: 9px;
+  font-weight: 500;
+  color: var(--text-dimmer);
+  font-style: italic;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.project-switcher-footer {
+  padding: 10px 16px;
+  font-size: 11px;
+  color: var(--text-dimmer);
+  border-top: 1px solid var(--border-subtle);
+  display: flex;
+  justify-content: center;
+}
+.project-switcher-footer kbd {
+  display: inline-block;
+  padding: 1px 5px;
+  margin: 0 1px;
+  background: rgba(var(--overlay-rgb), 0.1);
+  border-radius: 4px;
+  font-size: 10px;
+  font-family: inherit;
+  color: var(--text-muted);
+}

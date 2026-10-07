@@ -1,0 +1,924 @@
+/* ==========================================================================
+   Header (now inside .title-bar-content)
+   ========================================================================== */
+
+/* Legacy #header — removed from DOM, styles kept for .title-bar-content */
+#header {
+  display: none;
+}
+
+#header-left {
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.header-title {
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#header-rename-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: 1px solid transparent;
+  background: none;
+  color: var(--text-dimmer);
+  cursor: pointer;
+  border-radius: 8px;
+  flex-shrink: 0;
+  padding: 0;
+  margin-left: 4px;
+  transition: color 0.15s, background 0.15s, border-color 0.15s;
+}
+
+#header-rename-btn:hover { color: var(--text-secondary); background: rgba(var(--overlay-rgb),0.04); border-color: var(--border); }
+#header-rename-btn .lucide { width: 13px; height: 13px; }
+
+#header-info-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border: none;
+  background: transparent;
+  color: var(--text-dimmer);
+  cursor: pointer;
+  border-radius: 6px;
+  flex-shrink: 0;
+  padding: 0;
+  margin-left: 6px;
+  transition: color 0.15s, background 0.15s;
+  position: relative;
+}
+#header-info-btn:hover { color: var(--text); }
+#header-info-btn > * { pointer-events: none; }
+#header-info-btn .lucide { width: 14px; height: 14px; }
+#header-info-btn .lucide circle {
+  fill: currentColor;
+  stroke: currentColor;
+}
+#header-info-btn .lucide path,
+#header-info-btn .lucide line {
+  stroke: var(--bg);
+  stroke-width: 2.5;
+}
+
+/* Session info popover */
+.session-info-popover {
+  position: fixed;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 16px;
+  min-width: 260px;
+  box-shadow: 0 4px 16px rgba(var(--shadow-rgb), 0.4);
+  z-index: 9999;
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+.session-info-popover .info-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.session-info-popover .info-label {
+  color: var(--text-muted);
+  flex-shrink: 0;
+  min-width: 70px;
+}
+.session-info-popover .info-value {
+  font-family: "Roboto Mono", monospace;
+  font-size: 11px;
+  color: var(--text);
+  word-break: break-all;
+}
+.session-info-popover .info-copy-btn {
+  margin-left: auto;
+  border: none;
+  background: transparent;
+  color: var(--text-dimmer);
+  cursor: pointer;
+  padding: 2px;
+  border-radius: 4px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  transition: color 0.15s;
+}
+.session-info-popover .info-copy-btn:hover { color: var(--accent2); }
+.session-info-popover .info-copy-btn .lucide { width: 13px; height: 13px; }
+
+.header-rename-input {
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--text);
+  background: var(--input-bg);
+  border: 1px solid var(--accent);
+  border-radius: 6px;
+  padding: 2px 8px;
+  font-family: inherit;
+  outline: none;
+  min-width: 0;
+  flex: 1;
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+/* --- Terminal toggle button (mobile only) --- */
+#footer-status,
+#terminal-toggle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  color: var(--text-dimmer);
+  cursor: pointer;
+  padding: 4px;
+  transition: color 0.15s, background 0.15s, border-color 0.15s;
+}
+#footer-status .lucide,
+#terminal-toggle-btn .lucide { width: 15px; height: 15px; }
+#footer-status:hover,
+#terminal-toggle-btn:hover { color: var(--text-secondary); background: rgba(var(--overlay-rgb),0.04); border-color: var(--border); }
+#terminal-toggle-btn { position: relative; }
+#terminal-count {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: var(--success);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 700;
+  min-width: 14px;
+  height: 14px;
+  border-radius: 7px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 3px;
+  font-family: "Roboto Mono", monospace;
+}
+#terminal-count.hidden { display: none; }
+
+/* --- QR code button & overlay --- */
+#qr-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  color: var(--text-dimmer);
+  cursor: pointer;
+  padding: 4px;
+  transition: color 0.15s, background 0.15s, border-color 0.15s;
+}
+#qr-btn .lucide { width: 15px; height: 15px; }
+#qr-btn:hover { color: var(--text-secondary); background: rgba(var(--overlay-rgb),0.04); border-color: var(--border); }
+#qr-btn.active { color: var(--text); background: rgba(var(--overlay-rgb),0.06); border-color: var(--border); }
+
+#qr-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(var(--shadow-rgb), 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 500;
+}
+#qr-overlay.hidden { display: none; }
+
+#qr-overlay-inner {
+  background: #fff;
+  border-radius: 16px;
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  box-shadow: 0 8px 32px rgba(var(--shadow-rgb), 0.5);
+}
+
+#qr-canvas table { border-collapse: collapse; }
+#qr-canvas td { width: 4px; height: 4px; padding: 0; }
+
+#qr-url {
+  font-size: 13px;
+  color: #555;
+  word-break: break-all;
+  text-align: center;
+  max-width: 260px;
+  font-family: system-ui, sans-serif;
+  cursor: pointer;
+  padding: 4px 10px;
+  border-radius: 6px;
+  transition: background 0.15s, color 0.15s;
+}
+#qr-url:hover { background: #eee; color: #222; }
+#qr-url:active { background: #ddd; }
+#qr-url.copied { color: #16a34a; font-weight: 600; }
+.qr-hint {
+  display: block;
+  font-size: 11px;
+  color: #999;
+  margin-top: 2px;
+  font-weight: 400;
+}
+.qr-share-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 12px;
+  padding: 8px 16px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #fff;
+  color: #333;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.qr-share-btn:hover { background: #f5f5f5; }
+.qr-share-btn .lucide { width: 14px; height: 14px; }
+.qr-share-btn.hidden { display: none; }
+
+/* --- Notification menu --- */
+#notif-menu-wrap {
+  position: relative;
+}
+
+#notif-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  color: var(--text-dimmer);
+  cursor: pointer;
+  padding: 4px;
+  transition: color 0.15s, background 0.15s, border-color 0.15s;
+}
+
+#notif-btn .lucide { width: 15px; height: 15px; }
+#notif-btn:hover { color: var(--text-secondary); background: rgba(var(--overlay-rgb),0.04); border-color: var(--border); }
+#notif-btn.active { color: var(--text); background: rgba(var(--overlay-rgb),0.06); border-color: var(--border); }
+
+#notif-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  background: var(--bg-alt);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 8px 0;
+  min-width: 200px;
+  box-shadow: 0 4px 16px rgba(var(--shadow-rgb), 0.4);
+  z-index: 200;
+}
+
+#notif-menu.hidden { display: none; }
+
+.notif-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 14px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.notif-option > span:first-child {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.notif-option > span:first-child .lucide {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+.notif-option:hover { background: rgba(var(--overlay-rgb), 0.03); }
+.notif-option input { display: none; }
+
+#notif-blocked-hint {
+  padding: 6px 14px;
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--warning);
+}
+
+#notif-blocked-hint.hidden { display: none; }
+#notif-blocked-hint a { color: var(--accent); text-decoration: none; }
+#notif-blocked-hint a:hover { text-decoration: underline; }
+
+.toggle-track {
+  width: 34px;
+  height: 20px;
+  background: var(--input-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  position: relative;
+  transition: background 0.2s, border-color 0.2s;
+  flex-shrink: 0;
+}
+
+.toggle-thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 14px;
+  height: 14px;
+  background: var(--text-dimmer);
+  border-radius: 50%;
+  transition: transform 0.2s, background 0.2s;
+}
+
+.notif-option input:checked + .toggle-track {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.notif-option input:checked + .toggle-track .toggle-thumb {
+  transform: translateX(14px);
+  background: #fff;
+}
+
+/* --- Notification menu items --- */
+.notif-divider {
+  height: 1px;
+  background: var(--border-subtle);
+  margin: 4px 0;
+}
+
+#notif-push-row {
+  display: none;
+}
+
+/* iOS Safari notification info */
+.notif-ios-info { cursor: default; }
+.notif-ios-info-btn {
+  background: none;
+  border: none;
+  color: var(--text-dimmer);
+  cursor: pointer;
+  padding: 2px;
+  display: flex;
+  align-items: center;
+  transition: color 0.15s;
+}
+.notif-ios-info-btn:hover { color: var(--text-secondary); }
+
+#notif-ios-hint {
+  padding: 6px 14px;
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+#notif-ios-hint .lucide { flex-shrink: 0; }
+#notif-ios-hint strong { color: var(--text-secondary); }
+#notif-ios-hint.hidden { display: none; }
+
+.notif-action {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 14px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  background: none;
+  border: none;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.notif-action:hover { background: rgba(var(--overlay-rgb), 0.03); }
+.notif-action .lucide { flex-shrink: 0; }
+
+.notif-action.copied { color: var(--success); }
+
+#client-count {
+  cursor: default;
+  font-size: 11px;
+}
+
+.client-avatar {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid var(--bg);
+  background: var(--bg-alt);
+  object-fit: cover;
+  cursor: default;
+  transition: filter 0.15s;
+}
+
+.client-avatar:hover {
+  filter: brightness(1.3);
+}
+
+/* .tooltip styles moved to css/tooltip.css */
+
+/* --- Config chip (inline in input bottom bar) --- */
+#config-chip-wrap {
+  position: relative;
+}
+
+#config-chip-wrap.hidden { display: none; }
+
+#config-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 36px;
+  padding: 0 8px;
+  border-radius: 10px;
+  border: none;
+  background: none;
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.15s, background 0.15s;
+  white-space: nowrap;
+}
+
+#config-chip .lucide { width: 10px; height: 10px; }
+#config-chip .config-chip-icon { display: none; }
+
+@media (max-width: 1000px) {
+  #config-chip .config-chip-icon { display: inline-flex; width: 16px; height: 16px; }
+  #config-chip-label { display: none; }
+  #config-chip .lucide:last-child { display: none; }
+  #config-chip { padding: 0 6px; }
+}
+#config-chip:hover { color: var(--text-secondary); background: rgba(var(--overlay-rgb),0.06); }
+#config-chip.active { color: var(--text-secondary); background: rgba(var(--overlay-rgb),0.06); }
+
+#config-popover {
+  position: absolute;
+  bottom: calc(100% + 4px);
+  right: 0;
+  background: var(--bg-alt);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 4px 0;
+  min-width: 220px;
+  max-height: min(600px, calc(100vh - 120px));
+  overflow-y: auto;
+  box-shadow: 0 4px 16px rgba(var(--shadow-rgb), 0.4);
+  z-index: 200;
+}
+
+#config-popover.hidden { display: none; }
+
+.config-section {
+  padding: 6px 0 2px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.config-section:first-child {
+  border-top: none;
+}
+
+.config-section-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 4px 14px 4px;
+}
+
+/* lr-db0437: states which scope a model/mode picker applies to — "This
+   session only" / "Default for new sessions in this project" / "Server
+   default" / loop-scoped. Shared across the config-chip popover, project
+   settings, server settings, Ralph-loop preview, and scheduler task tabs
+   (some of those render inside .settings-card, not .config-section, hence
+   the standalone rule rather than nesting under .config-section-label). */
+.config-scope-label {
+  font-size: 11px;
+  color: var(--text-dimmer);
+  padding: 0 14px 6px;
+  font-style: italic;
+}
+
+.config-radio-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.config-radio-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 14px;
+  border: none;
+  background: none;
+  color: var(--text-secondary);
+  font-family: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  white-space: nowrap;
+  text-align: left;
+}
+
+.config-radio-item:hover { background: rgba(var(--overlay-rgb),0.05); color: var(--text); }
+.config-radio-item.active { color: var(--accent); font-weight: 600; }
+
+/* lr-f22787: same catalog-sourced marker as .settings-model-catalog-badge
+   (server-settings.css), for the session-chip model picker surface. */
+.config-model-catalog-badge {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-dimmer);
+}
+
+/* lr-f22787 (retired-disabled variant removed by lr-d3817f — retired
+   entries are filtered out of the picker entirely, never rendered): a
+   deprecated (still-runnable) entry keeps a marker only. */
+.config-model-deprecated-badge {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--warning, #e5a83d);
+}
+
+/* --- Older models disclosure (lr-e03635) — session-chip model picker's
+   collapsible escape hatch, mirroring the settings-panel disclosure
+   (.settings-older-models-toggle/-body in server-settings.css) for the
+   .config-radio-list surface. */
+.config-older-models-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 8px 14px;
+  border: none;
+  background: none;
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.config-older-models-toggle:hover { color: var(--text-secondary); background: rgba(var(--overlay-rgb),0.05); }
+
+.config-older-models-toggle .settings-adv-chevron {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  transition: transform 0.15s;
+}
+
+.config-older-models-body {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Segmented control for effort */
+.config-segmented {
+  display: flex;
+  gap: 2px;
+  padding: 4px 14px 8px;
+}
+
+.config-segment-btn {
+  flex: 1;
+  padding: 6px 4px;
+  border: 1px solid var(--border);
+  background: none;
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  text-transform: capitalize;
+}
+
+.config-segment-btn:first-child { border-radius: 6px 0 0 6px; }
+.config-segment-btn:last-child { border-radius: 0 6px 6px 0; }
+.config-segment-btn:only-child { border-radius: 6px; }
+
+.config-segment-btn:hover {
+  color: var(--text-secondary);
+  background: rgba(var(--overlay-rgb),0.04);
+}
+
+.config-segment-btn.active {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: rgba(var(--accent-rgb, 99, 102, 241), 0.08);
+  font-weight: 600;
+}
+
+/* Toggle row for beta options */
+.config-toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 14px 8px;
+}
+
+.config-toggle-label {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.config-toggle-btn {
+  position: relative;
+  width: 36px;
+  height: 20px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--bg-alt);
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.config-toggle-btn .config-toggle-knob {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--text-muted);
+  transition: transform 0.2s, background 0.2s;
+}
+
+.config-toggle-btn.active {
+  background: rgba(var(--accent-rgb, 99, 102, 241), 0.15);
+  border-color: var(--accent);
+}
+
+.config-toggle-btn.active .config-toggle-knob {
+  transform: translateX(16px);
+  background: var(--accent);
+}
+
+.config-budget-row {
+  padding: 4px 14px 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.config-budget-label {
+  font-size: 11px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.config-budget-input {
+  width: 80px;
+  padding: 4px 6px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 11px;
+}
+
+/* --- Info panels container --- */
+#info-panels {
+  position: fixed;
+  top: 80px;
+  right: 16px;
+  width: 280px;
+  max-height: calc(100vh - 160px);
+  overflow-y: auto;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+}
+
+#info-panels:empty { display: none; }
+
+/* --- Usage panel --- */
+#usage-panel, #status-panel, #context-panel, #team-panel, #diagnostics-panel {
+  background: var(--bg-alt);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(var(--shadow-rgb), 0.3);
+  font-size: 12px;
+  pointer-events: auto;
+}
+
+#usage-panel.hidden, #status-panel.hidden, #context-panel.hidden, #team-panel.hidden, #diagnostics-panel.hidden { display: none; }
+
+.usage-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border-subtle);
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--text);
+}
+
+.usage-panel-actions {
+  display: flex;
+  gap: 2px;
+}
+
+.usage-panel-header button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 2px;
+  border-radius: 4px;
+}
+
+.usage-panel-header button:hover { color: var(--text); background: rgba(var(--overlay-rgb),0.06); }
+.usage-panel-header button .lucide { width: 14px; height: 14px; }
+
+.usage-panel-body {
+  padding: 8px 14px 12px;
+}
+
+/* --- Plan usage link --- */
+.usage-external-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border-subtle);
+  background: var(--input-bg);
+  color: var(--text-secondary);
+  font-size: 12px;
+  text-decoration: none;
+  transition: background 0.15s, color 0.15s;
+}
+.usage-external-link:hover {
+  background: var(--hover-bg);
+  color: var(--text-primary);
+}
+.usage-external-link svg {
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
+}
+
+.usage-divider {
+  height: 1px;
+  background: var(--border-subtle);
+  margin: 8px 0;
+}
+
+.usage-section-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 4px;
+}
+
+.usage-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 3px 0;
+  color: var(--text-secondary);
+}
+
+.usage-label {
+  color: var(--text-muted);
+}
+
+.usage-value {
+  font-family: "Roboto Mono", monospace;
+  font-weight: 500;
+}
+
+/* --- Context bar --- */
+.context-bar-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 6px 0 8px;
+}
+.context-bar {
+  flex: 1;
+  height: 6px;
+  background: var(--border);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.context-bar-fill {
+  height: 100%;
+  width: 0%;
+  background: var(--success);
+  border-radius: 3px;
+  transition: width 0.3s ease, background 0.3s ease;
+}
+.context-bar-fill.warn { background: var(--warning); }
+.context-bar-fill.danger { background: var(--error); }
+.context-bar-pct {
+  font-family: "Roboto Mono", monospace;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  min-width: 32px;
+  text-align: right;
+}
+
+/* --- Context mini bar (in input area) --- */
+#context-mini {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px 2px;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+#context-mini:hover { opacity: 0.8; }
+#context-mini.hidden { display: none; }
+.context-mini-bar {
+  flex: 1;
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.context-mini-fill {
+  height: 100%;
+  width: 0%;
+  border-radius: 2px;
+  background: var(--success);
+  transition: width 0.3s ease, background 0.3s ease;
+}
+.context-mini-fill.warn { background: var(--warning); }
+.context-mini-fill.danger { background: var(--error); }
+.context-mini-label {
+  font-family: "Roboto Mono", monospace;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-dimmer);
+  min-width: 24px;
+  text-align: right;
+}
+
+@media (max-width: 768px) {
+  #info-panels {
+    top: auto;
+    bottom: calc(var(--safe-bottom, 0px) + 56px + 64px);
+    right: 12px;
+    left: 12px;
+    width: auto;
+    max-height: 60vh;
+  }
+
+  /* Config chip: icon-only on mobile */
+  #config-chip .config-chip-icon { display: inline; width: 14px; height: 14px; }
+  #config-chip-label { display: none; }
+}
+
+

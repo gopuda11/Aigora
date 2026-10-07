@@ -1,0 +1,7 @@
+{
+  "name": "com.aigora.mcp_bridge",
+  "description": "Aigora MCP Bridge - Manages local MCP server processes",
+  "path": "__INSTALL_PATH__/aigora-mcp-host.js",
+  "type": "stdio",
+  "allowed_origins": ["chrome-extension://__EXTENSION_ID__/"]
+}

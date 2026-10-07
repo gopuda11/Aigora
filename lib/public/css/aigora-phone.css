@@ -1,0 +1,175 @@
+/* aigora-phone.css - the phone (<=768px) layout of the standalone Aigora page, modelled on a chat app:
+   a top bar (☰ · "방 | 채널" pill · bell or 새 세션), a clean thread, one pill composer, and a sidebar
+   (the page's own .ai-sidebar, off-canvas) that holds every other feature. aigora/phone-nav.js drives it.
+   Colours, the font, radii and the motion tokens (--ai-in / --ai-out / --ai-push / --ai-pop) come from
+   aigora-app.css; nothing here defines a colour. Above 768px this file changes nothing: the desktop-only
+   elements it styles are display:none there (aigora-app.css). Reduced motion (OS setting or 동작 줄이기)
+   switches every transition off in aigora-app.css, so the sidebar and the sheets simply land. */
+@media (max-width: 768px) {
+  /* ---- page and keyboard -------------------------------------------------------------------
+     The layout is as tall as the visual viewport; with the on-screen keyboard open phone-nav.js sets
+     --ai-vv-h / --ai-vv-top (visualViewport) and the layout follows, so the composer is never covered. */
+  html, body { overscroll-behavior: none; }
+  #layout { height: 100vh; height: 100dvh; }
+  #layout.is-kb-open { position: fixed; top: var(--ai-vv-top, 0px); left: 0; right: 0; height: var(--ai-vv-h, 100dvh); }
+  #main-column { overflow-x: hidden; }
+
+  /* What the desktop page shows and the phone moves into the sidebar. */
+  #layout .ai-mobile-bar, #layout #agora-room-header, #layout #ai-social-tools, #layout #ai-skills-bar, #layout #ai-send-mode,
+  #layout #ai-session-pop, #layout #ai-session-col, #layout .ai-brand, #layout #ai-room-tools, #layout #agora-room-rail, #layout .ai-spacer,
+  #layout #ai-new-session { display: none !important; }
+
+  /* ---- top bar ------------------------------------------------------------------------------ */
+  .ai-phone-bar { display: flex; flex: none; align-items: center; justify-content: space-between; gap: 12px; background: var(--bg);
+    padding: calc(8px + env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) 8px max(12px, env(safe-area-inset-left)); }
+  .ai-pb-circle, .ai-ps-circle { position: relative; flex: none; display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; padding: 0;
+    border: 1px solid var(--border-subtle); border-radius: 50%; background: var(--fill); color: var(--text); cursor: pointer; }
+  .ai-pb-circle:active, .ai-ps-circle:active { background: var(--sidebar-hover); }
+  .ai-pb-circle:focus-visible, .ai-ps-circle:focus-visible, .ai-ps-row:focus-visible, .ai-ps-primary:focus-visible, .ai-sg-row:focus-visible,
+  .ai-mode-chip:focus-visible, .ai-pb-seg button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .ai-pb-circle[aria-disabled="true"] { opacity: .4; }
+  .ai-pb-icon { display: inline-flex; }
+  .ai-pb-badge { position: absolute; top: -3px; right: -3px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: var(--danger-fill);
+    color: var(--on-accent); font-size: 11px; font-weight: 650; line-height: 18px; text-align: center; font-variant-numeric: tabular-nums; }
+  .ai-pb-seg { display: grid; grid-template-columns: repeat(2, minmax(64px, 1fr)); flex: 0 1 220px; min-width: 0; margin: 0; padding: 3px; background: var(--segment-track); border-radius: 999px; }
+  .ai-pb-seg .ai-send-pill { top: 3px; bottom: 3px; left: 3px; width: calc(50% - 3px); background: var(--segment-thumb); box-shadow: 0 1px 3px rgba(var(--shadow-rgb), .14); }
+  .ai-pb-seg[data-tab="private"] .ai-send-pill { transform: translateX(100%); }
+  .ai-pb-seg button { min-width: 0; min-height: 44px; padding: 0 12px; font-size: 15px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; background: transparent; }
+  .ai-pb-seg button[aria-selected="true"] { color: var(--text); }
+  .ai-pb-seg button[aria-selected="false"] { color: var(--text-secondary); }
+  .ai-phone-room:not(.hidden) { display: block; margin: 0; padding: 0 16px 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: center; font-size: 12px; color: var(--text-muted); }
+
+  /* 방 전환 sheet: the rooms, and 방 만들기 for an administrator. */
+  .ai-sheet-create:not(.hidden) { display: block; width: 100%; min-height: 48px; margin-top: 8px; border: 0; border-radius: 12px; background: var(--accent-soft); color: var(--accent-text); font: inherit; font-weight: 600; cursor: pointer; }
+  .ai-sheet-create:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  /* ---- thread, progress, suggestions ----------------------------------------------------------- */
+  .ai-phone-chat { display: flex; flex-direction: column; flex: 1; min-height: 0; }
+  .ai-chat { padding: 12px max(16px, env(safe-area-inset-right)) 12px max(16px, env(safe-area-inset-left)); overflow-x: hidden; overscroll-behavior: contain; }
+  .ai-chat .bubble { font-size: 15px; }
+  .ai-chat:has(> .ai-empty:only-child) { display: flex; align-items: center; justify-content: center; }
+  .ai-private-chat-note { margin: 0 0 12px; font-size: 12.5px; }
+  .ai-phone-progress:not(.hidden) { display: flex; flex: none; align-items: center; gap: 10px; margin: 0 max(16px, env(safe-area-inset-right)) 8px max(16px, env(safe-area-inset-left));
+    padding: 8px 12px; border-radius: 14px; background: var(--fill); font-size: 12.5px; color: var(--text-secondary); }
+  .ai-pg-dots { display: inline-flex; gap: 5px; }
+  .ai-pg-dots i { width: 8px; height: 8px; border-radius: 50%; background: var(--border); }
+  .ai-pg-dots i.is-done { background: var(--success); }
+  .ai-pg-dots i.is-current { background: var(--accent); box-shadow: 0 0 0 3px var(--accent-ring); }
+  .ai-pg-text { min-width: 0; font-weight: 600; color: var(--text); }
+  .ai-pg-text small { margin-left: 8px; font-weight: 400; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+  .ai-phone-suggest:not(.hidden) { display: flex; flex: none; flex-direction: column; gap: 2px; padding: 0 max(12px, env(safe-area-inset-right)) 8px max(12px, env(safe-area-inset-left)); }
+  .ai-sg-row { display: flex; align-items: center; gap: 14px; width: 100%; min-height: 52px; padding: 6px 10px; border: 0; border-radius: 12px; background: transparent; color: var(--text); font: inherit; text-align: left; cursor: pointer; }
+  .ai-sg-row:active { background: var(--sidebar-hover); }
+  .ai-sg-row svg { flex: none; color: var(--text-secondary); }
+  .ai-sg-text { display: flex; flex-direction: column; min-width: 0; }
+  .ai-sg-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 15px; }
+  .ai-sg-sub { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; color: var(--text-muted); }
+  .perm-actions button, .ai-appr-actions button, .post-card-open { min-height: 44px; padding: 0 16px; }
+
+  /* ---- composer: one pill: + · mode chip · input · send ------------------------------------------ */
+  .ai-composer { margin: 0 max(12px, env(safe-area-inset-right)) calc(10px + env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left)); padding: 4px 6px; border-radius: 28px; box-shadow: 0 4px 18px rgba(var(--shadow-rgb), .08); }
+  #layout.is-kb-open .ai-composer { margin-bottom: 8px; }
+  .ai-composer-row { align-items: center; gap: 2px; }
+  #input-more-btn { width: 44px; height: 44px; background: transparent; color: var(--text); }
+  #input-more-btn svg { width: 24px; height: 24px; }
+  .ai-mode-chip:not(.hidden) { position: relative; display: inline-flex; flex: none; align-items: center; min-height: 32px; margin: 0 4px; padding: 0 12px; border: 0; border-radius: 16px;
+    background: var(--fill); color: var(--text-secondary); font: inherit; font-size: 13px; font-weight: 650; white-space: nowrap; cursor: pointer; }
+  .ai-mode-chip:not(.hidden)::before { content: ""; position: absolute; inset: -6px -2px; }
+  .ai-mode-chip[data-mode="member"] { background: var(--accent-soft); color: var(--accent-text); }
+  .ai-input { min-height: 44px; padding: 11px 6px; font-size: 16px; }
+  .ai-input::placeholder { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  /* The pill itself shows focus (a square ring around the textarea would break its shape). */
+  #layout .ai-input:focus-visible { outline: none; }
+  .ai-composer:focus-within { border-color: var(--accent); }
+  .ai-attach-hint { margin: 0; padding: 0 12px 8px; }
+  .ai-send { flex: none; width: 48px; height: 48px; font-size: 22px; }
+  .ai-send[data-stop="1"] { font-size: 16px; }
+  .ai-composer-note { padding: 0 10px 6px; }
+
+  /* "+" sheet: the existing composer menu as a bottom sheet of large rows (사진 · 파일 · 로컬 모델 · 스킬). */
+  #layout #input-add-menu:not(.hidden) { position: fixed; left: 0; right: 0; bottom: 0; top: auto; z-index: 330; display: flex; flex-direction: column; gap: 2px; width: auto; max-height: 72dvh; overflow-y: auto;
+    padding: 8px 12px calc(14px + env(safe-area-inset-bottom)); border: 0; border-radius: 20px 20px 0 0; background: var(--elevated); box-shadow: 0 0 0 100vmax var(--scrim-sheet); overscroll-behavior: contain; }
+  #layout #input-add-menu:not(.hidden)::before { content: attr(aria-label); padding: 10px 10px 6px; font-size: 13px; font-weight: 650; color: var(--text-secondary); }
+  #input-add-menu button { min-height: 60px; padding: 8px 12px; gap: 16px; font-size: 16px; }
+  #input-add-menu svg { width: 24px; height: 24px; color: var(--text); }
+  #input-add-menu strong { font-size: 16px; font-weight: 600; }
+  #input-add-menu small { font-size: 12.5px; }
+
+  /* ---- the bell / pin panels: bottom sheets within thumb reach ------------------------------------ */
+  .ai-pop { position: fixed; top: auto; left: 0; right: 0; bottom: 0; z-index: 330; width: auto; max-height: 72dvh; padding: 8px 12px calc(14px + env(safe-area-inset-bottom));
+    border: 0; border-radius: 20px 20px 0 0; box-shadow: 0 0 0 100vmax var(--scrim-sheet); overscroll-behavior: contain; }
+  .ai-pop button:not(.ai-sw) { min-height: 44px; }
+  .ai-sw::before { content: ""; position: absolute; inset: -11px -4px; }   /* 44px hit area around the 22px switch */
+
+  /* ---- the sidebar: the page's own aside, off-canvas -------------------------------------------- */
+  #layout .ai-sidebar { position: fixed; top: 0; bottom: 0; left: 0; z-index: 300; display: flex; flex: none; width: min(86vw, 340px); min-width: 0; overflow: hidden;
+    padding: env(safe-area-inset-top) 0 0 env(safe-area-inset-left); border-right: 1px solid var(--border-subtle); background: var(--bg-alt); backdrop-filter: none; touch-action: pan-y;
+    transform: translateX(-100%); visibility: hidden; transition: transform var(--ai-pop) var(--ai-ease-x), visibility 0s linear var(--ai-pop); }
+  #layout .ai-sidebar.is-open { transform: none; visibility: visible; transition: transform var(--ai-push) var(--ai-ease), visibility 0s; }
+  #layout .ai-sidebar > * { min-width: 0; }
+  .ai-phone-scrim { display: block; position: fixed; inset: 0; z-index: 290; background: var(--scrim); opacity: 0; pointer-events: none; touch-action: none; transition: opacity var(--ai-in) var(--ai-ease); }
+  .ai-phone-scrim.is-on { opacity: 1; pointer-events: auto; }
+  .ai-phone-edge:not(.hidden) { display: block; position: absolute; left: 0; top: calc(60px + env(safe-area-inset-top)); bottom: calc(var(--ai-composer-h, 64px) + 24px); width: 20px; z-index: 5; touch-action: none; }
+
+  .ai-phone-side { display: flex; flex: 1; min-height: 0; flex-direction: column; }
+  .ai-ps-head { display: flex; flex: none; align-items: center; justify-content: space-between; padding: 8px 16px 6px 20px; }
+  .ai-ps-title { font-size: 20px; font-weight: 700; letter-spacing: -.025em; }
+  .ai-ps-title sup { color: var(--accent-text); font-size: .62em; }
+  .ai-ps-search:not(.hidden) { display: block; flex: none; padding: 4px 16px 8px; }
+  .ai-ps-search input { width: 100%; min-height: 44px; padding: 0 16px; border: 1px solid var(--border-subtle); border-radius: 22px; background: var(--fill); color: var(--text); font: inherit; font-size: 16px; }
+  .ai-ps-search input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .ai-ps-body, .ai-ps-results { flex: 1; min-height: 0; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; padding: 4px 12px 16px; }
+  .ai-ps-menu { display: flex; flex-direction: column; }
+  .ai-ps-row { display: flex; align-items: center; gap: 14px; width: 100%; min-height: 44px; padding: 4px 12px; border: 0; border-radius: 12px; background: transparent; color: var(--text); font: inherit; font-size: 15px; font-weight: 600; text-align: left; cursor: pointer; }
+  .ai-ps-row:active { background: var(--sidebar-hover); }
+  .ai-ps-row svg { flex: none; }
+  .ai-ps-label { min-width: 0; overflow-wrap: anywhere; }
+  .ai-ps-meta { margin-left: auto; min-width: 0; max-width: 46%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12.5px; font-weight: 400; color: var(--text-muted); }
+  .ai-ps-badge { margin-left: auto; min-width: 20px; height: 20px; padding: 0 6px; border-radius: 10px; background: var(--danger-fill); color: var(--on-accent); font-size: 11px; font-weight: 650; line-height: 20px; text-align: center; }
+  .ai-ps-row.is-dim .ai-ps-label { color: var(--text-secondary); font-weight: 500; }
+  .ai-ps-divider { height: 1px; margin: 8px 12px 6px; background: var(--border-subtle); }
+  .ai-ps-sub { margin: 10px 12px 4px; font-size: 12px; font-weight: 650; color: var(--text-secondary); }
+  .ai-ps-subhead { display: flex; align-items: center; justify-content: space-between; }
+  .ai-ps-subhead .ai-ps-sub { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  #ai-sidebar[data-tab="room"] #ai-phone-list, #ai-sidebar[data-tab="private"] #ai-ps-prev { display: none; }
+
+  /* The context list: previous conversations (방), the viewer's sessions and 조원 채널 folders (채널). */
+  .ai-pl-list { margin: 0; padding: 0; list-style: none; }
+  .ai-pl-list > li { display: flex; align-items: center; }
+  .ai-pl-list > li.ai-sgroup { display: block; }
+  .ai-pl-row.ai-sgroup-head { min-height: 48px; gap: 8px; }
+  .ai-sgroup-list { padding-left: 16px; }
+  .ai-pl-row { display: flex; align-items: center; flex: 1; width: 100%; min-width: 0; min-height: 52px; padding: 6px 12px; border: 0; border-radius: 12px; background: transparent; color: var(--text); font: inherit; text-align: left; cursor: pointer; }
+  .ai-pl-row:active { background: var(--sidebar-hover); }
+  .ai-pl-row[aria-current="true"] { background: var(--sidebar-active); }
+  .ai-pl-row[aria-current="true"] .ai-pl-title { color: var(--accent-text); }
+  .ai-pl-row:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+  .ai-pl-main { display: flex; flex: 1; flex-direction: column; min-width: 0; gap: 2px; }
+  .ai-pl-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 15px; font-weight: 500; }
+  .ai-pl-date { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; color: var(--text-muted); }
+  .ai-phone-list .ai-private-empty, .ai-phone-list .ai-private-status { margin: 4px 12px; font-size: 13px; color: var(--text-secondary); }
+  .ai-phone-list .ai-private-close { min-height: 44px; margin: 0 8px; padding: 0 4px; border: 0; background: transparent; color: var(--text-secondary); font: inherit; font-size: 13px; cursor: pointer; }
+  .ai-ps-folders .ai-folder { min-height: 48px; font-size: 15px; }
+  .ai-ps-folders .ai-tree-leaf { min-height: 44px; }
+  .ai-phone-list .ag-has-menu > .ai-pl-row { width: auto; }
+  .ai-row-more { opacity: 1; width: 44px; height: 44px; }
+  .ai-row-menu-item, .ai-account-menu-item { min-height: 44px; }
+
+  /* Footer: the floating primary button (left), the avatar (right), and the quiet usage / connection line. */
+  .ai-side-foot { display: grid; flex: none; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "primary account" "usage conn"; align-items: center; gap: 4px 12px;
+    padding: 8px 16px calc(8px + env(safe-area-inset-bottom)); background: var(--bg-alt); }
+  .ai-ps-primary:not(.hidden) { grid-area: primary; justify-self: start; display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 0 22px 0 18px; border: 0; border-radius: 24px;
+    background: var(--accent-fill); color: var(--on-accent); font: inherit; font-size: 16px; font-weight: 650; cursor: pointer; box-shadow: 0 6px 18px rgba(var(--shadow-rgb), .22); }
+  .ai-ps-primary[aria-disabled="true"] { opacity: .45; }
+  .ai-ps-primary:active { background: var(--accent-fill-hover); }
+  #layout .ai-account { grid-area: account; order: 0; margin: 0; }
+  #layout .ai-account-btn { width: 48px; height: 48px; min-height: 48px; padding: 0; justify-content: center; border: 1px solid var(--border-subtle); border-radius: 50%; background: var(--fill); }
+  #layout .ai-account-text, #layout .ai-account-chevron { display: none; }
+  #layout .ai-account-avatar { width: 40px; height: 40px; }
+  #layout .ai-usage-sidebar { grid-area: usage; min-width: 0; margin: 0; }
+  #layout .ai-usage-sidebar .ai-usage-btn { width: 100%; min-height: 44px; height: auto; padding: 0 4px; background: transparent; color: var(--text-muted); font-size: 12px; }
+  #layout .ai-usage-sidebar .ai-usage-btn > svg { display: none; }
+  #layout .ai-usage-sidebar .ai-usage-btn-label { font-weight: 560; }
+  #layout .ai-usage-sidebar .ai-usage-popover { position: fixed; top: auto; left: 12px; right: 12px; bottom: calc(76px + env(safe-area-inset-bottom)); width: auto; max-height: 60dvh; overflow-y: auto; z-index: 310; }
+  #layout .ai-conn { grid-area: conn; margin: 0; font-size: 11px; }
+}

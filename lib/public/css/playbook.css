@@ -1,0 +1,264 @@
+/* ==========================================================================
+   Playbook — interactive step-by-step tutorial modal
+   ========================================================================== */
+
+.playbook-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 400;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: playbookFadeIn 0.2s ease;
+}
+.playbook-overlay.hidden {
+  display: none;
+}
+
+@keyframes playbookFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.playbook-modal {
+  background: var(--bg);
+  border: 1px solid var(--border-subtle);
+  border-radius: 16px;
+  width: 420px;
+  max-width: 90vw;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  outline: none;
+  animation: playbookSlideIn 0.25s ease;
+  display: flex;
+  flex-direction: column;
+}
+.playbook-modal.hidden {
+  display: none;
+}
+
+@keyframes playbookSlideIn {
+  from { opacity: 0; transform: translateY(12px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* --- Header --- */
+.playbook-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 20px 0;
+}
+.playbook-header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.playbook-icon {
+  font-size: 18px;
+}
+.playbook-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.playbook-close {
+  background: none;
+  border: none;
+  color: var(--text-dimmer);
+  font-size: 20px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  line-height: 1;
+  transition: color 0.15s, background 0.15s;
+}
+.playbook-close:hover {
+  color: var(--text);
+  background: rgba(var(--overlay-rgb), 0.08);
+}
+
+/* --- Progress dots --- */
+.playbook-progress {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  padding: 16px 20px 4px;
+}
+.playbook-progress-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--border-subtle);
+  transition: background 0.3s ease, transform 0.3s ease;
+}
+.playbook-progress-dot.done {
+  background: var(--accent);
+  opacity: 0.5;
+}
+.playbook-progress-dot.active {
+  background: var(--accent);
+  transform: scale(1.25);
+}
+
+/* --- Body --- */
+.playbook-body {
+  padding: 16px 24px 8px;
+  flex: 1;
+}
+.playbook-step-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 10px;
+  letter-spacing: -0.3px;
+}
+.playbook-step-body {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+.playbook-step-body strong {
+  color: var(--text);
+  font-weight: 600;
+}
+.playbook-step-note {
+  font-size: 12px;
+  color: var(--text-dimmer);
+  margin-top: 12px;
+  padding: 8px 12px;
+  background: rgba(var(--overlay-rgb), 0.04);
+  border-radius: 8px;
+}
+
+/* --- Action buttons --- */
+.playbook-actions {
+  display: flex;
+  gap: 8px;
+  padding: 16px 24px 20px;
+  justify-content: flex-end;
+}
+.playbook-btn {
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+  border: none;
+}
+.playbook-btn:active {
+  transform: scale(0.97);
+}
+.playbook-btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+.playbook-btn-primary {
+  background: var(--accent);
+  color: #fff;
+}
+.playbook-btn-primary:hover:not(:disabled) {
+  filter: brightness(1.1);
+}
+.playbook-btn-secondary {
+  background: rgba(var(--overlay-rgb), 0.06);
+  color: var(--text-muted);
+  border: 1px solid var(--border-subtle);
+}
+.playbook-btn-secondary:hover:not(:disabled) {
+  background: rgba(var(--overlay-rgb), 0.1);
+  color: var(--text);
+}
+
+/* --- Hub playbook cards --- */
+.hub-playbooks {
+  animation: hubCardIn 0.4s ease 0.20s both;
+}
+.hub-playbooks-grid {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.hub-playbook-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: rgba(var(--overlay-rgb), 0.03);
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  flex: 1;
+  min-width: 180px;
+}
+.hub-playbook-card:hover {
+  background: rgba(var(--overlay-rgb), 0.07);
+  border-color: var(--accent);
+}
+.hub-playbook-card.completed {
+  background: rgba(76, 175, 80, 0.08);
+  border-color: rgba(76, 175, 80, 0.25);
+}
+.hub-playbook-card.completed:hover {
+  background: rgba(76, 175, 80, 0.14);
+  border-color: rgba(76, 175, 80, 0.4);
+}
+.hub-playbook-card-icon {
+  font-size: 18px;
+  flex-shrink: 0;
+}
+.hub-playbook-card-body {
+  flex: 1;
+  min-width: 0;
+}
+.hub-playbook-card-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+.hub-playbook-card-desc {
+  font-size: 11px;
+  color: var(--text-dimmer);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.hub-playbook-card-check {
+  color: var(--success);
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+/* --- Tip "Try it" button (inline after text) --- */
+.hub-tip-try {
+  display: inline;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--accent);
+  font-size: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  margin-left: 6px;
+  font-family: inherit;
+}
+.hub-tip-try:hover {
+  background: var(--accent-12);
+}
+
+/* --- Mobile --- */
+@media (max-width: 768px) {
+  .playbook-modal {
+    width: 95vw;
+    border-radius: 12px;
+  }
+  .hub-playbook-card {
+    min-width: 140px;
+  }
+}

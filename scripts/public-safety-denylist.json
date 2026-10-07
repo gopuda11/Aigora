@@ -1,0 +1,60 @@
+{
+  "_comment": "Regex deny-list for scripts/check-public-safety.js. Case-insensitive. Owner-specific identifiers go in ~/.config/aigora/public-denylist.json (or $AIGORA_PUBLIC_DENYLIST), never here. allowFileLines exempts matching lines of one named file from the deny patterns (the intended identity/attribution lines); it never exempts secrets. The files listed in allowFiles are excluded from the scan. The /home pattern deliberately skips obvious placeholder users (user, you, me, x, alice, ...).",
+  "denyPatterns": [
+    "ngrok-free\\.(dev|app)",
+    "/mnt/data",
+    "/home/(?!(?:user|username|you|me|x|evil|chad|alice|bob|example|runner)\\b|\\.{1,3}(?![A-Za-z0-9_-]))[A-Za-z0-9._-]+",
+    "172\\.30\\.77\\.",
+    "[\\w.\\]-]:(?:11435|11436|11437|17841)\\b",
+    "antigravity",
+    "\\bwebgpt\\b",
+    "chatgpt-web",
+    "copilot.{0,24}(?:login|oauth)",
+    "Claude Code",
+    "credentialSource[^\\n]{0,60}[\"\\']subscription",
+    "credentialSources[^\\n]{0,100}[\"\\']subscription",
+    "allowSharedSubscription",
+    "withSubscriptionCredential",
+    "resolveSubscriptionCredential",
+    "(?:claude|codex)\\s+login",
+    "claudeAiOauth",
+    "api/oauth/usage",
+    "claude\\.ai/settings/usage",
+    "chatgpt\\.com/admin/usage",
+    "notif-banner-auth-login"
+  ],
+  "allowLinePatterns": [
+    "sk-abcdefghijklmnopqrstuvwxyz123456",
+    "sk-ant-api03-CANARYKEY0123456789",
+    "sk-ant-api03-CANARY-F1-0123456789",
+    "sk-ant-api03-CANARY-SANDBOX-0123456789abcdef",
+    "sk-ant-api03-AAAAAAAAAAAAAAAAAAAAAAAA"
+  ],
+  "allowFileLines": {
+    "CREDITS.md": [
+      "^\\|\\ \\[Nhahan/WebGPT\\]\\(https://github\\.com/Nhahan/WebGPT\\)\\ \\|\\ Earlier\\ external\\ runtime\\ integration,\\ removed\\ in\\ 0\\.1\\.0;\\ no\\ source\\ was\\ ever\\ copied;\\ not\\ used\\ in\\ the\\ public\\ build\\ \\|\\ MIT;\\ \\[upstream\\ LICENSE\\]\\(https://github\\.com/Nhahan/WebGPT/blob/main/LICENSE\\);\\ historical\\ credit\\ restored\\ from\\ the\\ private\\ development\\ record\\ \\|$",
+      "^\\|\\ \\[Claude\\ Code\\ \\(Anthropic\\)\\]\\(https://github\\.com/anthropics/claude\\-code\\)\\ \\|\\ Planning,\\ integration\\ and\\ development\\ verification\\ \\|\\ Anthropic\\ commercial\\ terms;\\ \\[upstream\\ license\\ statement\\]\\(https://github\\.com/anthropics/claude\\-code/blob/main/LICENSE\\.md\\)\\ \\|$",
+      "^\\|\\ \\[Google\\ Antigravity\\ \\(Gemini\\)\\]\\(https://antigravity\\.google/\\)\\ \\|\\ Independent\\ static\\ review\\ during\\ development\\ \\|\\ license\\ not\\ verified;\\ provider\\ product/service\\ terms\\ apply\\ \\|$",
+      "^\\-\\ Subscription/consumer\\-login\\ provider\\ code\\ was\\ excluded\\ after\\ reviewing\\ provider\\ terms;\\ “Claude\\ Code”\\ branding\\ is\\ not\\ used\\ in\\ product\\ UI\\.\\ Its\\ name\\ here\\ identifies\\ a\\ development\\ tool\\.$"
+    ],
+    "FORK_NOTICE.md": [
+      "^\\[Nhahan/WebGPT\\]\\(https://github\\.com/Nhahan/WebGPT\\)\\ was\\ an\\ earlier\\ external\\ runtime\\ integration,\\ removed\\ in\\ 0\\.1\\.0;\\ no\\ source\\ was\\ ever\\ copied\\.\\ WWG\\ and\\ mixdog\\ were\\ evaluated,\\ with\\ no\\ ported\\ code\\ found\\ in\\ this\\ public\\ tree\\.\\ Development\\ tools\\ and\\ scanner\\ engines\\ are\\ credited\\ separately\\ in\\ \\[CREDITS\\.md\\]\\(CREDITS\\.md\\)\\.$",
+      "^The\\ unlicensed\\ \\[clay\\-chrome\\]\\(https://github\\.com/chadbyte/clay\\-chrome\\)\\ browser\\ extension\\ is\\ neither\\ bundled\\ nor\\ downloaded\\.\\ Subscription/consumer\\-login\\ provider\\ code\\ was\\ excluded\\ after\\ reviewing\\ provider\\ terms;\\ “Claude\\ Code”\\ branding\\ is\\ not\\ used\\ in\\ product\\ UI\\.\\ Assets\\ with\\ unknown\\ provenance\\ are\\ identified\\ in\\ CREDITS;\\ the\\ pre\\-publication\\ gate\\ checks\\ secrets,\\ licenses,\\ privacy\\ and\\ terms\\ before\\ publishing\\.$"
+    ],
+    "docs/BUILDING-WITH-AI.md": [
+      "^\\-\\ \\*\\*Planning\\ and\\ integration:\\*\\*\\ Claude\\ \\(Claude\\ Code\\)\\ plans\\ changes,\\ integrates\\ work\\ and\\ verifies\\ results\\.$",
+      "^\\-\\ \\*\\*Static\\ review:\\*\\*\\ Google\\ Antigravity\\ \\(Gemini\\ Flash\\)\\ and\\ GitHub\\ Copilot\\ provide\\ independent\\ static\\ reviews\\.$",
+      "^\\|\\ Recorded\\ delegated\\ agent\\ jobs\\ \\|\\ 56\\ Codex,\\ 19\\ Antigravity,\\ 5\\ Copilot\\ \\|$"
+    ]
+  },
+  "allowFiles": [
+    "scripts/public-safety-denylist.json",
+    "scripts/check-public-safety.js",
+    "test/check-public-safety.test.js",
+    "package-lock.json"
+  ],
+  "denyPaths": [
+    "local-ext",
+    "node_modules"
+  ]
+}
