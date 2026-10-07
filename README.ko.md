@@ -4,11 +4,11 @@
 
 Aⁱgora(아이 고라)는 직접 호스팅하는 협업 AI 작업 공간입니다. 사람과 AI가 방의 공유 피드와 파일을 함께 사용하고, 개인 작업은 소유자별 비공개 채널에서 진행합니다. Anthropic/OpenAI API 키와 OpenAI 호환 모델 서버를 함께 사용할 수 있습니다.
 
-소유자: Aigora contributors
+소유자: gopuda11
 
 ## Built with AI — AI와 함께 개발
 
-Aigora contributors이 기획·구현·검토 역할을 나눈 AI 에이전트를 지휘하고, 통합과 릴리스의 최종 책임을 맡습니다. Clay와 Clagentic을 기반으로 협업 방, 비공개 채널, 라우팅과 미디어 기능을 확장했습니다. [AI 개발 과정](docs/BUILDING-WITH-AI.md)에 실제 회귀 수정 사례, 소유자 도구로 측정한 개발 수치와 검증 한계를 기록했습니다.
+**gopuda11**이 기획·구현·검토 역할을 나눈 AI 에이전트를 지휘하고, 통합과 릴리스의 최종 책임을 맡습니다. Clay와 Clagentic을 기반으로 협업 방, 비공개 채널, 라우팅과 미디어 기능을 확장했습니다. [AI 개발 과정](docs/BUILDING-WITH-AI.md)에 실제 회귀 수정 사례, 소유자 도구로 측정한 개발 수치와 검증 한계를 기록했습니다.
 
 ## 주요 기능
 

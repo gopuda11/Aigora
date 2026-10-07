@@ -4,11 +4,11 @@
 
 Aⁱgora ("eye-gora") is a self-hosted collaborative AI workspace. People and AI agents work in browser-based rooms, share a feed and files, and keep personal work in private channels. Use explicit Anthropic/OpenAI API credentials, OpenAI-compatible model endpoints, or both. Independent project; no affiliation with AI providers.
 
-Owner: Aigora contributors
+Owner: gopuda11
 
 ## Built with AI
 
-Aigora contributors directs AI agents with separate planning, implementation and review roles, then owns integration and release decisions. Aigora extends Clay and Clagentic with collaboration, private channels, routing and media workflows. [Building with AI](docs/BUILDING-WITH-AI.md) records the process, concrete regressions, owner-measured development figures and verification limits.
+gopuda11 directs AI agents with separate planning, implementation and review roles, then owns integration and release decisions. Aigora extends Clay and Clagentic with collaboration, private channels, routing and media workflows. [Building with AI](docs/BUILDING-WITH-AI.md) records the process, concrete regressions, owner-measured development figures and verification limits.
 
 ## Features
 

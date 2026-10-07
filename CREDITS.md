@@ -1,6 +1,6 @@
 # Credits and provenance
 
-Maintainer: **Aigora contributors**.
+Maintainer: **gopuda11**.
 
 ## 1. Code in this product (license notice required)
 
@@ -50,7 +50,7 @@ Installing a runtime does not grant rights to provider service access or model w
 
 Versions, source URLs and loaded CDN paths are listed in THIRD-PARTY-NOTICES. These browser downloads are not vendored npm dependencies. See [Twemoji source/attribution](https://github.com/twitter/twemoji) and [CC-BY-4.0](https://creativecommons.org/licenses/by/4.0/).
 
-The thirteen shipped file icons and avatars are original neutral artwork by Aigora contributors (MIT), reproducible from `scripts/generate-neutral-icons.py`; see [per-file provenance and hashes](docs/asset-provenance.md). Prior raster artwork was replaced because its input provenance could not be established. Hand-written decorative SVGs and named-theme palette data still require separate provenance review; the repository license alone does not establish third-party asset permissions.
+The thirteen shipped file icons and avatars are original neutral artwork by gopuda11 (MIT), reproducible from `scripts/generate-neutral-icons.py`; see [per-file provenance and hashes](docs/asset-provenance.md). Prior raster artwork was replaced because its input provenance could not be established. Hand-written decorative SVGs and named-theme palette data still require separate provenance review; the repository license alone does not establish third-party asset permissions.
 
 The console references named palettes (Ayu, Catppuccin, Dracula, Everforest, GitHub, Gruvbox, Monokai, Nord, One Dark/Light, Rosé Pine, Solarized, Tokyo Night). These names identify presets; source notices for the particular JSON palette values are missing. Aigora's MIT license does not establish those upstream projects' asset provenance.
 

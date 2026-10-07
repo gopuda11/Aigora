@@ -1,6 +1,6 @@
 # Building Aigora with AI
 
-Aigora is a portfolio project by **Aigora contributors**. Its development demonstrates how one human owner can direct AI agents, integrate their changes, investigate regressions and decide what is ready to ship. AI assistance does not remove the owner's responsibility for design, security, attribution or release decisions.
+Aigora is a portfolio project by **gopuda11**. Its development demonstrates how one human owner can direct AI agents, integrate their changes, investigate regressions and decide what is ready to ship. AI assistance does not remove the owner's responsibility for design, security, attribution or release decisions.
 
 ## Origin and contributions
 

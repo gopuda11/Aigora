@@ -1,6 +1,6 @@
 # Shipped icon provenance
 
-The thirteen file assets below are original neutral artwork created for this public release by Aigora contributors and licensed under the root MIT license. `scripts/generate-neutral-icons.py` is the complete source: fixed line geometry, colors, circles and system-font letter labels. Raster PNG and ICO bytes are generated with Python standard-library code; no upstream artwork, provider marks, fonts, copied bitmaps or external renderer are incorporated. Maskable icons keep the mark within the central safe area. Existing URLs and dimensions are preserved.
+The thirteen file assets below are original neutral artwork created for this public release by gopuda11 and licensed under the root MIT license. `scripts/generate-neutral-icons.py` is the complete source: fixed line geometry, colors, circles and system-font letter labels. Raster PNG and ICO bytes are generated with Python standard-library code; no upstream artwork, provider marks, fonts, copied bitmaps or external renderer are incorporated. Maskable icons keep the mark within the central safe area. Existing URLs and dimensions are preserved.
 
 History review: `ff385509` introduced the prior A mark and raster replacements, while `911e2d3a` introduced letter avatars and removed provider avatar bitmaps. Earlier raster icons were inherited from Clay/Clagentic. A commit alone does not establish the origin of raster inputs, so all thirteen file assets have been replaced by this reproducible source. The source tree does not redistribute the previous artwork.
 

@@ -43,8 +43,8 @@ if [ -e "$target" ] && [ -n "$(ls -A "$target" 2>/dev/null)" ]; then
 fi
 
 # Public history must not copy the private checkout's personal Git identity.
-name="Aigora contributors"
-email="noreply@users.noreply.github.com"
+name="gopuda11"
+email="gopuda11@users.noreply.github.com"
 
 mkdir -p "$target"
 git -C "$repo" archive HEAD | tar -x -C "$target"   # honours export-ignore in .gitattributes
@@ -55,7 +55,7 @@ node "$repo/scripts/check-public-safety.js" --root "$target" --config "$repo/scr
 cd "$target"
 git init -q -b main
 git add -A
-git -c user.name="Aigora contributors" -c user.email="$email" commit -q -m "Aigora: initial public release"
+git -c user.name="gopuda11" -c user.email="$email" commit -q -m "Aigora: initial public release"
 echo "export-public: committed $(git rev-parse --short HEAD) in $target (no remote configured, nothing pushed)"
 
 # The tree must pass the safety check before anyone publishes it.

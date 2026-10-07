@@ -1,10 +1,10 @@
 # Fork provenance
 
-Aigora is maintained by **Aigora contributors** and published at [Aigora contributors/Aigora](https://github.com/Aigora contributors/Aigora).
+Aigora is maintained by **gopuda11** and published at [gopuda11/Aigora](https://github.com/gopuda11/Aigora).
 
 The inherited code began as a fork of [Clagentic Console](https://github.com/clagentic/clagentic-console), itself based on [Clay](https://github.com/chadbyte/clay). Both are MIT-licensed. The recorded fork base is `349dbc27114a5f733ac140ac3ccac0b14805b555`.
 
-The complete MIT notice in [LICENSE](LICENSE), including the Clay and Clagentic Console copyright lines, must remain with substantial copies. Those upstream legal attribution names are not Aigora's maintainer identity. Aigora's own copyright is attributed only to Aigora contributors.
+The complete MIT notice in [LICENSE](LICENSE), including the Clay and Clagentic Console copyright lines, must remain with substantial copies. Those upstream legal attribution names are not Aigora's maintainer identity. Aigora's own copyright is attributed only to gopuda11.
 
 The public repository starts with a fresh history produced by `scripts/export-public.sh` because upstream history contained sensitive upstream material that must not be redistributed. Inherited commit authorship is not carried into that history; attribution remains here, in LICENSE and in [CREDITS.md](CREDITS.md). The separate private repository and deployment do not adopt this public branch's architecture.
 

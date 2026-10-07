@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Original neutral Aigora artwork, MIT, Aigora contributors.
+"""Original neutral Aigora artwork, MIT, gopuda11.
 No upstream image, font, provider logo or external renderer is used.
 Run with Python 3; --root can reproduce the assets in an empty review directory.
 """
