@@ -10,6 +10,21 @@ Owner: gopuda11
 
 gopuda11 directs AI agents with separate planning, implementation and review roles, then owns integration and release decisions. Aigora extends Clay and Clagentic with collaboration, private channels, routing and media workflows. [Building with AI](docs/BUILDING-WITH-AI.md) records the process, concrete regressions, owner-measured development figures and verification limits.
 
+## Screenshots
+
+Captured from a local demo instance with fictional users and a local Ollama model (`gemma4:12b`) answering through `@local`.
+
+![Room feed: members and a local AI share one chronological feed, with a highlighted @mention and a file card](media/screenshots/room-feed.png)
+
+| | |
+|---|---|
+| ![@ picker listing AI agents and room members](media/screenshots/mention-picker.png) | ![Comment thread under a pinned message](media/screenshots/thread-pins.png) |
+| **@ picker** — address an AI agent or a teammate from the same composer. | **Member comments** — threads under any message stay between people and are not sent to the AI; pins keep decisions visible. |
+| ![Private channel with its own sessions](media/screenshots/private-channel.png) | ![Korean interface in dark mode](media/screenshots/dark-ko.png) |
+| **Private channels** — personal sessions inside a room, visible only to the owner and the room admin. | **Korean / English, light / dark** — a local model answering in Korean. |
+| ![AI and routing settings](media/screenshots/admin-routing.png) | <img src="media/screenshots/mobile.png" alt="Phone layout of the room feed" width="260"> |
+| **Decision routing** — optional Clef/JEV routing, auto model selection and abstain threshold, set by admins. | **Phone layout** — Room/Channel switch and a touch composer; installable as a PWA. |
+
 ## Features
 
 ### Collaboration

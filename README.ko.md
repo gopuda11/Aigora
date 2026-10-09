@@ -10,6 +10,21 @@ Aⁱgora(아이 고라)는 직접 호스팅하는 협업 AI 작업 공간입니�
 
 **gopuda11**이 기획·구현·검토 역할을 나눈 AI 에이전트를 지휘하고, 통합과 릴리스의 최종 책임을 맡습니다. Clay와 Clagentic을 기반으로 협업 방, 비공개 채널, 라우팅과 미디어 기능을 확장했습니다. [AI 개발 과정](docs/BUILDING-WITH-AI.md)에 실제 회귀 수정 사례, 소유자 도구로 측정한 개발 수치와 검증 한계를 기록했습니다.
 
+## 화면
+
+가상의 사용자와 로컬 Ollama 모델(`gemma4:12b`, `@local`)로 구성한 데모 인스턴스에서 캡처했습니다.
+
+![방 피드: 조원과 로컬 AI가 하나의 시간순 피드를 공유하고, 나를 부른 멘션이 강조되며 파일 카드가 표시됩니다](media/screenshots/room-feed.png)
+
+| | |
+|---|---|
+| ![AI와 조원을 함께 보여 주는 @ 선택기](media/screenshots/mention-picker.png) | ![고정 메시지 아래의 댓글 스레드](media/screenshots/thread-pins.png) |
+| **@ 선택기** — 같은 입력창에서 AI 에이전트나 조원을 부릅니다. | **조원 댓글** — 메시지 아래 댓글은 사람끼리만 보고 AI에게 보내지 않습니다. 고정으로 결정 사항을 남깁니다. |
+| ![자체 세션을 가진 비공개 채널](media/screenshots/private-channel.png) | ![다크 모드의 한국어 화면](media/screenshots/dark-ko.png) |
+| **비공개 채널** — 방 안의 개인 세션. 본인과 방 관리자만 볼 수 있습니다. | **한국어/영어, 밝게/어둡게** — 로컬 모델의 한국어 답변. |
+| ![AI·라우팅 설정](media/screenshots/admin-routing.png) | <img src="media/screenshots/mobile.png" alt="휴대폰 방 피드" width="260"> |
+| **판단 라우팅** — 관리자가 켜는 Clef/JEV 라우팅, 자동 모델 선택, 보류 기준값. | **휴대폰 화면** — 방/채널 전환과 터치 입력창, PWA 설치 지원. |
+
 ## 주요 기능
 
 - 방 생성·초대·역할 관리·보관·복원, 공유 피드, 댓글·답글·반응·고정 메시지, 공유 게시물, 멤버 `@멘션`, 알림과 메시지 링크.
