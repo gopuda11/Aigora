@@ -31,7 +31,7 @@ Captured from a local demo instance with fictional users and a local Ollama mode
 
 - Rooms with a shared chronological feed, human messages, AI answers, visible run progress and file cards; room creation, renaming, descriptions, invitations, membership roles, archive/restore and deletion controls.
 - Private channels and sessions tied to their owner, folders/groups, rename/archive/restore/delete, personal conversation layouts and cross-vendor sessions. Room membership does not grant access to another person's private channel.
-- Shared posts, comments/replies, reactions, pins, read state and jump-to-message links; member `@mentions`, an AI/member picker and highlighted mentions of you.
+- Shared posts, comments/replies, pins, read state and jump-to-message links; member `@mentions`, an AI/member picker and highlighted mentions of you.
 - Presence, typing/activity indicators, direct messages and per-project sticky notes in the console.
 - Responsive desktop/phone navigation, installable PWA, reconnect recovery, cached views and drafts, scroll restoration and offline queued messages. Queued sends persist in the browser and are retried when connected; an offline browser cannot execute an agent.
 
